@@ -1,6 +1,7 @@
 # README Clew 2 - PRD
 
-**Version:** 1.0 (approved Oct 7, 2026)
+**Version:** 1.1 (Oct 7, 2026: adds M21 scan receipt and build usage report; Q2 resolved)
+**Changelog:** v1.0 approved Oct 7. v1.1 Oct 7: owner added M21 (Praxi Clew-style receipt). Successor projects confirmed allowed.
 **Owner:** La Shara Cordero
 **Hackathon:** AdaL "What Would Jev Do?" (Oct 6-11, 2026)
 **Repo:** `readme-clew-2` (new repo, all code written this week)
@@ -102,6 +103,7 @@ README Clew 2 is a rebuild from scratch that fixes both by changing who decides 
 | M18 | JSON export: "Download JSON" button saves the report object (3b) as a file. Built in the browser, nothing stored |
 | M19 | Status badge: `/api/badge?repo=owner/name` returns an SVG with the four counts. Embeddable in any README (section 3d) |
 | M20 | Social card: `/api/og?repo=owner/name` returns a 1200x630 PNG with repo name, counts, and the clew's mood. The `?repo=` page links use it as their preview image (section 3d) |
+| M21 | Scan receipt in every report, plus a build-week usage report of every real Jev and Haiku call (section 3e) |
 
 ### STUB (comment stubs with implementation notes, not built)
 
@@ -181,6 +183,8 @@ readme-clew-2/
     prefilter.js         rule-based decisions for obvious lines (section 3c)
     candidates.js        regex candidate finder per line
     report.js            builds the report object (section 3b), pure function
+    receipt.js           builds the scan receipt (section 3e), pure function
+    usage.js             counts calls, tokens, and cost per model during a run
     links.js             GitHub line links, pure function
     jev.js               Glasser -> Jev request/response, try/catch, timeout
     questions.js         builds the Jev question set from lines + candidates
@@ -244,7 +248,8 @@ The same report object feeds the popup, the live page, and the tests. `report.js
   "notes": { "summary": "string or null", "buckets": { "verified": "...", "unverifiable": "...", "missing": "...", "contradicted": "..." } },
   "mood": "calm | curious | worried | tangled",
   "tilt": true,
-  "meta": { "linesTotal": 120, "linesToJev": 38, "jevModel": "jev-1.13.0", "readmeTruncated": false, "ms": 2400 }
+  "meta": { "linesTotal": 120, "linesToJev": 38, "jevModel": "jev-1.13.0", "readmeTruncated": false, "ms": 2400 },
+  "receipt": { "...": "see section 3e" }
 }
 ```
 
@@ -315,6 +320,48 @@ Rules:
 - Each `?repo=` page sets `og:image` to `/api/og?repo=owner/name`, so pasting the link into LinkedIn or X shows the card.
 
 Image rendering library for the card is chosen in spike S6.
+
+---
+
+## 3e. Scan receipt and build usage report (M21)
+
+Modeled on Praxi Clew's `usage_report.md` and `trace`. The receipt records each scan. The usage report records the build week.
+
+### Scan receipt (inside every report, and in the JSON export)
+
+```json
+"receipt": {
+  "runId": "scan_7f3a91c2",
+  "scannedAt": "2026-10-09T18:22:04Z",
+  "repo": "owner/name",
+  "commit": "a1b2c3d",
+  "readmeSha256": "...",
+  "reportSha256": "...",
+  "lines": { "total": 120, "decidedByRule": 82, "decidedByJev": 38, "lowConfidence": 3 },
+  "calls": [
+    { "provider": "Glasser", "model": "jev-1.13.0", "calls": 1, "inputTokens": 4100, "estCostUsd": 0.0002 },
+    { "provider": "Anthropic", "model": "<haiku id>", "calls": 1, "inputTokens": 310, "outputTokens": 90, "status": "ok | timeout | skipped" }
+  ],
+  "stepsMs": { "github": 640, "rules": 12, "jev": 310, "verifiers": 25, "haiku": 1900 },
+  "architecture": "Rules and verifiers decide what's true. Jev labels lines. Haiku explains."
+}
+```
+
+Rules:
+
+- Built by `receipt.js` from counts code already has. No model writes any part of it.
+- `reportSha256` is the fingerprint of the report without the receipt, so anyone can re-check it from the JSON export.
+- Shown on the page as a collapsed "Receipt" panel under the footer, and in full in the JSON export.
+- Nothing is stored server-side (N2 holds). Badge and card requests produce a receipt but don't return it.
+- Costs are estimates from published per-token prices, labeled "est."
+
+### Build usage report (`evaluation/usage_report.md`)
+
+- Every real Jev and Haiku call made from the build machine (Block 2 onward: evals, live checks, demo recording) appends one line to `evaluation/usage-log.jsonl`: time, run id, purpose, model, calls, tokens, est. cost. Counts only, never content (N9).
+- `node tools/usage-report.js` turns the log into `evaluation/usage_report.md`: totals, per-model table, est. cost against the $11 Glasser balance, and the architecture note.
+- Spike calls (Block 0) are recorded by hand in LEDGER.md, since spike code isn't kept.
+- Production calls on Vercel are not logged (N2). The Glasser dashboard is the source for those, and the report says so.
+- AdaL's own session logs (HTML, one per session) are copied into `build-record/` as the record of how the code was built. AdaL's completion checks also use Jev; the build summary mentions it.
 
 ---
 
@@ -519,12 +566,12 @@ Each spike answers one yes/no question. Either answer ends it. Results go in LED
 | 0 | Spikes S1-S6 | discard (findings to LEDGER) | Spike |
 | 1 | `segment`, `candidates`, five verifiers, `buckets`, `gate`, `mood` on fixtures with mocked Jev answers. No network | promote | Working |
 | 2 | `jev.js` + `questions.js` via Glasser, swapped in for the mock | promote | Working |
-| 3 | `github.js` + `/api/scan` with validation, limits, timeouts, logging floor | promote | Full |
+| 3 | `github.js` + `/api/scan` with validation, limits, timeouts, logging floor, `receipt.js`, `usage.js` | promote | Full |
 | 4 | `summarize.js` (Haiku), fail-open | promote | Full |
 | 5 | Live page: render fixture JSON first, then wire to API. Mascot states. Deep links. Demo repo | promote | Full |
 | 6 | Extension popup, same render module | promote | Full |
 | 6b | JSON export, `/api/badge`, `/api/og`, `og:image` tags, badge copy snippet | promote | Full |
-| 7 | Bookmarklet, release ZIP, README (with its own badge), screenshots | promote | Full |
+| 7 | Bookmarklet, release ZIP, README (with its own badge), screenshots, `usage_report.md` generated, AdaL session logs in `build-record/` | promote | Full |
 | 8 | Demo video with AdaL Video Producer, screenshots | n/a | n/a |
 | 9 | Social post, build summary, submission form | n/a | n/a |
 | 10 | STRETCH X1, only if the done line is already met and submission is sent | promote | Full |
@@ -558,6 +605,8 @@ All CI tests run offline: no Glasser, no Anthropic, no GitHub. Jev answers come 
 | `badge-svg.js` | Counts render. Output is valid SVG. No input text reaches the SVG unescaped |
 | `og-card.js` | Each mood gives a layout. A repo name at max length still fits |
 | `export.js` | Downloaded JSON equals the report object exactly |
+| `receipt.js` | Line counts add up (rule + Jev = total). `reportSha256` matches a re-hash of the report. No README text in the receipt |
+| `usage.js` | Totals equal the sum of logged calls. Log lines contain no content fields |
 
 ### Fixture tests (Block 1 onward)
 
@@ -616,14 +665,15 @@ Runs the whole pipeline on every fixture, twice:
 
 | Tool | Use | Check |
 |---|---|---|
-| AdaL desktop app (Preview) | Builds everything. `@PRD.md` + AGENTS.md for context | Engineer mode is CLI-only; not used |
+| AdaL desktop app (Preview) | Builds everything. `@PRD.md` + AGENTS.md (read every turn) for context | Confirmed running on Windows Oct 7. Engineer mode is CLI-only; not used. Image paste doesn't work on Windows; use `@file` |
 | Jev (pinned jev-1.13.0, via Glasser) | Line labels, name picks | Pinned so labels don't shift mid-week |
 | AdaL Video Producer | Demo video | Built into AdaL, loads on request |
 | Glasser | Paid access to Jev, $11 credit | Also eligible for "Best use of Glasser" |
 | Claude Haiku 4.5 | Summary | Confirm model id is current before Block 4 |
 | Vercel (Hobby) | Live page + function | 300 s max duration, 2 GB memory |
 | Chrome MV3 | Extension | Current extension platform |
-| TypeSafe agent skill | Teaches AdaL Jev patterns | Load via `@skills:gh:typesafe-ai/skills/skills/typesafe-ai` |
+| TypeSafe agent skill | Teaches AdaL Jev patterns | Try `@skills:gh:typesafe-ai/skills/skills/typesafe-ai`. Not in AdaL's docs, so fallback: copy SKILL.md into `.adal/skills/typesafe-ai/` |
+| record-demo-video skill | Captures screen recordings of the live app with Playwright | AdaL Video Producer needs footage supplied; it doesn't record the screen |
 
 ---
 
@@ -643,6 +693,6 @@ Runs the whole pipeline on every fixture, twice:
 | # | Question | Who | Blocks |
 |---|---|---|---|
 | Q1 | What does "Workflows or Sandboxes" mean in the build summary? | AdaL Discord | Submission |
-| Q2 | Is a successor to an earlier project allowed if all code is new? | AdaL Discord | Submission |
+| Q2 | ~~Is a successor to an earlier project allowed if all code is new?~~ Resolved Oct 7: yes | AdaL Discord | Done |
 | Q3 | ~~Carry over badge / social cards / JSON export?~~ Resolved Oct 7: all three are MUST, built new | Owner | Done |
 | Q4 | Exact Glasser request format for Jev | Spike S1 | Block 2 |
