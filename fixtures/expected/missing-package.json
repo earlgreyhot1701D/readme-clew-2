@@ -1,0 +1,19 @@
+{
+  "repo": { "owner": "fixture", "name": "missing-package", "readmePath": "README.md" },
+  "counts": { "verified": 1, "unverifiable": 0, "missing": 1, "contradicted": 0 },
+  "findings": [
+    { "id": "f-01", "bucket": "missing", "claimType": "dependency", "line": null, "quote": null, "name": "lodash",
+      "evidence": { "file": "src/index.js", "detail": "src/index.js imports lodash (dependencies has it); the README never mentions it" },
+      "decidedBy": "rule", "confidence": null, "lowConfidence": false, "verifier": "coverage",
+      "link": null },
+    { "id": "f-02", "bucket": "verified", "claimType": "dependency", "line": 3, "quote": "Built with Express.", "name": "express",
+      "evidence": { "file": "package.json", "detail": "dependencies has express" },
+      "decidedBy": "jev", "confidence": 0.97, "lowConfidence": false, "verifier": "dependencies",
+      "link": "https://github.com/fixture/missing-package/blob/HEAD/README.md?plain=1#L3" }
+  ],
+  "notes": null,
+  "mood": "worried",
+  "tilt": false,
+  "meta": { "jevModel": "jev-1.13.0", "readmeTruncated": false, "linesTotal": 3, "linesToJev": 1, "ms": 0 },
+  "receipt": null
+}

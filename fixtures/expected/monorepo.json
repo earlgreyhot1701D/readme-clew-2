@@ -1,0 +1,27 @@
+{
+  "repo": { "owner": "fixture", "name": "monorepo", "readmePath": "README.md" },
+  "counts": { "verified": 3, "unverifiable": 0, "missing": 1, "contradicted": 0 },
+  "findings": [
+    { "id": "f-01", "bucket": "missing", "claimType": "dependency", "line": null, "quote": null, "name": "fastify",
+      "evidence": { "file": "packages/api/src/server.js", "detail": "packages/api/src/server.js imports fastify (dependencies has it); the README never mentions it" },
+      "decidedBy": "rule", "confidence": null, "lowConfidence": false, "verifier": "coverage",
+      "link": null },
+    { "id": "f-02", "bucket": "verified", "claimType": "dependency", "line": 3, "quote": "Uses React for the web app.", "name": "react",
+      "evidence": { "file": "packages/web/package.json", "detail": "dependencies has react" },
+      "decidedBy": "jev", "confidence": 0.97, "lowConfidence": false, "verifier": "dependencies",
+      "link": "https://github.com/fixture/monorepo/blob/HEAD/README.md?plain=1#L3" },
+    { "id": "f-03", "bucket": "verified", "claimType": "command", "line": 5, "quote": "Run `npm run dev` to start the web app.", "name": "npm run dev",
+      "evidence": { "file": "packages/web/package.json", "detail": "scripts has dev" },
+      "decidedBy": "jev", "confidence": 0.96, "lowConfidence": false, "verifier": "commands",
+      "link": "https://github.com/fixture/monorepo/blob/HEAD/README.md?plain=1#L5" },
+    { "id": "f-04", "bucket": "verified", "claimType": "command", "line": 7, "quote": "Run `npm run build` to build everything.", "name": "npm run build",
+      "evidence": { "file": "package.json", "detail": "scripts has build" },
+      "decidedBy": "jev", "confidence": 0.96, "lowConfidence": false, "verifier": "commands",
+      "link": "https://github.com/fixture/monorepo/blob/HEAD/README.md?plain=1#L7" }
+  ],
+  "notes": null,
+  "mood": "worried",
+  "tilt": false,
+  "meta": { "jevModel": "jev-1.13.0", "readmeTruncated": false, "linesTotal": 7, "linesToJev": 3, "ms": 0 },
+  "receipt": null
+}

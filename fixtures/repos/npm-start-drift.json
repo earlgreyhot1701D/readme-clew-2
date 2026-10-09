@@ -1,0 +1,6 @@
+{
+  "pkg": { "name": "drift-demo", "scripts": { "start:prod": "node dist/server.js", "dev": "node --watch src/index.js" } },
+  "workspaces": [],
+  "files": ["package.json", "README.md", "src/index.js"],
+  "sources": { "src/index.js": "console.log('hello');\n" }
+}

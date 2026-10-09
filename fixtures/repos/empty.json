@@ -1,0 +1,6 @@
+{
+  "pkg": { "name": "empty" },
+  "workspaces": [],
+  "files": ["package.json"],
+  "sources": {}
+}

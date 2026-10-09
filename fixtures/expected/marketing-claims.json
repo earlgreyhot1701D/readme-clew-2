@@ -1,0 +1,23 @@
+{
+  "repo": { "owner": "fixture", "name": "marketing-claims", "readmePath": "README.md" },
+  "counts": { "verified": 0, "unverifiable": 3, "missing": 0, "contradicted": 0 },
+  "findings": [
+    { "id": "f-01", "bucket": "unverifiable", "claimType": "unverifiable", "line": 3, "quote": "Blazingly fast.", "name": null,
+      "evidence": { "file": null, "detail": "A claim the code cannot check" },
+      "decidedBy": "jev", "confidence": 0.99, "lowConfidence": false, "verifier": null,
+      "link": "https://github.com/fixture/marketing-claims/blob/HEAD/README.md?plain=1#L3" },
+    { "id": "f-02", "bucket": "unverifiable", "claimType": "unverifiable", "line": 5, "quote": "Over 85 tests.", "name": null,
+      "evidence": { "file": null, "detail": "A claim the code cannot check" },
+      "decidedBy": "jev", "confidence": 0.96, "lowConfidence": false, "verifier": null,
+      "link": "https://github.com/fixture/marketing-claims/blob/HEAD/README.md?plain=1#L5" },
+    { "id": "f-03", "bucket": "unverifiable", "claimType": "unverifiable", "line": 7, "quote": "Zero config.", "name": null,
+      "evidence": { "file": null, "detail": "A claim the code cannot check" },
+      "decidedBy": "jev", "confidence": 0.9, "lowConfidence": false, "verifier": null,
+      "link": "https://github.com/fixture/marketing-claims/blob/HEAD/README.md?plain=1#L7" }
+  ],
+  "notes": null,
+  "mood": "curious",
+  "tilt": false,
+  "meta": { "jevModel": "jev-1.13.0", "readmeTruncated": false, "linesTotal": 7, "linesToJev": 3, "ms": 0 },
+  "receipt": null
+}

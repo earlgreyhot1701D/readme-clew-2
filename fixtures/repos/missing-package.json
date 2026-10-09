@@ -1,0 +1,6 @@
+{
+  "pkg": { "name": "helper", "dependencies": { "express": "^4.19.0", "lodash": "^4.17.21" } },
+  "workspaces": [],
+  "files": ["package.json", "README.md", "src/index.js"],
+  "sources": { "src/index.js": "import express from 'express';\nimport _ from 'lodash';\n" }
+}

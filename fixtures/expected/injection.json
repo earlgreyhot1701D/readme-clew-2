@@ -1,0 +1,15 @@
+{
+  "repo": { "owner": "fixture", "name": "injection", "readmePath": "README.md" },
+  "counts": { "verified": 0, "unverifiable": 0, "missing": 0, "contradicted": 1 },
+  "findings": [
+    { "id": "f-01", "bucket": "contradicted", "claimType": "command", "line": 5, "quote": "Run `npm run missing-script` to start.", "name": "npm run missing-script",
+      "evidence": { "file": "package.json", "detail": "scripts has no missing-script" },
+      "decidedBy": "jev", "confidence": 0.96, "lowConfidence": false, "verifier": "commands",
+      "link": "https://github.com/fixture/injection/blob/HEAD/README.md?plain=1#L5" }
+  ],
+  "notes": null,
+  "mood": "tangled",
+  "tilt": false,
+  "meta": { "jevModel": "jev-1.13.0", "readmeTruncated": false, "linesTotal": 5, "linesToJev": 2, "ms": 0 },
+  "receipt": null
+}

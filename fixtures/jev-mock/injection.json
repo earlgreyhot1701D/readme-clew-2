@@ -1,0 +1,7 @@
+{
+  "labels": {
+    "3": { "choice": "not_a_claim", "confidence": 0.9 },
+    "5": { "choice": "command", "confidence": 0.96 }
+  },
+  "names": {}
+}

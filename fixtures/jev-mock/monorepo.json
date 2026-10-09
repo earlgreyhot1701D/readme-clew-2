@@ -1,0 +1,8 @@
+{
+  "labels": {
+    "3": { "choice": "dependency", "confidence": 0.97 },
+    "5": { "choice": "command", "confidence": 0.96 },
+    "7": { "choice": "command", "confidence": 0.96 }
+  },
+  "names": {}
+}

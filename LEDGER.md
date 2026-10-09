@@ -143,3 +143,48 @@ Library check done before the fold (Oct 8, 2026):
 ### Open items
 
 - S2 used 10 easy hand-written lines. Re-run on real READMEs and harder lines when the Block 2 golden set exists.
+
+## Block 1: rules, candidates, verifiers, buckets on fixtures (Working tier)
+
+Oct 8, 2026. No network, no Jev calls. 102 tests pass offline.
+
+### Known limits (owner asked for the first two to be logged)
+
+1. **One name per line.** A finding carries one `name`. "Built with Express and better-sqlite3" has two candidates, so Jev must pick one (PRD 4.2), and only that package is verified. The other is not checked. With no pick, the claim is Unverifiable.
+2. **Coverage is packages only.** `verifiers/coverage.js` finds packages that code imports and the README never mentions. It does not find env vars that code reads, or scripts, that the README skips. Stub comment is in the file.
+3. **Candidate finder is heuristic.** Package names come from backticks, cue phrases ("built with", "uses", "powered by", and a few more), and words in parentheses. A parenthesized word like "(optional)" becomes the package candidate "optional". If Jev labels that line `dependency` at high confidence, the verifier can report Contradicted. The gate only catches low-confidence labels. Needs a look in Block 2.
+4. **Env var tokens need an underscore.** `PORT` alone is not a pre-filter env var (so `README` or `JSON` do not trigger it). A line about `PORT` goes to Jev, gets no name candidate, and ends up Unverifiable.
+5. **Pre-filter limits.** HTML comments spanning several lines are not detected. Indented (4-space) code blocks are not treated as fences. Only ``` and ~~~ fences count.
+6. **External URLs are always Unverifiable.** `npx some-tool` is Unverifiable unless the package is declared. Verifiers never touch the network.
+7. **Import detection is regex-based.** It reads `import ... from`, `import()`, and `require()` with string literals. Dynamic specifiers built from variables are not seen.
+8. **Name-pick path is only tested inline.** Every fixture's mock has `names: {}`, because no fixture line has two candidates. The pick logic is covered by tests in `tests/gate.test.js`, not by a fixture.
+9. **Jev label drift (S3) is not modeled.** Mocks are fixed. Block 2 live checks have to allow for a few lines changing.
+
+### Decisions and deviations
+
+- **Fence marker lines** (` ``` ` and `~~~`) are decided `not_a_claim` by the pre-filter. PRD 3c has no row for them; without a rule they would go to Jev. PRD 3c should get a row. I did not edit PRD.md.
+- **"One Verified, one Contradicted, one Missing per verifier" (PRD 9b):** only `coverage.js` can return Missing. The other four verifiers got Verified, Contradicted, and an Unverifiable case instead (no name, external URL, no package.json). `coverage.js` got Missing, clean, and an edge case.
+- **Gate scope** follows PRD v1.2: only Jev's verifier-bound labels are gated. When Jev also picks a name, the gate uses the lower of the label and pick confidences, and the finding is marked `decidedBy: jev`. The threshold is 0.7, marked PROVISIONAL in `lib/gate.js`.
+- **Mood:** "mostly Unverifiable" means at least half of the findings. Empty report is calm.
+- **`npm start` with no start script** is Verified only if `server.js` is in the tree (npm's own fallback).
+- **Monorepo:** scripts and dependencies are looked up in the root and in each workspace `package.json`.
+- **Expected reports** in `fixtures/expected/` were written by hand from what each fixture is meant to show, then compared with the pipeline output. They are golden files, so they would also pin a wrong behavior if I misjudged it. The explicit assertions in `tests/fixtures.test.js` (headline cases) are written in code, not copied from output.
+- **`report.js`** leaves `notes: null` (Block 4) and `receipt: null` (Block 3). `meta.ms` is passed in; tests use 0.
+- **`tests/helpers.js`** is not in the approved file list. It is a 32-line fixture loader that three test files share.
+- **Missing findings** use `line: null`, `quote: null`, `link: null` (PRD 3b says "no line or link").
+
+### Tests shown failing (AGENTS.md rule)
+
+Method: break one line of source code, run the suite, read which tests go red, restore, confirm green. Three rounds, 75 deliberate breaks across all 14 `lib/` files.
+- Round 1: 14 breaks (one per source file). 48 tests went red, at least one in every test file.
+- Round 2: about 55 breaks aimed at the remaining tests. 82 tests went red.
+- Round 3: 7 breaks for the tests still green or masked. Test 65 (relative link inside a sentence) needed two breaks to its regex (start and end anchors). Test 66 (fence marker) had been hidden by another break in round 2, so it got its own.
+- `tests/file-size.test.js` was shown red earlier with a temporary file in `lib/` (218 lines, over the cap), then the file was deleted.
+- Result: all 102 tests went red at least once. After each round every break was restored and the suite was green at 102 of 102.
+- Weak spots: some fixture tests went red together with others on every break (they compare whole reports). That shows they are sensitive, not that they test one thing.
+
+### Wrong turns
+
+- First attempt to run a review script with `node -e` lost its quotes in PowerShell. Switched to a small script file, deleted afterwards (`tests/_review.js`).
+- My first temporary oversize file had 218 lines, not 201. Still over the cap, so the demonstration holds.
+- Fixed one detail in `candidates.js` before testing: backticked names with capitals (`Express`) were being rejected as package names.

@@ -1,0 +1,6 @@
+{
+  "pkg": { "name": "stack", "devDependencies": { "vite": "^5.4.0" } },
+  "workspaces": [],
+  "files": ["package.json", "README.md"],
+  "sources": {}
+}

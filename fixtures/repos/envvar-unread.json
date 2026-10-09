@@ -1,0 +1,6 @@
+{
+  "pkg": { "name": "config-demo" },
+  "workspaces": [],
+  "files": ["package.json", "README.md", "src/index.js"],
+  "sources": { "src/index.js": "const level = process.env.LOG_LEVEL || 'info';\nconst port = process.env.PORT;\n" }
+}

@@ -1,0 +1,6 @@
+{
+  "pkg": { "name": "clean-tool", "scripts": { "build": "node build.js", "start": "node src/index.js" }, "dependencies": { "express": "^4.19.0" } },
+  "workspaces": [],
+  "files": ["package.json", "README.md", "LICENSE", "build.js", "src/index.js"],
+  "sources": { "src/index.js": "import express from 'express';\nconst key = process.env.API_KEY;\n" }
+}

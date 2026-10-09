@@ -1,0 +1,8 @@
+{
+  "labels": {
+    "3": { "choice": "unverifiable", "confidence": 0.99 },
+    "5": { "choice": "unverifiable", "confidence": 0.96 },
+    "7": { "choice": "unverifiable", "confidence": 0.9 }
+  },
+  "names": {}
+}

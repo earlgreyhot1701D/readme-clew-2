@@ -1,0 +1,6 @@
+{
+  "pkg": { "name": "speedy" },
+  "workspaces": [],
+  "files": ["package.json", "README.md"],
+  "sources": {}
+}

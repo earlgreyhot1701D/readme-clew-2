@@ -1,0 +1,19 @@
+{
+  "repo": { "owner": "fixture", "name": "frontend-vite", "readmePath": "README.md" },
+  "counts": { "verified": 1, "unverifiable": 1, "missing": 0, "contradicted": 0 },
+  "findings": [
+    { "id": "f-01", "bucket": "unverifiable", "claimType": "dependency", "line": 5, "quote": "We also use Webpack for bundling.", "name": "webpack",
+      "evidence": { "file": null, "detail": "Jev wasn't sure (confidence 0.5)" },
+      "decidedBy": "jev", "confidence": 0.5, "lowConfidence": true, "verifier": null,
+      "link": "https://github.com/fixture/frontend-vite/blob/HEAD/README.md?plain=1#L5" },
+    { "id": "f-02", "bucket": "verified", "claimType": "dependency", "line": 3, "quote": "Frontend (Vite)", "name": "vite",
+      "evidence": { "file": "package.json", "detail": "devDependencies has vite" },
+      "decidedBy": "jev", "confidence": 0.95, "lowConfidence": false, "verifier": "dependencies",
+      "link": "https://github.com/fixture/frontend-vite/blob/HEAD/README.md?plain=1#L3" }
+  ],
+  "notes": null,
+  "mood": "curious",
+  "tilt": true,
+  "meta": { "jevModel": "jev-1.13.0", "readmeTruncated": false, "linesTotal": 5, "linesToJev": 2, "ms": 0 },
+  "receipt": null
+}

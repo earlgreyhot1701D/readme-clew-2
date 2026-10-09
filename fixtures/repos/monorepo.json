@@ -1,0 +1,12 @@
+{
+  "pkg": { "name": "mono", "private": true, "workspaces": ["packages/*"], "scripts": { "build": "npm run build --workspaces" } },
+  "workspaces": [
+    { "path": "packages/web", "pkg": { "name": "web", "scripts": { "dev": "vite" }, "dependencies": { "react": "^18.3.0" } } },
+    { "path": "packages/api", "pkg": { "name": "api", "dependencies": { "fastify": "^4.28.0" } } }
+  ],
+  "files": ["package.json", "README.md", "packages/web/package.json", "packages/web/src/main.jsx", "packages/api/package.json", "packages/api/src/server.js"],
+  "sources": {
+    "packages/web/src/main.jsx": "import React from 'react';\n",
+    "packages/api/src/server.js": "import Fastify from 'fastify';\n"
+  }
+}

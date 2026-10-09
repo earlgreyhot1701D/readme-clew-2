@@ -1,0 +1,6 @@
+{
+  "pkg": { "name": "notes", "scripts": { "start": "node index.js" } },
+  "workspaces": [],
+  "files": ["package.json", "README.md", "index.js"],
+  "sources": { "index.js": "console.log('notes');\n" }
+}

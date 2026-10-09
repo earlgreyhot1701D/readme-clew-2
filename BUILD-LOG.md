@@ -27,6 +27,22 @@ Oct 8, 2026
 19. Owner closed Block 0 early to save time. S4 folds into Block 6, S6 into Block 6b (`@vercel/og` 1.0.3 approved for 6b only; if it fails the card becomes a STUB). Recorded both in LEDGER.md as "folded, not run", reason: time.
 20. Deleted `spike/` entirely, as the owner asked. Kept `LICENSE`, `LEDGER.md`, `BUILD-LOG.md`. Block 0 closed.
 
+## Block 1: rules, candidates, verifiers, buckets on fixtures (Working tier)
+
+Oct 8, 2026
+
+1. Re-read AGENTS.md (200-line cap) and PRD v1.2 (sections 3, 3b, 3c, 3e, 4, 5, 9, 9b).
+2. Committed Block 0 (PRD.md, AGENTS.md, LICENSE, LEDGER.md, BUILD-LOG.md), message "Block 0 closed; PRD v1.2; AGENTS.md file size cap". Pushed to `main` (59ba5c9..b940b17).
+3. First file: `tests/file-size.test.js`, plus `package.json` (type module, `npm test` = `node --test`, no dependencies). Showed the size test failing with a temporary 218-line file in `lib/`, deleted the file, test green.
+4. Wrote `lib/`: `segment`, `prefilter`, `candidates`, `gate` (0.7, PROVISIONAL), `links`, `mood`, `buckets`, `report`, `pipeline`, and `verifiers/` (`dependencies`, `commands`, `envvars`, `references`, `coverage`). No file near the cap.
+5. Wrote 10 fixtures, each with a README, a repo snapshot (`fixtures/repos/`), mocked Jev answers (`fixtures/jev-mock/`), and a hand-written expected report (`fixtures/expected/`): clean-minimal, npm-start-drift, frontend-vite, envvar-unread, missing-package, marketing-claims, empty, no-claims, monorepo, injection.
+6. Ran every fixture and checked the output against what each one is meant to show before writing the expected files.
+7. Wrote `tests/`: file-size, segment, prefilter, candidates, gate (with name-pick tests), verifiers, buckets, mood, links, report, fixtures, plus `helpers.js`. 102 tests, all pass.
+8. Showed every test failing at least once: three rounds of deliberate one-line breaks (75 in total), restoring after each round. Details in LEDGER.md.
+9. Logged known limits, deviations, and decisions in LEDGER.md. Stopped at the Block 1 QA checkpoint.
+
+Not touched: `PRD.md`, `AGENTS.md`, anything outside the approved file list. `README.md` appeared in the working tree during this block. I did not create it.
+
 ## Files added in Block 0 (all of `spike/` deleted at step 20) (spike code, to be discarded after the owner OKs it)
 
 - `spike/_env.mjs`, `spike/_peek-openapi.mjs`

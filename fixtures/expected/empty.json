@@ -1,0 +1,10 @@
+{
+  "repo": { "owner": "fixture", "name": "empty", "readmePath": "README.md" },
+  "counts": { "verified": 0, "unverifiable": 0, "missing": 0, "contradicted": 0 },
+  "findings": [],
+  "notes": null,
+  "mood": "calm",
+  "tilt": false,
+  "meta": { "jevModel": "jev-1.13.0", "readmeTruncated": false, "linesTotal": 0, "linesToJev": 0, "ms": 0 },
+  "receipt": null
+}

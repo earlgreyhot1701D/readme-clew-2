@@ -1,0 +1,6 @@
+{
+  "pkg": { "name": "my-notes" },
+  "workspaces": [],
+  "files": ["package.json", "README.md"],
+  "sources": {}
+}

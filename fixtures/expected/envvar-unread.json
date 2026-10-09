@@ -1,0 +1,19 @@
+{
+  "repo": { "owner": "fixture", "name": "envvar-unread", "readmePath": "README.md" },
+  "counts": { "verified": 1, "unverifiable": 0, "missing": 0, "contradicted": 1 },
+  "findings": [
+    { "id": "f-01", "bucket": "contradicted", "claimType": "env_var", "line": 3, "quote": "Set `DATABASE_URL` to your database.", "name": "DATABASE_URL",
+      "evidence": { "file": null, "detail": "No source file reads DATABASE_URL (1 files checked)" },
+      "decidedBy": "rule", "confidence": null, "lowConfidence": false, "verifier": "envvars",
+      "link": "https://github.com/fixture/envvar-unread/blob/HEAD/README.md?plain=1#L3" },
+    { "id": "f-02", "bucket": "verified", "claimType": "env_var", "line": 5, "quote": "Set `LOG_LEVEL` to change logging.", "name": "LOG_LEVEL",
+      "evidence": { "file": "src/index.js", "detail": "src/index.js reads LOG_LEVEL" },
+      "decidedBy": "rule", "confidence": null, "lowConfidence": false, "verifier": "envvars",
+      "link": "https://github.com/fixture/envvar-unread/blob/HEAD/README.md?plain=1#L5" }
+  ],
+  "notes": null,
+  "mood": "tangled",
+  "tilt": false,
+  "meta": { "jevModel": "jev-1.13.0", "readmeTruncated": false, "linesTotal": 5, "linesToJev": 0, "ms": 0 },
+  "receipt": null
+}

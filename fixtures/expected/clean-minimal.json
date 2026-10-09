@@ -1,0 +1,31 @@
+{
+  "repo": { "owner": "fixture", "name": "clean-minimal", "readmePath": "README.md" },
+  "counts": { "verified": 5, "unverifiable": 0, "missing": 0, "contradicted": 0 },
+  "findings": [
+    { "id": "f-01", "bucket": "verified", "claimType": "command", "line": 8, "quote": "npm install", "name": "npm install",
+      "evidence": { "file": null, "detail": "npm install is a built-in command" },
+      "decidedBy": "rule", "confidence": null, "lowConfidence": false, "verifier": "commands",
+      "link": "https://github.com/fixture/clean-minimal/blob/HEAD/README.md?plain=1#L8" },
+    { "id": "f-02", "bucket": "verified", "claimType": "command", "line": 9, "quote": "npm run build", "name": "npm run build",
+      "evidence": { "file": "package.json", "detail": "scripts has build" },
+      "decidedBy": "rule", "confidence": null, "lowConfidence": false, "verifier": "commands",
+      "link": "https://github.com/fixture/clean-minimal/blob/HEAD/README.md?plain=1#L9" },
+    { "id": "f-03", "bucket": "verified", "claimType": "dependency", "line": 12, "quote": "Built with Express.", "name": "express",
+      "evidence": { "file": "package.json", "detail": "dependencies has express" },
+      "decidedBy": "jev", "confidence": 0.98, "lowConfidence": false, "verifier": "dependencies",
+      "link": "https://github.com/fixture/clean-minimal/blob/HEAD/README.md?plain=1#L12" },
+    { "id": "f-04", "bucket": "verified", "claimType": "env_var", "line": 14, "quote": "Set `API_KEY` before you start it.", "name": "API_KEY",
+      "evidence": { "file": "src/index.js", "detail": "src/index.js reads API_KEY" },
+      "decidedBy": "rule", "confidence": null, "lowConfidence": false, "verifier": "envvars",
+      "link": "https://github.com/fixture/clean-minimal/blob/HEAD/README.md?plain=1#L14" },
+    { "id": "f-05", "bucket": "verified", "claimType": "file_or_url", "line": 16, "quote": "Terms are in [LICENSE](./LICENSE).", "name": "./LICENSE",
+      "evidence": { "file": "LICENSE", "detail": "path exists in the repo" },
+      "decidedBy": "jev", "confidence": 0.97, "lowConfidence": false, "verifier": "references",
+      "link": "https://github.com/fixture/clean-minimal/blob/HEAD/README.md?plain=1#L16" }
+  ],
+  "notes": null,
+  "mood": "calm",
+  "tilt": false,
+  "meta": { "jevModel": "jev-1.13.0", "readmeTruncated": false, "linesTotal": 16, "linesToJev": 3, "ms": 0 },
+  "receipt": null
+}
