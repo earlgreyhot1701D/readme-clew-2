@@ -1,7 +1,7 @@
 # README Clew 2 - PRD
 
-**Version:** 1.1 (Oct 7, 2026: adds M21 scan receipt and build usage report; Q2 resolved)
-**Changelog:** v1.0 approved Oct 7. v1.1 Oct 7: owner added M21 (Praxi Clew-style receipt). Successor projects confirmed allowed.
+**Version:** 1.2 (Oct 8, 2026: Block 0 spike results applied)
+**Changelog:** v1.0 approved Oct 7. v1.1 Oct 7: owner added M21 (Praxi Clew-style receipt). Successor projects confirmed allowed. v1.2 Oct 8: spike results (LEDGER.md, Block 0). Glasser caps a call at 100 questions, so Jev runs in batches. Pinning the model does not guarantee identical labels. Gate threshold moves to Block 2 and applies only to verifier-bound labels. Vercel Hobby rate rule confirmed. Q4 resolved.
 **Owner:** La Shara Cordero
 **Hackathon:** AdaL "What Would Jev Do?" (Oct 6-11, 2026)
 **Repo:** `readme-clew-2` (new repo, all code written this week)
@@ -70,7 +70,7 @@ README Clew 2 is a rebuild from scratch that fixes both by changing who decides 
 | Low certainty | Not reported | Low-confidence calls go to Unverifiable, never Contradicted |
 | Summary | Claude Sonnet | Claude Haiku, from structured findings only |
 | Form | Web page | Chrome extension + web page + bookmarklet |
-| Speed | 10-20 s | Target: a few seconds (confirmed in spike S3) |
+| Speed | 10-20 s | About 1.4 s of Jev time for a 283-line README, in 3 batches (spike S3) |
 
 **Who it's for:** self-taught and AI-assisted builders who want to check their own receipts before someone else does. Also hackathon judges, who read a lot of READMEs.
 
@@ -113,7 +113,7 @@ README Clew 2 is a rebuild from scratch that fixes both by changing who decides 
 | S2 | Python and Go repos | New candidate patterns + verifiers per language |
 | S3 | Firefox | Unlisted self-signed add-on |
 | S5 | Glasser fallback to OpenRouter's Jev | Only if Glasser goes down mid-week |
-| S6 | Auto-tuned confidence threshold | v2 uses one fixed threshold set in spike S2 |
+| S6 | Auto-tuned confidence threshold | v2 uses one fixed threshold set in Block 2 |
 
 ### STRETCH
 
@@ -156,10 +156,12 @@ README Clew 2 is a rebuild from scratch that fixes both by changing who decides 
          2b. prefilter.js  │  obvious lines decided by rules, never sent to Jev (code)
          3. candidates.js  │  per line: backticked commands, package-like tokens,
                            │  UPPER_SNAKE env vars, paths, URLs (code, regex)
-         4. jev.js         │  ONE batched call via Glasser:
+         4. jev.js         │  batched calls via Glasser, max 100 questions per call
+                           │  (Glasser limit; about 3 calls for a 283-line README):
                            │    per line  -> Choice: claim type
                            │    per multi-candidate line -> Choice: which name
-         5. gate.js        │  confidence < threshold -> Unverifiable ("low confidence")
+         5. gate.js        │  verifier-bound labels below threshold -> Unverifiable
+                           │  ("low confidence")
          6. verifiers/     │  five deterministic checks -> buckets
          7. summarize.js   │  Haiku: counts + types + validated names only.
                            │  9 s timeout, fail-open
@@ -294,8 +296,9 @@ Rules decide the obvious lines first. Jev only sees what rules can't settle. Sam
 
 Also deterministic:
 
-- **Model pinned** to `jev-1.13.0`, not `jev-latest`, so the same README gets the same labels all week. Recorded in `meta.jevModel`.
-- **Threshold** is one fixed number set in spike S2, stored in `gate.js`.
+- **Model pinned** to `jev-1.13.0`, not `jev-latest`, so the model can't change mid-week. Recorded in `meta.jevModel`. Pinning does not make labels identical: spike S3 saw 4 to 5 of 283 lines change label between two identical runs. Tests use mocked Jev answers, so CI stays deterministic; live checks allow for small drift.
+- **Threshold** is one fixed number stored in `gate.js`. Block 1 uses a provisional 0.7, marked PROVISIONAL. The final value is set in Block 2.
+- **The gate applies only to verifier-bound labels:** `dependency`, `command`, `env_var`, `file_or_url`. Wavering between `not_a_claim` and `unverifiable` can't produce Contradicted, so it isn't gated. Block 2 measures confidence on verifier-bound lines only, after the 3c pre-filter.
 - **Line links** built by code from owner, repo, path, and line number.
 
 ---
@@ -312,7 +315,7 @@ v1 kept the last 50 scans in server memory to feed its badge and cards. v2 has n
 
 Rules:
 
-- Badge and card never call Haiku. One Jev call per cache miss, same limits as a scan.
+- Badge and card never call Haiku. One scan's worth of Jev calls per cache miss, same limits as a scan.
 - Badge and card share `pipeline.js` with the scan, so the counts always match what the page shows.
 - If a scan fails, the badge says "scan failed" and the card shows the clew with no counts. Never a broken image.
 - Badge embed snippet is shown on the report page with a Copy button:
@@ -339,7 +342,7 @@ Modeled on Praxi Clew's `usage_report.md` and `trace`. The receipt records each 
   "reportSha256": "...",
   "lines": { "total": 120, "decidedByRule": 82, "decidedByJev": 38, "lowConfidence": 3 },
   "calls": [
-    { "provider": "Glasser", "model": "jev-1.13.0", "calls": 1, "inputTokens": 4100, "estCostUsd": 0.0002 },
+    { "provider": "Glasser", "model": "jev-1.13.0", "calls": 3, "inputTokens": 52000, "costUsd": "0.0024" },
     { "provider": "Anthropic", "model": "<haiku id>", "calls": 1, "inputTokens": 310, "outputTokens": 90, "status": "ok | timeout | skipped" }
   ],
   "stepsMs": { "github": 640, "rules": 12, "jev": 310, "verifiers": 25, "haiku": 1900 },
@@ -353,7 +356,7 @@ Rules:
 - `reportSha256` is the fingerprint of the report without the receipt, so anyone can re-check it from the JSON export.
 - Shown on the page as a collapsed "Receipt" panel under the footer, and in full in the JSON export.
 - Nothing is stored server-side (N2 holds). Badge and card requests produce a receipt but don't return it.
-- Costs are estimates from published per-token prices, labeled "est."
+- Jev cost is exact: Glasser returns `charge_usd` per run. Haiku cost is an estimate from published per-token prices, labeled "est."
 
 ### Build usage report (`evaluation/usage_report.md`)
 
@@ -510,7 +513,7 @@ The video file is generated after Block 7, so it shows the real deployed product
 | # | Item | Rule |
 |---|---|---|
 | 2 | Validation | URL must match `github.com/owner/repo`. Body <= 4 KB. README truncated at 50 KB |
-| 4 | Outbound rate | One Jev call and one Haiku call per scan. GitHub calls capped |
+| 4 | Outbound rate | Jev in batches of up to 100 questions (about 3 calls for a typical README), one Haiku call per scan. GitHub calls capped |
 | 6 | Errors | `try/catch` on every fetch. Every failure has a visible, honest message |
 | 8 | Logging | Request id, path, status, timing, counts only |
 | 9 | Cost bounds | Glasser balance is prepaid ($11). Anthropic spend cap set before Block 4 |
@@ -522,7 +525,9 @@ The extension calls the API through `host_permissions`. The API allows only its 
 
 ### 7.4 Rate limiting (honest version)
 
-In-function per-IP limits on serverless are best effort, because instances don't share memory. Real protection is the prepaid Glasser balance and the Anthropic spend cap. Block 0 checks whether Vercel's firewall offers a simple rate rule on the free plan.
+In-function per-IP limits on serverless are best effort, because instances don't share memory. Real protection is the prepaid Glasser balance and the Anthropic spend cap.
+
+Spike S5 (LEDGER.md): Vercel Hobby allows 1 rate-limit rule per project (and 3 custom firewall rules total), keyed by IP or JA4, fixed window of 10 s to 10 min, counted per region so not exact. Plan: one rule covering `/api/scan`, `/api/badge`, and `/api/og` together. Source: https://vercel.com/docs/vercel-firewall/vercel-waf/rate-limiting
 
 ### 7.5 11-point pre-deploy checklist (Full tier)
 
@@ -565,7 +570,7 @@ Each spike answers one yes/no question. Either answer ends it. Results go in LED
 |---|---|---|---|
 | 0 | Spikes S1-S6 | discard (findings to LEDGER) | Spike |
 | 1 | `segment`, `candidates`, five verifiers, `buckets`, `gate`, `mood` on fixtures with mocked Jev answers. No network | promote | Working |
-| 2 | `jev.js` + `questions.js` via Glasser, swapped in for the mock | promote | Working |
+| 2 | `jev.js` + `questions.js` via Glasser, swapped in for the mock. Batches of 100. Compare README-as-state against line-as-state and keep whichever gives higher confidence on verifier-bound lines. Set the final gate threshold | promote | Working |
 | 3 | `github.js` + `/api/scan` with validation, limits, timeouts, logging floor, `receipt.js`, `usage.js` | promote | Full |
 | 4 | `summarize.js` (Haiku), fail-open | promote | Full |
 | 5 | Live page: render fixture JSON first, then wire to API. Mascot states. Deep links. Demo repo | promote | Full |
@@ -634,7 +639,7 @@ Runs the whole pipeline on every fixture, twice:
 
 | Check | When | Pass |
 |---|---|---|
-| Jev label eval on the golden set | After Block 2 | At least 8 of 10 lines labeled right (same bar as spike S2) |
+| Jev label eval on the golden set | After Block 2 | At least 8 of 10 lines labeled right (same bar as spike S2). Run twice and record how many labels drift |
 | Deployed scan of 3 real repos | Every Full-tier block | Report renders, timings in `meta.ms` under 10 s |
 | Badge in a real README, card in a real LinkedIn/X preview | Block 6b | Badge shows counts on GitHub. Pasted link shows the card |
 | Extension load-unpacked from the release ZIP | Block 7 | Works on a clean Chrome profile |
@@ -668,7 +673,7 @@ Runs the whole pipeline on every fixture, twice:
 | AdaL desktop app (Preview) | Builds everything. `@PRD.md` + AGENTS.md (read every turn) for context | Confirmed running on Windows Oct 7. Engineer mode is CLI-only; not used. Image paste doesn't work on Windows; use `@file` |
 | Jev (pinned jev-1.13.0, via Glasser) | Line labels, name picks | Pinned so labels don't shift mid-week |
 | AdaL Video Producer | Demo video | Built into AdaL, loads on request |
-| Glasser | Paid access to Jev, $11 credit | Also eligible for "Best use of Glasser" |
+| Glasser | Paid access to Jev, $11 credit | `POST https://api.glasser.ai/v1/runs`, provider `typesafe`, endpoint `/v1/systemone`. Max 100 questions per call, 45 s deadline, failed runs charge $0. Also eligible for "Best use of Glasser" |
 | Claude Haiku 4.5 | Summary | Confirm model id is current before Block 4 |
 | Vercel (Hobby) | Live page + function | 300 s max duration, 2 GB memory |
 | Chrome MV3 | Extension | Current extension platform |
@@ -685,6 +690,7 @@ Runs the whole pipeline on every fixture, twice:
 - The verifiers check names and existence, not meaning. A README that says `npm test` runs 85 tests is checked for the `test` script, not the count.
 - Monorepo discovery uses conventional folder names only.
 - Rate limiting is best effort. The real ceiling is the prepaid Glasser balance.
+- Jev's labels can shift slightly between identical runs, even with the model pinned. A scan run twice may differ on a few lines.
 
 ---
 
@@ -695,4 +701,4 @@ Runs the whole pipeline on every fixture, twice:
 | Q1 | What does "Workflows or Sandboxes" mean in the build summary? | AdaL Discord | Submission |
 | Q2 | ~~Is a successor to an earlier project allowed if all code is new?~~ Resolved Oct 7: yes | AdaL Discord | Done |
 | Q3 | ~~Carry over badge / social cards / JSON export?~~ Resolved Oct 7: all three are MUST, built new | Owner | Done |
-| Q4 | Exact Glasser request format for Jev | Spike S1 | Block 2 |
+| Q4 | ~~Exact Glasser request format for Jev~~ Resolved Oct 8 in spike S1 (see section 11, Glasser row) | Spike S1 | Done |

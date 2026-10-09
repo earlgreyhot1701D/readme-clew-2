@@ -1,6 +1,6 @@
 # AGENTS.md - README Clew 2
 
-Read this every session. The spec is `PRD.md` (v1.0, approved). If anything here conflicts with PRD.md, PRD.md wins. Say so in one line and follow it.
+Read this every session. The spec is `PRD.md` (approved; check its Version line for the current revision). If anything here conflicts with PRD.md, PRD.md wins. Say so in one line and follow it.
 
 ## What this project is
 
@@ -48,7 +48,11 @@ bookmarklet/  bookmarklet source
 fixtures/     readmes/, jev-mock/, expected/
 ```
 
-No god files. If a file starts doing two jobs, propose a split.
+No god files. One file, one purpose. If a file starts doing two jobs, propose a split.
+
+- **Hard cap: 200 lines per file** in `api/`, `lib/`, `web/`, `extension/`, `bookmarklet/`. Fixtures, tests, and docs are exempt.
+- The cap is enforced by `tests/file-size.test.js`, which fails `node --test` when any capped file goes over. Don't raise the cap or add exemptions without my approval.
+- If a change would push a file over 200 lines, stop and propose the split first.
 
 ## Stack
 
