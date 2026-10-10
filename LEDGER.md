@@ -279,3 +279,42 @@ Totals: 159,510 input tokens, 16,190 output tokens, $0.007397. The MCP balance w
 
 - P22-type lines (a product or design system written like a package) still get a confident `dependency` label. They end Unverifiable today only because the candidate finder finds no package name. A candidate finder that proposes more names would remove that protection.
 - Re-run the eval on real repos with snapshots after Block 3 (`github.js`), which makes the false-Contradicted count real for real READMEs.
+
+## Block 3+4: scan API, GitHub fetch, receipt, Haiku summary (Full tier)
+
+Oct 9, 2026, evening. Status: code and offline tests done (197 pass, 0 fail, 0 cancelled, 0 skipped, 0 todo). Not deployed yet. The deployed scans wait for the owner's Vercel steps.
+
+### Sources for the Jev limits
+
+- **Enforced limits:** https://docs.typesafe.ai/models.md (read Oct 9, 2026). Jev 1.13 takes 64K tokens per request, and 32K tokens for state plus the longest single question. `lib/jev-budget.js` enforces both.
+- **Where we first saw the limit:** DigitalOcean, "Jev: an AI model that can't write a sentence", dev.to, Oct 9 2026, https://dev.to/digitalocean/jev-an-ai-model-that-cant-write-a-sentence-3cj. My own search could not find the post by title; the owner supplied the URL.
+- **Rule:** estimate tokens before every call (3 characters per token, deliberately pessimistic). Over budget: trim the README state first, at a line boundary. Reject with an honest error only when one question cannot fit. Every question carries its own line text, so trimming the state loses context, never the line being judged. Trimmed calls are counted (`usage.jev.trimmedCalls`).
+
+### Haiku model
+
+`claude-haiku-5-5`, from Anthropic's Haiku 5.5 migration guide (a fixed id, no date suffix, no alias). The PRD still says 4.5; the owner said Claude is updating it. Prices from the Haiku 5.5 page: $0.10 per million input tokens and $0.50 per million output tokens (prompts up to 100K). The Haiku cost in the receipt is an estimate and labeled so. Request rules followed: no temperature, top_p, or top_k; no assistant prefill; `output_config.effort` is `low` so thinking stays short (thinking tokens count toward max_tokens).
+- **NOT confirmed live.** The free `GET /v1/models` call returned HTTP 400: the key is not scoped to a workspace, so the request needs an `anthropic-workspace-id` header. `lib/summarize.js` sends that header from `ANTHROPIC_WORKSPACE_ID` when it is set. Until the id is set (locally and on Vercel), Haiku calls will fail and the scan returns `notes: null` (fail-open), which is the designed behavior. The exact request body (`output_config.effort`) has also not been tested against the live API.
+- Local note: if the shell already has an empty ANTHROPIC_API_KEY, `process.loadEnvFile` does not overwrite it, because it skips variables that already exist. Scratch scripts used `util.parseEnv` instead.
+
+### Decisions and deviations
+
+- GitHub fetch uses **4 API calls**, not 3. The extra `GET /repos/o/r` checks `private`, so a token that can read the owner's private repos can never be used to scan one (N1).
+- The GitHub token goes only to api.github.com, never to raw.githubusercontent.com (tested).
+- CORS (PRD 7.3): the allow-origin header is sent only when the request origin equals the function's own origin. The extension needs no CORS header because it calls through host_permissions.
+- Error mapping: 400, 413, 405, 429 for bad requests; 404 for missing or private repos or no README; 422 when one question is too big; 502, 503, 504 for GitHub, Glasser, or timeouts. Glasser error details are never sent to the client.
+- Haiku input is counts, claim types, buckets, who decided, and names that are one safe token (a sentence-like name from a README is dropped). No quotes, no evidence text, no README text. Its output must be exactly five short strings, stripped of links and markup, or it is rejected.
+- `scanRepo` also catches a throwing `summarize`, so a Haiku failure can never fail a scan.
+- `receipt.stepsMs` has github, jev (this includes the rule and verifier steps), and haiku. Rules and verifiers are not timed separately.
+- The tests found a real bug: the first state trimmer counted raw text, but the estimate counts JSON-escaped text. The trim now loops until the estimate fits.
+
+### Live check from this machine (not the deployed function)
+
+`lukeed/polka`, live GitHub and live Jev, Haiku skipped. 647 README lines, 373 sent to Jev in 4 calls (3 with a trimmed README state), 2.8 s total (GitHub 1.1 s, Jev 1.7 s). Jev cost $0.009130, 197,581 input tokens. Result: 2 verified, 143 unverifiable, 14 missing, 0 contradicted. The 14 Missing are mostly packages imported by example folders in the repo (for example `node-fetch`, `body-parser`).
+
+### Known limits added
+
+1. Coverage (Missing) counts packages imported by example or demo folders, which can overstate Missing on repos with examples. A fix would skip `examples/` and `docs/`. Not done (outside this block's scope).
+2. Only 20 source files are read, shallowest first, so deep imports can be missed.
+3. Large READMEs cost more: the 647-line README above cost $0.009, near the old $0.01 target, because each of 373 questions carries the criteria text.
+4. The per-IP limiter is best effort (in memory, per instance). The Vercel firewall rule and the prepaid balances are the real ceilings (PRD 7.4).
+5. The token estimate is conservative and not calibrated against Jev's tokenizer, so some trimming may happen that was not strictly needed.

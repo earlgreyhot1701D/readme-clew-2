@@ -61,6 +61,31 @@ Oct 8, 2026
 12. Updated `tests/gate.test.js` and `tests/questions.test.js` for the final threshold and criteria. Showed them failing once (three tests red), restored.
 13. Wrote results to LEDGER.md. Stopped at the Block 2 QA checkpoint. Uncommitted: the threshold and criteria change, test updates, `evaluation/results-*.json`, `evaluation/usage-log.jsonl`, LEDGER.md, BUILD-LOG.md.
 
+14. Owner approved. Committed and pushed "Block 2: live eval, threshold 0.8, timeout fix, criteria v2" (`86c87f1`).
+
+## Pause before Block 3+4 (logged by Claude, architect)
+
+Oct 9, 2026, evening
+
+1. AdaL researched and proposed Block 3+4 (scan API, GitHub fetch, receipt, Haiku summary, Vercel). Findings: Claude Haiku 5.5 is the current Haiku (PRD said 4.5); Jev 1.13 limits are 32K tokens for state plus the longest question and 64K per request (docs.typesafe.ai/models.md). Proposed three extra files: `lib/jev-budget.js`, `lib/scan-repo.js`, `vercel.json`.
+2. Owner set the Anthropic spend cap and added `ANTHROPIC_API_KEY` to `.env`. Owner approved the proposal.
+3. AdaL hit its weekly plan-credit limit before building anything. Credits return after the deadline. Working tree clean at `86c87f1`; no Block 3+4 code exists.
+4. Owner emailed the AdaL team to ask about hackathon credits. Owner chose not to buy a top-up.
+5. Plan: Claude does prep only, no build code (PRD update, Block 3+4 split into smaller prompts so each AdaL turn costs less). Cutoff Sat Oct 10, 12:00 PM PT. If credits come back, AdaL builds from the smaller prompts. If not, the owner decides the next step at the cutoff.
+
+6. Resumed Fri Oct 9 evening on Shara's own Anthropic key via /byoak.
+
+## Block 3+4: scan API, GitHub fetch, receipt, Haiku summary (Full tier, one block)
+
+Oct 9, 2026, evening
+
+1. Tree clean at `86c87f1`. Checked the free Anthropic `GET /v1/models` call: HTTP 400, "This API key is not scoped to a workspace" (needs an `anthropic-workspace-id` header). The id `claude-haiku-5-5` is confirmed from Anthropic's Haiku 5.5 migration guide, not from the live call.
+2. Wrote `lib/validate.js`, `ratelimit.js`, `github.js`, `jev-budget.js`, `usage.js`, `receipt.js`, `summarize.js`, `scan-repo.js`, `api/scan.js`, `vercel.json`. Changed `lib/jev.js` (`askAll` uses `jev-budget.js`, 40 s timeout kept).
+3. Tests: `validate` (with ratelimit), `github`, `jev-budget`, `receipt-usage`, `summarize`, `handler`, `product-promise`. 197 pass, 0 fail, 0 cancelled, 0 skipped, 0 todo.
+4. Showed every new test failing: three rounds of deliberate breaks (about 75), each restored by script. Round 1 left 15 green, round 2 targeted them and left 2 (a weak test and one that could not fail), round 3 fixed those. Two tests were rewritten because they could not fail.
+5. One live scan from this machine (GitHub + Jev, Haiku skipped): see LEDGER.
+6. Did not touch PRD.md, AGENTS.md, README.md, or the gate.
+
 ## Files added in Block 0 (all of `spike/` deleted at step 20) (spike code, to be discarded after the owner OKs it)
 
 - `spike/_env.mjs`, `spike/_peek-openapi.mjs`
