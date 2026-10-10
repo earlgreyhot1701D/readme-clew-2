@@ -1,0 +1,339 @@
+{
+ "label": "A-line",
+ "split": "A",
+ "mode": "line",
+ "model": "jev-1.13.0",
+ "wallMs": 2396,
+ "usage": {
+  "calls": 32,
+  "questions": 32,
+  "inputTokens": 20264,
+  "outputTokens": 2272,
+  "chargeUsd": "0.000951"
+ },
+ "calls": [
+  {
+   "questions": 1,
+   "ms": 423,
+   "attempts": 1
+  },
+  {
+   "questions": 1,
+   "ms": 449,
+   "attempts": 1
+  },
+  {
+   "questions": 1,
+   "ms": 453,
+   "attempts": 1
+  },
+  {
+   "questions": 1,
+   "ms": 596,
+   "attempts": 1
+  },
+  {
+   "questions": 1,
+   "ms": 610,
+   "attempts": 1
+  },
+  {
+   "questions": 1,
+   "ms": 227,
+   "attempts": 1
+  },
+  {
+   "questions": 1,
+   "ms": 252,
+   "attempts": 1
+  },
+  {
+   "questions": 1,
+   "ms": 235,
+   "attempts": 1
+  },
+  {
+   "questions": 1,
+   "ms": 262,
+   "attempts": 1
+  },
+  {
+   "questions": 1,
+   "ms": 276,
+   "attempts": 1
+  },
+  {
+   "questions": 1,
+   "ms": 289,
+   "attempts": 1
+  },
+  {
+   "questions": 1,
+   "ms": 311,
+   "attempts": 1
+  },
+  {
+   "questions": 1,
+   "ms": 179,
+   "attempts": 1
+  },
+  {
+   "questions": 1,
+   "ms": 172,
+   "attempts": 1
+  },
+  {
+   "questions": 1,
+   "ms": 181,
+   "attempts": 1
+  },
+  {
+   "questions": 1,
+   "ms": 200,
+   "attempts": 1
+  },
+  {
+   "questions": 1,
+   "ms": 179,
+   "attempts": 1
+  },
+  {
+   "questions": 1,
+   "ms": 219,
+   "attempts": 1
+  },
+  {
+   "questions": 1,
+   "ms": 245,
+   "attempts": 1
+  },
+  {
+   "questions": 1,
+   "ms": 217,
+   "attempts": 1
+  },
+  {
+   "questions": 1,
+   "ms": 264,
+   "attempts": 1
+  },
+  {
+   "questions": 1,
+   "ms": 275,
+   "attempts": 1
+  },
+  {
+   "questions": 1,
+   "ms": 355,
+   "attempts": 1
+  },
+  {
+   "questions": 1,
+   "ms": 241,
+   "attempts": 1
+  },
+  {
+   "questions": 1,
+   "ms": 266,
+   "attempts": 1
+  },
+  {
+   "questions": 1,
+   "ms": 279,
+   "attempts": 1
+  },
+  {
+   "questions": 1,
+   "ms": 373,
+   "attempts": 1
+  },
+  {
+   "questions": 1,
+   "ms": 403,
+   "attempts": 1
+  },
+  {
+   "questions": 1,
+   "ms": 269,
+   "attempts": 1
+  },
+  {
+   "questions": 1,
+   "ms": 279,
+   "attempts": 1
+  },
+  {
+   "questions": 1,
+   "ms": 282,
+   "attempts": 1
+  },
+  {
+   "questions": 1,
+   "ms": 230,
+   "attempts": 1
+  }
+ ],
+ "results": [
+  {
+   "id": "T11",
+   "choice": "unverifiable",
+   "confidence": 0.65
+  },
+  {
+   "id": "T28",
+   "choice": "dependency",
+   "confidence": 0.92
+  },
+  {
+   "id": "T33",
+   "choice": "dependency",
+   "confidence": 0.78
+  },
+  {
+   "id": "T69",
+   "choice": "file_or_url",
+   "confidence": 0.72
+  },
+  {
+   "id": "T2",
+   "choice": "unverifiable",
+   "confidence": 0.99
+  },
+  {
+   "id": "T57",
+   "choice": "unverifiable",
+   "confidence": 0.38
+  },
+  {
+   "id": "T83",
+   "choice": "not_a_claim",
+   "confidence": 0.51
+  },
+  {
+   "id": "P12",
+   "choice": "unverifiable",
+   "confidence": 1
+  },
+  {
+   "id": "P18",
+   "choice": "dependency",
+   "confidence": 0.76
+  },
+  {
+   "id": "P20",
+   "choice": "unverifiable",
+   "confidence": 0.76
+  },
+  {
+   "id": "P22",
+   "choice": "dependency",
+   "confidence": 0.52
+  },
+  {
+   "id": "P29",
+   "choice": "unverifiable",
+   "confidence": 0.38
+  },
+  {
+   "id": "P51",
+   "choice": "env_var",
+   "confidence": 0.93
+  },
+  {
+   "id": "P70",
+   "choice": "unverifiable",
+   "confidence": 0.99
+  },
+  {
+   "id": "P72",
+   "choice": "unverifiable",
+   "confidence": 1
+  },
+  {
+   "id": "P90",
+   "choice": "unverifiable",
+   "confidence": 0.94
+  },
+  {
+   "id": "C34",
+   "choice": "unverifiable",
+   "confidence": 0.98
+  },
+  {
+   "id": "C286",
+   "choice": "not_a_claim",
+   "confidence": 0.94
+  },
+  {
+   "id": "C313",
+   "choice": "dependency",
+   "confidence": 0.33
+  },
+  {
+   "id": "B53",
+   "choice": "unverifiable",
+   "confidence": 0.98
+  },
+  {
+   "id": "B107",
+   "choice": "unverifiable",
+   "confidence": 0.81
+  },
+  {
+   "id": "B121",
+   "choice": "not_a_claim",
+   "confidence": 0.3
+  },
+  {
+   "id": "B175",
+   "choice": "unverifiable",
+   "confidence": 0.9
+  },
+  {
+   "id": "H3",
+   "choice": "not_a_claim",
+   "confidence": 0.92
+  },
+  {
+   "id": "H7",
+   "choice": "dependency",
+   "confidence": 0.7
+  },
+  {
+   "id": "H9",
+   "choice": "unverifiable",
+   "confidence": 0.99
+  },
+  {
+   "id": "H15",
+   "choice": "unverifiable",
+   "confidence": 0.92
+  },
+  {
+   "id": "H23",
+   "choice": "command",
+   "confidence": 0.92
+  },
+  {
+   "id": "H27",
+   "choice": "file_or_url",
+   "confidence": 0.86
+  },
+  {
+   "id": "H31",
+   "choice": "env_var",
+   "confidence": 0.93
+  },
+  {
+   "id": "H33",
+   "choice": "env_var",
+   "confidence": 0.81
+  },
+  {
+   "id": "H35",
+   "choice": "unverifiable",
+   "confidence": 0.86
+  }
+ ],
+ "e2e": null
+}

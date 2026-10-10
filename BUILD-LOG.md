@@ -54,7 +54,12 @@ Oct 8, 2026
 5. Showed every new test failing: two rounds of deliberate breaks, each restored.
 6. Picked four real public READMEs at pinned commits and wrote `fixtures/golden/hard-cases.md` + `hard-cases.repo.json`. Built the 64-line golden set (`fixtures/golden/golden-set.json`), stratified into halves A and B (32 each).
 7. Wrote `evaluation/run-eval.js` (live runner with the $0.08 guard and counts-only usage log) and `evaluation/analyze.js` (offline analysis).
-8. Stopped before any Jev call. Next: owner approves the golden-set lines and expected labels, then the live eval.
+8. Stopped before any Jev call. Owner approved the golden set.
+9. Fixed 14 cancelled tests the owner found in `tests/jev.test.js`. Root cause: `AbortSignal.timeout` is unref'd, so a hanging request lets the process exit. Reproduced with a script, replaced it with an `AbortController` and a normal `setTimeout` in `lib/jev.js`. 141 pass, 0 cancelled. Reports now count cancelled as failed.
+10. Committed "Block 2: Jev client, questions, prose guard, golden set" (`a5f09a2`). Not pushed.
+11. Live eval: split A README-as-state (6 calls), split A line-as-state once (32 calls), one criteria revision (dependency and env_var), split A again, then threshold 0.8 set in `lib/gate.js`, then split B twice with the end-to-end hard-cases scan. 56 Glasser calls, $0.007397.
+12. Updated `tests/gate.test.js` and `tests/questions.test.js` for the final threshold and criteria. Showed them failing once (three tests red), restored.
+13. Wrote results to LEDGER.md. Stopped at the Block 2 QA checkpoint. Uncommitted: the threshold and criteria change, test updates, `evaluation/results-*.json`, `evaluation/usage-log.jsonl`, LEDGER.md, BUILD-LOG.md.
 
 ## Files added in Block 0 (all of `spike/` deleted at step 20) (spike code, to be discarded after the owner OKs it)
 

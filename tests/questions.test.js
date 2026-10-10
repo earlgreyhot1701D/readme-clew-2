@@ -19,7 +19,9 @@ test('the six claim types are the PRD 4.1 options, in order', () => {
 test('the dependency criterion names its blind spots', () => {
   assert.match(CRITERIA.dependency, /^The verifier checks whether a named package appears in package\.json or in imports\./);
   assert.match(CRITERIA.dependency, /only mentions it/);
-  assert.match(CRITERIA.dependency, /cannot tell a package from a product, service, or ordinary word in parentheses\.$/);
+  assert.match(CRITERIA.dependency, /cannot tell a package from a product, service, or ordinary word in parentheses\./);
+  assert.match(CRITERIA.dependency, /If you are not sure the name is a published npm package, choose unverifiable\.$/);
+  assert.match(CRITERIA.env_var, /needs the variable name to be written on the line/);
 });
 
 test('criteria describe the verifier and hold no example lines', () => {

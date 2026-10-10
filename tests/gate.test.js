@@ -3,17 +3,17 @@ import assert from 'node:assert/strict';
 import { gate, THRESHOLD } from '../lib/gate.js';
 import { runPipeline } from '../lib/pipeline.js';
 
-test('the threshold is the provisional 0.7', () => {
-  assert.equal(THRESHOLD, 0.7);
+test('the threshold is the final 0.8 set in Block 2', () => {
+  assert.equal(THRESHOLD, 0.8);
 });
 
 test('below threshold fails the gate with the low-confidence tag', () => {
-  const g = gate({ claimType: 'command', decidedBy: 'jev', confidence: 0.69 });
+  const g = gate({ claimType: 'command', decidedBy: 'jev', confidence: 0.79 });
   assert.deepEqual(g, { pass: false, lowConfidence: true });
 });
 
 test('at or above threshold passes', () => {
-  assert.equal(gate({ claimType: 'dependency', decidedBy: 'jev', confidence: 0.7 }).pass, true);
+  assert.equal(gate({ claimType: 'dependency', decidedBy: 'jev', confidence: 0.8 }).pass, true);
   assert.equal(gate({ claimType: 'env_var', decidedBy: 'jev', confidence: 0.99 }).pass, true);
 });
 

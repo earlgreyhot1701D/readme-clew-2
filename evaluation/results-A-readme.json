@@ -1,0 +1,337 @@
+{
+ "label": "A-readme",
+ "split": "A",
+ "mode": "readme",
+ "model": "jev-1.13.0",
+ "wallMs": 1479,
+ "usage": {
+  "calls": 6,
+  "questions": 51,
+  "inputTokens": 33656,
+  "outputTokens": 3476,
+  "chargeUsd": "0.001558"
+ },
+ "calls": [
+  {
+   "questions": 7,
+   "ms": 463,
+   "attempts": 1
+  },
+  {
+   "questions": 9,
+   "ms": 240,
+   "attempts": 1
+  },
+  {
+   "questions": 3,
+   "ms": 328,
+   "attempts": 1
+  },
+  {
+   "questions": 4,
+   "ms": 218,
+   "attempts": 1
+  },
+  {
+   "questions": 9,
+   "ms": 222,
+   "attempts": 1
+  },
+  {
+   "questions": 19,
+   "ms": 256,
+   "attempts": 1
+  }
+ ],
+ "results": [
+  {
+   "id": "T11",
+   "choice": "unverifiable",
+   "confidence": 0.82
+  },
+  {
+   "id": "T28",
+   "choice": "dependency",
+   "confidence": 0.98
+  },
+  {
+   "id": "T33",
+   "choice": "dependency",
+   "confidence": 0.98
+  },
+  {
+   "id": "T69",
+   "choice": "file_or_url",
+   "confidence": 0.78
+  },
+  {
+   "id": "T2",
+   "choice": "unverifiable",
+   "confidence": 1
+  },
+  {
+   "id": "T57",
+   "choice": "unverifiable",
+   "confidence": 0.78
+  },
+  {
+   "id": "T83",
+   "choice": "unverifiable",
+   "confidence": 0.48
+  },
+  {
+   "id": "P12",
+   "choice": "unverifiable",
+   "confidence": 1
+  },
+  {
+   "id": "P18",
+   "choice": "dependency",
+   "confidence": 0.93
+  },
+  {
+   "id": "P20",
+   "choice": "dependency",
+   "confidence": 0.69
+  },
+  {
+   "id": "P22",
+   "choice": "dependency",
+   "confidence": 0.94
+  },
+  {
+   "id": "P29",
+   "choice": "unverifiable",
+   "confidence": 0.34
+  },
+  {
+   "id": "P51",
+   "choice": "env_var",
+   "confidence": 0.88
+  },
+  {
+   "id": "P70",
+   "choice": "unverifiable",
+   "confidence": 0.98
+  },
+  {
+   "id": "P72",
+   "choice": "unverifiable",
+   "confidence": 1
+  },
+  {
+   "id": "P90",
+   "choice": "unverifiable",
+   "confidence": 0.74
+  },
+  {
+   "id": "C34",
+   "choice": "unverifiable",
+   "confidence": 1
+  },
+  {
+   "id": "C286",
+   "choice": "not_a_claim",
+   "confidence": 0.7
+  },
+  {
+   "id": "C313",
+   "choice": "not_a_claim",
+   "confidence": 0.53
+  },
+  {
+   "id": "B53",
+   "choice": "unverifiable",
+   "confidence": 0.94
+  },
+  {
+   "id": "B107",
+   "choice": "unverifiable",
+   "confidence": 0.94
+  },
+  {
+   "id": "B121",
+   "choice": "command",
+   "confidence": 0.32
+  },
+  {
+   "id": "B175",
+   "choice": "unverifiable",
+   "confidence": 0.86
+  },
+  {
+   "id": "H3",
+   "choice": "not_a_claim",
+   "confidence": 0.69
+  },
+  {
+   "id": "H7",
+   "choice": "dependency",
+   "confidence": 0.92
+  },
+  {
+   "id": "H9",
+   "choice": "unverifiable",
+   "confidence": 1
+  },
+  {
+   "id": "H15",
+   "choice": "unverifiable",
+   "confidence": 0.98
+  },
+  {
+   "id": "H23",
+   "choice": "command",
+   "confidence": 0.95
+  },
+  {
+   "id": "H27",
+   "choice": "file_or_url",
+   "confidence": 0.98
+  },
+  {
+   "id": "H31",
+   "choice": "env_var",
+   "confidence": 0.94
+  },
+  {
+   "id": "H33",
+   "choice": "env_var",
+   "confidence": 0.84
+  },
+  {
+   "id": "H35",
+   "choice": "unverifiable",
+   "confidence": 0.92
+  }
+ ],
+ "e2e": {
+  "shouldContradict": [
+   23,
+   29,
+   31
+  ],
+  "wallMs": 258,
+  "findings": [
+   {
+    "line": 23,
+    "bucket": "contradicted",
+    "claimType": "command",
+    "confidence": 0.94,
+    "lowConfidence": false
+   },
+   {
+    "line": 29,
+    "bucket": "contradicted",
+    "claimType": "file_or_url",
+    "confidence": 0.99,
+    "lowConfidence": false
+   },
+   {
+    "line": 31,
+    "bucket": "contradicted",
+    "claimType": "env_var",
+    "confidence": 0.94,
+    "lowConfidence": false
+   },
+   {
+    "line": 5,
+    "bucket": "unverifiable",
+    "claimType": "unverifiable",
+    "confidence": 0.98,
+    "lowConfidence": false
+   },
+   {
+    "line": 9,
+    "bucket": "unverifiable",
+    "claimType": "unverifiable",
+    "confidence": 1,
+    "lowConfidence": false
+   },
+   {
+    "line": 13,
+    "bucket": "unverifiable",
+    "claimType": "unverifiable",
+    "confidence": 0.86,
+    "lowConfidence": false
+   },
+   {
+    "line": 15,
+    "bucket": "unverifiable",
+    "claimType": "unverifiable",
+    "confidence": 0.98,
+    "lowConfidence": false
+   },
+   {
+    "line": 17,
+    "bucket": "unverifiable",
+    "claimType": "unverifiable",
+    "confidence": 0.86,
+    "lowConfidence": false
+   },
+   {
+    "line": 19,
+    "bucket": "unverifiable",
+    "claimType": "dependency",
+    "confidence": 0.98,
+    "lowConfidence": false
+   },
+   {
+    "line": 33,
+    "bucket": "unverifiable",
+    "claimType": "env_var",
+    "confidence": 0.8,
+    "lowConfidence": false
+   },
+   {
+    "line": 35,
+    "bucket": "unverifiable",
+    "claimType": "unverifiable",
+    "confidence": 0.89,
+    "lowConfidence": false
+   },
+   {
+    "line": 37,
+    "bucket": "unverifiable",
+    "claimType": "unverifiable",
+    "confidence": 1,
+    "lowConfidence": false
+   },
+   {
+    "line": 39,
+    "bucket": "unverifiable",
+    "claimType": "unverifiable",
+    "confidence": 0.98,
+    "lowConfidence": false
+   },
+   {
+    "line": 7,
+    "bucket": "verified",
+    "claimType": "dependency",
+    "confidence": 0.9,
+    "lowConfidence": false
+   },
+   {
+    "line": 21,
+    "bucket": "verified",
+    "claimType": "command",
+    "confidence": 0.94,
+    "lowConfidence": false
+   },
+   {
+    "line": 25,
+    "bucket": "verified",
+    "claimType": "command",
+    "confidence": 0.94,
+    "lowConfidence": false
+   },
+   {
+    "line": 27,
+    "bucket": "verified",
+    "claimType": "file_or_url",
+    "confidence": 0.96,
+    "lowConfidence": false
+   }
+  ]
+ }
+}

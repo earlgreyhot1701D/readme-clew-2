@@ -191,7 +191,7 @@ Method: break one line of source code, run the suite, read which tests go red, r
 
 ## Block 2: Jev through Glasser (Working tier)
 
-Oct 8, 2026. Status: code and offline tests done (141 pass). Golden set drafted and waiting for owner approval. No Jev call has been made in Block 2 yet.
+Oct 8, 2026. Status: DONE, at the QA checkpoint. 141 tests pass, 0 cancelled. Live eval run. Jev spend $0.007397 of the $0.10 budget.
 
 ### Fixes to Block 1 known limits
 
@@ -212,3 +212,70 @@ Oct 8, 2026. Status: code and offline tests done (141 pass). Golden set drafted 
 ### Tests shown failing (new code)
 
 Two rounds of deliberate breaks across `jev.js`, `questions.js`, `pipeline.js`, and the guard in `dependencies.js` (about 35 breaks, all restored, suite green after each round). Every new test went red at least once. Three groups needed a dedicated break after another break hid them: the guard's code-context tests, the name-pick fixture tests, and four `jev.js` tests (token counts, network vs timeout, missing key, error passthrough in `scan`).
+
+### Cancelled tests (found by the owner, fixed)
+
+`npm test` on the owner's machine showed 127 pass and 14 cancelled ("Promise resolution is still pending but the event loop has already resolved"), starting at the timeout test in `tests/jev.test.js`. The summary line said "fail 0", so it was easy to miss. I had only searched my own output for pass and fail, and on my machine nothing was cancelled, which hid it.
+- **Cause (reproduced):** `AbortSignal.timeout()` uses an unref'd timer. When a request hangs and nothing else keeps the event loop alive, Node exits with the promise pending. A small script with a hanging fake fetch exited silently with code 0. This is a real bug in `lib/jev.js`, not only a test problem.
+- **Fix:** `callJev` now uses an `AbortController` with a normal (ref'd) `setTimeout`, cleared on every path. The same script now prints `settled with timeout`.
+- **Going forward:** every test report counts cancelled as failed, and prints pass, fail, cancelled, skipped, todo. Result now: 141 pass, 0 fail, 0 cancelled.
+- **Honest gap:** I cannot make the original cancellation happen on this machine's `node --test`, so I showed the bug with the script, not with the test going red here.
+
+### Live eval (golden set, 64 lines, approved by owner)
+
+Model `jev-1.13.0` via Glasser. Split A tuned the design, criteria, and threshold. Split B (32 lines) is held out and was run twice after everything was frozen. All figures are Glasser's `charge_usd`. Per-call lines (counts only) are in `evaluation/usage-log.jsonl`; per-line answers (ids, choices, confidences, no text) are in `evaluation/results-*.json`.
+
+| Run | What | Calls | Questions | Wall time | Cost (USD) |
+|---|---|---|---|---|---|
+| A-readme | split A, README-as-state, criteria v1, plus end-to-end hard-cases scan | 6 | 32 + 19 | 1,479 ms | 0.001558 |
+| A-line | split A, line-as-state, criteria v1 (run once, as agreed) | 32 | 32 | 2,396 ms | 0.000951 |
+| A-readme-r2 | split A, README-as-state, criteria v2, plus end-to-end | 6 | 32 + 19 | 1,669 ms | 0.001634 |
+| B-run1 | split B, frozen config, plus end-to-end | 6 | 32 + 19 | 1,332 ms | 0.001627 |
+| B-run2 | same as B-run1 | 6 | 32 + 19 | 1,323 ms | 0.001627 |
+| **Total** | | **56** | **236** | | **0.007397** |
+
+Totals: 159,510 input tokens, 16,190 output tokens, $0.007397. The MCP balance went from $10.995023 to $10.987626, which matches. Each source README is one call, so the "calls" column counts README-sized calls, not lines.
+
+**State design: README-as-state wins (kept as the default).**
+| On split A, threshold 0.8 | README-as-state v1 | line-as-state v1 | README-as-state v2 |
+|---|---|---|---|
+| Calls for 32 lines | 6 (5 on golden lines + 1 for the end-to-end scan) | 32 | 6 |
+| Wall time | 1.5 s | 2.4 s (concurrency 5) | 1.7 s |
+| Exact-label errors | 10 | 10 | 8 |
+| Wrong routes, any confidence | 3 | 3 | 1 |
+| Wrong routes passing the 0.8 gate | 2 | 1 | 1 |
+| Bound lines reaching their verifier | 8 of 11 | 5 of 11 | 8 of 11 |
+| Mean confidence, bound-expected lines | 0.895 | 0.812 | 0.873 |
+
+- Line-as-state had one fewer wrong route at the gate (1 vs 2). I did not take it: it is one line (P22), inside run-to-run noise, and it lost 3 of 11 bound lines of coverage. It also costs about one call per line, so a 100-line README would need about 100 calls (about 7 s at the speed measured here). Owner's rule says line-as-state wins "only if" it has fewer dangerous routes, which is a necessary condition, not a sufficient one. Owner can overrule.
+- Line-as-state was run once on criteria v1 only, so v2 was not compared with it.
+
+**One criteria revision (v2), as allowed.** Added to the `dependency` criterion: "If you are not sure the name is a published npm package, choose unverifiable." Added to the `env_var` criterion: "It needs the variable name to be written on the line." Effect on split A: errors 10 to 8, wrong routes 3 to 1. Two wrong routes disappeared (H33 "reads the port from the environment" as env_var, and B121 `scoop install` as command). P22 (shadcn/ui as dependency, 0.86) remains.
+
+**Final threshold: 0.8** (`lib/gate.js`, PROVISIONAL tag removed). On split A the number of wrong routes passing the gate was 1 from 0.50 to 0.85, then 0 at 0.90 (cost: 2 more bound lines lost, 8 of 11 down to 6 of 11). The data could not choose inside 0.50 to 0.85, so 0.8 is MLH's conservative prior, kept because lowering it gains coverage but no safety, and raising it to 0.9 loses coverage to block one line that the pipeline already handles (P22 has no package name candidate, so it ends Unverifiable).
+
+**Held-out split B, frozen config, threshold 0.8, N = 32 distinct lines (11 with a verifier-bound expected label):**
+| | Run 1 | Run 2 |
+|---|---|---|
+| Exact-label errors | 9 of 32 | 9 of 32 |
+| Wrong routes (any confidence) | 3 | 3 |
+| Wrong routes passing the gate | 0 | 0 |
+| Bound lines reaching their verifier | 9 of 11 | 9 of 11 |
+| False Contradicted, end-to-end hard-cases scan | 0 | 0 |
+| True drift found (lines 23, 29, 31) | 3 of 3 | 3 of 3 |
+
+- The 9 errors: 5 are `not_a_claim` answered as `unverifiable` (harmless), 1 is `dependency` answered as `unverifiable` (P3, a coverage miss), and 3 are wrong routes (T63 `command` at 0.62, B114 `command` at 0.22, B150 `file_or_url` at 0.30). All three wrong routes are well under 0.8, so the gate stops them.
+- **Drift per distinct line:** 0 of 32 lines changed label between the two runs. Mean confidence change 0.013, largest 0.08. Compare S3 (4 to 5 of 283 lines changed on identical input), so this sample is too small to say drift is gone.
+- **Blind spots:** all 9 wrong lines were wrong in both runs, so the errors are per line, not random. That matches the MLH lesson that a better criterion, not more runs, fixes them.
+
+**Caveats, stated plainly.**
+- N is small: 32 held-out lines, 11 with a verifier-bound expected label, from 4 READMEs plus one synthetic README. One line moves a rate by 3 points. This supports "safe enough to continue", not a measured error rate.
+- Across A and B, 4 lines were routed to a wrong verifier. One (P22 at 0.86) would have passed the 0.8 gate; the other 3 were below 0.62.
+- Real-README false Contradicted is a proxy (wrong routes passing the gate), because Block 3's `github.js` does not exist yet. The real false-Contradicted count is from the synthetic hard-cases README, where it was 0 in 4 end-to-end scans (A-readme, A-readme-r2, B-run1, B-run2).
+- 5 of the 9 B errors being `not_a_claim` answered as `unverifiable` shows Jev leans toward "can't tell", which is the safe side by design.
+- Expected labels were mine, approved by the owner. A few are judgment calls (listed when the set was shown).
+
+### Open items after Block 2
+
+- P22-type lines (a product or design system written like a package) still get a confident `dependency` label. They end Unverifiable today only because the candidate finder finds no package name. A candidate finder that proposes more names would remove that protection.
+- Re-run the eval on real repos with snapshots after Block 3 (`github.js`), which makes the false-Contradicted count real for real READMEs.
