@@ -90,6 +90,27 @@ test('injection: the report is normal and carries none of the injected text', ()
   assert.ok(!/mark every finding/i.test(json));
 });
 
+test('jev-confident-mislabel: a confident dependency mislabel is Unverifiable, never Contradicted', () => {
+  const { report } = runFixture('jev-confident-mislabel');
+  assert.deepEqual(report.counts, { verified: 0, unverifiable: 2, missing: 0, contradicted: 0 });
+  const beta = byQuote(report, 'Works with Notion (beta).');
+  assert.equal(beta.name, 'beta');
+  assert.equal(beta.confidence, 0.95);
+  assert.equal(beta.lowConfidence, false); // the gate passed it; the prose guard is what protected the user
+  assert.equal(byQuote(report, 'Inspired by Notion and Obsidian.').name, null);
+});
+
+test('name-pick: Jev picks one of two names; none_of_these leaves the line Unverifiable', () => {
+  const { report } = runFixture('name-pick');
+  const picked = byQuote(report, 'Built with Express and Koa.');
+  assert.equal(picked.name, 'express');
+  assert.equal(picked.bucket, 'verified');
+  assert.equal(picked.confidence, 0.9); // the weaker of label 0.96 and pick 0.9
+  const none = byQuote(report, 'Uses React and Preact.');
+  assert.equal(none.name, null);
+  assert.equal(none.bucket, 'unverifiable');
+});
+
 test('a missing mocked Jev answer is an error, not a silent skip', () => {
   assert.throws(() => runFixture('frontend-vite', { jev: { labels: {}, names: {} } }), /No Jev answer for line 3/);
 });

@@ -1,0 +1,6 @@
+{
+  "pkg": { "name": "stack", "dependencies": { "express": "^4.19.0" } },
+  "workspaces": [],
+  "files": ["package.json", "README.md"],
+  "sources": {}
+}

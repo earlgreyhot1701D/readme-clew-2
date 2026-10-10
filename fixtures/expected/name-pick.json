@@ -1,0 +1,19 @@
+{
+  "repo": { "owner": "fixture", "name": "name-pick", "readmePath": "README.md" },
+  "counts": { "verified": 1, "unverifiable": 1, "missing": 0, "contradicted": 0 },
+  "findings": [
+    { "id": "f-01", "bucket": "unverifiable", "claimType": "dependency", "line": 5, "quote": "Uses React and Preact.", "name": null,
+      "evidence": { "file": null, "detail": "No package name found on this line" },
+      "decidedBy": "jev", "confidence": 0.95, "lowConfidence": false, "verifier": "dependencies",
+      "link": "https://github.com/fixture/name-pick/blob/HEAD/README.md?plain=1#L5" },
+    { "id": "f-02", "bucket": "verified", "claimType": "dependency", "line": 3, "quote": "Built with Express and Koa.", "name": "express",
+      "evidence": { "file": "package.json", "detail": "dependencies has express" },
+      "decidedBy": "jev", "confidence": 0.9, "lowConfidence": false, "verifier": "dependencies",
+      "link": "https://github.com/fixture/name-pick/blob/HEAD/README.md?plain=1#L3" }
+  ],
+  "notes": null,
+  "mood": "curious",
+  "tilt": false,
+  "meta": { "jevModel": "jev-1.13.0", "readmeTruncated": false, "linesTotal": 5, "linesToJev": 2, "ms": 0 },
+  "receipt": null
+}

@@ -34,9 +34,30 @@ test('dependencies: Verified when only imported', () => {
   const r = verifyDependency('left-pad', { ...repo, sources: { 'a.js': "const l = require('left-pad');" } });
   assert.equal(r.bucket, 'verified');
 });
-test('dependencies: Contradicted when neither declared nor imported', () => {
-  const r = verifyDependency('webpack', repo);
+test('dependencies: Contradicted when neither declared nor imported, in code context', () => {
+  const r = verifyDependency('webpack', repo, { text: 'We bundle with `webpack`.', inFence: false });
   assert.equal(r.bucket, 'contradicted');
+});
+// Prose guard (fixes known limit #3): a name found only in prose is never Contradicted.
+test('dependencies guard: prose-only name is Unverifiable, never Contradicted', () => {
+  const r = verifyDependency('beta', repo, { text: 'Works with Notion (beta).', inFence: false });
+  assert.equal(r.bucket, 'unverifiable');
+  assert.match(r.evidence.detail, /only in prose/);
+});
+test('dependencies guard: no context at all is treated as prose', () => {
+  assert.equal(verifyDependency('webpack', repo).bucket, 'unverifiable');
+});
+test('dependencies guard: backticks, a code fence, or an install command count as code context', () => {
+  assert.equal(verifyDependency('webpack', repo, { text: 'Uses `webpack`.', inFence: false }).bucket, 'contradicted');
+  assert.equal(verifyDependency('webpack', repo, { text: 'webpack', inFence: true }).bucket, 'contradicted');
+  assert.equal(verifyDependency('webpack', repo, { text: 'Install it with npm install webpack', inFence: false }).bucket, 'contradicted');
+  assert.equal(verifyDependency('webpack', repo, { text: 'Run yarn add webpack first.', inFence: false }).bucket, 'contradicted');
+});
+test('dependencies guard: a prose-only name that IS declared is still Verified', () => {
+  assert.equal(verifyDependency('vite', repo, { text: 'Frontend (Vite)', inFence: false }).bucket, 'verified');
+});
+test('dependencies guard: a backticked name in a longer span still counts as code', () => {
+  assert.equal(verifyDependency('webpack', repo, { text: 'Run `npm i webpack` once.', inFence: false }).bucket, 'contradicted');
 });
 test('dependencies: Unverifiable with no name', () => {
   assert.equal(verifyDependency(null, repo).bucket, 'unverifiable');

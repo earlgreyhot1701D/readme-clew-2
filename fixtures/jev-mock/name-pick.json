@@ -1,0 +1,10 @@
+{
+  "labels": {
+    "3": { "choice": "dependency", "confidence": 0.96 },
+    "5": { "choice": "dependency", "confidence": 0.95 }
+  },
+  "names": {
+    "3": { "choice": "express", "confidence": 0.9 },
+    "5": { "choice": "none_of_these", "confidence": 0.6 }
+  }
+}

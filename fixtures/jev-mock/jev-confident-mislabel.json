@@ -1,0 +1,7 @@
+{
+  "labels": {
+    "3": { "choice": "dependency", "confidence": 0.95 },
+    "5": { "choice": "dependency", "confidence": 0.95 }
+  },
+  "names": {}
+}

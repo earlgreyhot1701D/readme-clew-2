@@ -5,7 +5,7 @@ import { runPipeline } from '../lib/pipeline.js';
 const dir = (p) => new URL(`../fixtures/${p}`, import.meta.url);
 
 export const FIXTURES = ['clean-minimal', 'npm-start-drift', 'frontend-vite', 'envvar-unread', 'missing-package',
-  'marketing-claims', 'empty', 'no-claims', 'monorepo', 'injection'];
+  'marketing-claims', 'empty', 'no-claims', 'monorepo', 'injection', 'jev-confident-mislabel', 'name-pick'];
 
 export function loadFixture(name) {
   const read = (p) => readFileSync(dir(p), 'utf8');

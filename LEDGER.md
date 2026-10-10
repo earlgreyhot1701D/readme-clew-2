@@ -188,3 +188,27 @@ Method: break one line of source code, run the suite, read which tests go red, r
 - First attempt to run a review script with `node -e` lost its quotes in PowerShell. Switched to a small script file, deleted afterwards (`tests/_review.js`).
 - My first temporary oversize file had 218 lines, not 201. Still over the cap, so the demonstration holds.
 - Fixed one detail in `candidates.js` before testing: backticked names with capitals (`Express`) were being rejected as package names.
+
+## Block 2: Jev through Glasser (Working tier)
+
+Oct 8, 2026. Status: code and offline tests done (141 pass). Golden set drafted and waiting for owner approval. No Jev call has been made in Block 2 yet.
+
+### Fixes to Block 1 known limits
+
+- **Limit #3 FIXED (prose guard).** `lib/verifiers/dependencies.js`: a dependency name that appears only in prose (not in backticks, a code fence, or an install command) can now be Verified or Unverifiable, never Contradicted. "(optional)" or "(beta)" as a package candidate ends as Unverifiable with the note "appears only in prose". Without a context argument the verifier treats the name as prose, the safe default. This also covers a confident Jev mislabel that the confidence gate cannot catch.
+- **Limit #8 FIXED (name-pick path).** New fixture `name-pick` uses the names path: one line where Jev picks one of two candidates (weaker of label and pick confidence is used) and one where Jev answers `none_of_these` (the line stays Unverifiable).
+- New fixture `jev-confident-mislabel`: the mock labels "Inspired by Notion and Obsidian." and "Works with Notion (beta)." as `dependency` at 0.95. The second line is the one that shows the guard: without it the result is Contradicted (the `beta` candidate is not in package.json), with it the result is Unverifiable. The first line has no package candidate, so it was Unverifiable either way.
+
+### Decisions and deviations
+
+- **Questions follow the MLH lessons (README.md Credits).** Criteria describe what each verifier checks and what it cannot see, with no example lines. The dependency criterion has the owner's blind-spot sentence about products, services, and words in parentheses. One test sentence in the instruction. "When in doubt, choose unverifiable." Name-pick questions have a `none_of_these` option.
+- **State designs.** README-as-state: whole README as state (numbered lines), one question per line, 100 questions per call. Line-as-state: the line is the state, one call per line, concurrency 5. README-as-state is the default. Line-as-state wins only with fewer dangerous routes on split A (owner's tie-breaker).
+- **Answers are checked.** `jev.js` rejects a response whose model is not `jev-1.13.0`, whose answer is missing, or whose choice is not one of the options sent.
+- **Retries.** One retry on 429, 503, 529 with the same Idempotency-Key, so the retry is a read and is never charged twice. Timeouts are not retried (40 s timeout, Glasser deadline 45 s).
+- **`evaluation/analyze.js` was added** (not in the approved list). It is the offline half of the eval: threshold sweeps and drift from saved results, no network, no cost. It keeps `run-eval.js` to one job.
+- **Golden set stores no README text.** `fixtures/golden/golden-set.json` holds line numbers, a 10-character hash of each line, the expected label, a hard-case flag, and the split. README text is fetched at pinned commit SHAs when the eval runs; the runner stops before any call if a hash does not match. Four real READMEs: shadcn-ui/taxonomy, vercel/platforms, chalk/chalk, mckaywrigley/chatbot-ui. Hard cases are in a small synthetic README, `fixtures/golden/hard-cases.md`, with a repo snapshot so the end-to-end false-Contradicted count is real.
+- **Label vs outcome.** The eval counts exact-label errors, but the harmful error is a *wrong route*: a line that should not reach a verifier does, or the wrong verifier gets it. Unverifiable vs not_a_claim confusion is harmless.
+
+### Tests shown failing (new code)
+
+Two rounds of deliberate breaks across `jev.js`, `questions.js`, `pipeline.js`, and the guard in `dependencies.js` (about 35 breaks, all restored, suite green after each round). Every new test went red at least once. Three groups needed a dedicated break after another break hid them: the guard's code-context tests, the name-pick fixture tests, and four `jev.js` tests (token counts, network vs timeout, missing key, error passthrough in `scan`).

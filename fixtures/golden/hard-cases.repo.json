@@ -1,0 +1,6 @@
+{
+  "pkg": { "name": "hard-cases", "scripts": { "build": "node build.js", "dev": "node --watch src/index.js" }, "dependencies": { "express": "^4.19.0" }, "devDependencies": { "vite": "^5.4.0" } },
+  "workspaces": [],
+  "files": ["package.json", "README.md", "docs/guide.md", "build.js", "src/index.js"],
+  "sources": { "src/index.js": "import express from 'express';\nconst port = 3000;\n" }
+}

@@ -43,6 +43,19 @@ Oct 8, 2026
 
 Not touched: `PRD.md`, `AGENTS.md`, anything outside the approved file list. `README.md` appeared in the working tree during this block. I did not create it.
 
+## Block 2: Jev through Glasser (Working tier)
+
+Oct 8, 2026
+
+1. Committed and pushed Block 1 ("Block 1: deterministic core, 102 tests", `df0cc13`). README.md (Claude's Credits section) kept.
+2. Proposed the Block 2 file list. Owner approved with four changes: two-line fixture, README-as-state default with a dangerous-routes tie-breaker, the dependency criterion blind spot, and the $0.08 spend guard.
+3. Wrote `lib/questions.js` and `lib/jev.js`; added `scan()` to `lib/pipeline.js`; added the prose guard to `lib/verifiers/dependencies.js`.
+4. Wrote `tests/questions.test.js` and `tests/jev.test.js`; updated `tests/verifiers.test.js`, `tests/helpers.js`, `tests/fixtures.test.js`. Added fixtures `jev-confident-mislabel` and `name-pick`. 141 tests pass offline.
+5. Showed every new test failing: two rounds of deliberate breaks, each restored.
+6. Picked four real public READMEs at pinned commits and wrote `fixtures/golden/hard-cases.md` + `hard-cases.repo.json`. Built the 64-line golden set (`fixtures/golden/golden-set.json`), stratified into halves A and B (32 each).
+7. Wrote `evaluation/run-eval.js` (live runner with the $0.08 guard and counts-only usage log) and `evaluation/analyze.js` (offline analysis).
+8. Stopped before any Jev call. Next: owner approves the golden-set lines and expected labels, then the live eval.
+
 ## Files added in Block 0 (all of `spike/` deleted at step 20) (spike code, to be discarded after the owner OKs it)
 
 - `spike/_env.mjs`, `spike/_peek-openapi.mjs`
