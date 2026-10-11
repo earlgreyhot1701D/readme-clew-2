@@ -1,17 +1,13 @@
-// DOM rendering for a report. textContent only: every repo-derived string goes through el(). No HTML string sinks.
+// DOM rendering for a full report on the page. textContent only: every repo-derived string goes through el().
+// The strips the popup also draws (counts, status, states) live in render-strips.js.
 import { el } from './dom.js';
 import { renderSection } from './render-sections.js';
 import { goToSection } from './navigate.js';
 import { downloadReport } from './download.js';
-import { chipLabel } from './ui-state.js';
-import { statusStrip, bubbleText, clewPose, bucketSections, countChips, recordFields, footerText } from './view-model.js';
+import { renderCounts, renderStatus, renderState, strip } from './render-strips.js';
+import { bucketSections, recordFields, footerText } from './view-model.js';
 
-function strip(cls) { return el('section', `strip ${cls ?? ''}`.trim()); }
-
-// A clew picture: square PNG shown at 120 px, with width and height set so the page does not shift when it loads.
-function clewImg(file, mood) {
-  return el('img', 'clew', null, { src: `mascot/${file}.png`, alt: `The clew, ${mood}`, width: '120', height: '120' });
-}
+export { renderCounts, renderStatus, renderState };
 
 export function renderRecord(report) {
   const s = strip('record');
@@ -23,29 +19,6 @@ export function renderRecord(report) {
     grid.append(box);
   }
   s.append(grid);
-  return s;
-}
-
-// Each count chip is a button: it opens its section if closed, scrolls there, and focuses the section header.
-export function renderCounts(counts) {
-  const s = strip('counts');
-  for (const c of countChips(counts)) {
-    const chip = el('button', `chip b-${c.bucket}`, null, { type: 'button', 'aria-label': chipLabel(c.bucket, c.count) });
-    chip.append(el('span', 'label', c.label), el('span', 'num', String(c.count)));
-    chip.addEventListener('click', () => goToSection(c.bucket));
-    s.append(chip);
-  }
-  return s;
-}
-
-export function renderStatus(report) {
-  const st = statusStrip(report.mood, report.counts);
-  const pose = clewPose(report.mood, report.tilt);
-  const s = strip('status');
-  s.append(el('div', `status-fill m-${st.mood}`, st.text, { role: 'status' }));
-  const row = el('div', 'clew-row');
-  row.append(clewImg(pose.file, st.mood), el('p', 'bubble', bubbleText(report)));
-  s.append(row);
   return s;
 }
 
@@ -64,31 +37,10 @@ export function renderFooter(report) {
 }
 
 // Fills the report root. Strips appear top to bottom (the stagger is CSS, off under reduced motion).
+// Each count chip is a button: it opens its section if closed, scrolls there, and focuses the section header.
 export function renderReport(report, root) {
   root.replaceChildren();
-  const parts = [renderRecord(report), renderCounts(report.counts), renderStatus(report), ...bucketSections(report).map(renderSection), renderFooter(report)];
+  const parts = [renderRecord(report), renderCounts(report.counts, (bucket) => goToSection(bucket)), renderStatus(report),
+    ...bucketSections(report).map(renderSection), renderFooter(report)];
   parts.forEach((p, i) => { p.style.setProperty('--i', String(i)); root.append(p); });
-}
-
-// A one-line state strip (idle, loading, errors).
-// onRetry (errors only): adds a TRY AGAIN button that calls it. The button is one click and never fires by itself.
-export function renderState(root, text, kind, withCursor, onRetry) {
-  root.replaceChildren();
-  const s = strip(`state s-${kind}`);
-  const p = el('p', 'state-text', text, { role: kind === 'error' ? 'alert' : 'status' });
-  if (withCursor) p.append(el('span', 'cursor', '\u2588'));
-  if (kind === 'idle') { // the first screen has the mascot beside the idle text
-    const row = el('div', 'idle-row');
-    row.append(clewImg('calm', 'calm'), p);
-    s.append(row);
-  } else if (kind === 'error' && onRetry) {
-    const row = el('div', 'error-row');
-    const again = el('button', 'btn btn-small retry', 'TRY AGAIN', { type: 'button' });
-    again.addEventListener('click', onRetry);
-    row.append(p, again);
-    s.append(row);
-  } else {
-    s.append(p);
-  }
-  root.append(s);
 }

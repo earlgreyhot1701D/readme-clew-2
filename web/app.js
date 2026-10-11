@@ -2,15 +2,15 @@
 // ui-state.js and scan-state.js.
 // Rule: a scan only starts on a click (or Enter in the form). ?repo= and USE DEMO REPO fill the field and nothing more.
 import { renderReport, renderState } from './render.js';
-import { parseRepoInput, initialRepoValue, errorState, formatScanTime, STATES, DEMO_SHORT } from './view-model.js';
-import { initialState, step, retryTarget, retryableError } from './scan-state.js';
+import { parseRepoInput, initialRepoValue, formatScanTime, STATES, DEMO_SHORT } from './view-model.js';
+import { fetchScan } from './scan-client.js';
+import { initialState, step, retryTarget } from './scan-state.js';
 import { landAfterScan } from './navigate.js';
 import { fixtureName, loadFixture } from './fixture-mode.js';
 import { initTabs } from './tabs.js';
 import { bindDisclosure } from './disclosure.js';
 import { SITE_URL, deepLink, withoutRepoParam } from './site.js';
 
-const CLIENT_TIMEOUT_MS = 70000; // the function allows 60 s
 const form = document.getElementById('scan-form');
 const input = document.getElementById('repo-input');
 const button = document.getElementById('scan-btn');
@@ -19,10 +19,6 @@ const stamp = document.getElementById('scan-time');
 const banner = document.getElementById('banner'); // idle, SCANNING, and error strips. The report stays below it.
 const out = document.getElementById('out');
 let state = initialState();
-
-function looksLikeReport(r) {
-  return r && typeof r === 'object' && r.counts && Array.isArray(r.findings) && r.repo && typeof r.mood === 'string';
-}
 
 // Applies one event, then repaints the banner and the SCAN button. The report below is only redrawn on a new report.
 function dispatch(event) {
@@ -46,34 +42,12 @@ function showReport(report, { land }) {
   if (land) landAfterScan(report.counts);
 }
 
-async function fetchReport(url) {
-  const ctl = new AbortController();
-  const timer = setTimeout(() => ctl.abort(), CLIENT_TIMEOUT_MS);
-  try {
-    const res = await fetch('/api/scan', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ repo: url }),
-      signal: ctl.signal,
-    });
-    let body = null;
-    try { body = await res.json(); } catch { body = null; }
-    if (!res.ok) return { error: errorState(res.status, body?.error?.code), retryable: retryableError(res.status, body?.error?.code) };
-    if (!looksLikeReport(body)) return { error: STATES.failed, retryable: true };
-    return { report: body };
-  } catch {
-    return { error: STATES.failed, retryable: true }; // network failure or timeout
-  } finally {
-    clearTimeout(timer);
-  }
-}
-
 // One scan for a repo that is already validated. The form and TRY AGAIN both come through here, and nothing else starts a scan.
 async function runScan(p) {
   if (!state.canScan) return; // a scan is running: ignore
   input.value = p.url;
   dispatch({ type: 'start', owner: p.owner, name: p.name });
-  const result = await fetchReport(p.url);
+  const result = await fetchScan(p.url);
   if (result.report) {
     dispatch({ type: 'ok', report: result.report });
     showReport(result.report, { land: true });

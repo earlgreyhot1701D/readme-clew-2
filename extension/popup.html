@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>README Clew 2</title>
+  <link rel="stylesheet" href="shared/tokens.css">
+  <link rel="stylesheet" href="shared/layout.css">
+  <link rel="stylesheet" href="shared/findings.css">
+  <link rel="stylesheet" href="shared/chrome.css">
+  <link rel="stylesheet" href="popup.css">
+  <script type="module" src="popup.js"></script>
+</head>
+<body class="popup">
+  <main class="terminal">
+    <header class="strip title">
+      <div class="title-row">
+        <h1>README CLEW 2 // CLAIM LEDGER</h1>
+        <p class="scan-time"><span class="label">SCANNED</span> <span id="scan-time" class="value">-</span></p>
+      </div>
+    </header>
+    <section class="strip target">
+      <div class="target-row">
+        <div class="target-name"><span class="label">REPO &gt;</span> <span id="repo-name" class="value">-</span></div>
+        <button id="scan-btn" class="btn" type="button" disabled>SCAN</button>
+      </div>
+    </section>
+    <div id="banner" aria-live="polite"></div>
+    <div id="out" aria-busy="false"></div>
+  </main>
+</body>
+</html>

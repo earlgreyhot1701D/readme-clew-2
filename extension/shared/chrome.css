@@ -1,0 +1,75 @@
+/* Page chrome: title strip, intro line, HOW? toggle, tabs, and the site footer. */
+.title { display: block; }
+.title-row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+
+.intro-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 8px; }
+.tagline { margin: 0; color: var(--muted); font-size: 15px; }
+.btn-small { padding: 4px 12px; font-size: 13px; }
+.btn[aria-expanded="true"] { background: var(--text); color: var(--bg); }
+
+.how {
+  margin: 10px 0 0;
+  padding: 10px 12px;
+  border: 1px solid var(--rule);
+  background: var(--bg);
+  font-size: 15px;
+  max-width: 72ch;
+}
+
+/* Tabs: real buttons. The selected tab is a solid fill (bg text on the color). */
+.tabs { display: flex; gap: 8px; padding-top: 8px; padding-bottom: 8px; }
+.tab {
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--rule);
+  padding: 8px 22px;
+  font-family: var(--head);
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.tab:hover { border-color: var(--text); }
+.tab[aria-selected="true"] { background: var(--text); color: var(--bg); border-color: var(--text); }
+
+[role="tabpanel"] { margin: 0; }
+
+/* A link that looks like a button (the 404 page). */
+a.btn { display: inline-block; text-decoration: none; }
+
+/* An error strip with a TRY AGAIN button beside the text. */
+.error-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.error-row .state-text { flex: 1 1 260px; }
+
+/* Home screen: the calm clew beside the idle strip text. */
+.idle-row { display: flex; align-items: center; gap: 16px; }
+@media (max-width: 600px) { .idle-row { flex-direction: column; align-items: center; text-align: center; } }
+
+.hint-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 8px; }
+.hint-row .hint { margin: 0; }
+
+/* Sections are scrolled to from the count chips and after a scan, so keep a little air above the header. */
+.strip { scroll-margin-top: 8px; }
+#banner:empty { display: none; }
+
+.site-footer p { margin: 0; color: var(--muted); font-size: 13px; overflow-wrap: anywhere; }
+
+.linkbtn {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: var(--text);
+  font-family: var(--head);
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+@media (max-width: 760px) {
+  .tabs .tab { flex: 1; padding: 10px 6px; }
+  .how { max-width: none; }
+}

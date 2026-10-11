@@ -1,0 +1,28 @@
+/* Popup layout: 400 px wide (STYLE 5: 380 to 420). Tokens, strips, rows, and states come from shared/ (copies of web/). */
+html, body.popup { width: 400px; min-width: 400px; max-width: 400px; margin: 0; }
+body.popup { padding: 8px; font-size: 14px; overflow-x: hidden; }
+.popup .terminal { max-width: none; padding: 6px; }
+.popup h1 { font-size: 14px; letter-spacing: 0.06em; }
+.popup .title-row { flex-wrap: nowrap; gap: 8px; }
+.popup .scan-time { flex: none; font-size: 12px; }
+.popup .scan-time .value { font-size: 12px; }
+
+.target-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.target-name { min-width: 0; overflow-wrap: anywhere; }
+.target-name .value { font-size: 14px; }
+
+/* The 2 by 2 counts, a smaller clew, and a narrower bubble. Rows keep the page's own look. */
+.popup .counts { grid-template-columns: repeat(2, 1fr); }
+.popup .chip { padding: 4px 8px; }
+.popup .clew-row { flex-direction: row; align-items: center; gap: 10px; }
+.popup .clew { width: 84px; height: 84px; }
+.popup .bubble { font-size: 13px; padding: 8px 10px; }
+.popup .bubble::before { display: block; }
+.popup .status-fill { font-size: 14px; padding: 6px 10px; }
+.popup .quote { font-size: 13px; }
+.popup .more, .popup .hint { margin: 8px 0 0; font-size: 12px; color: var(--muted); }
+.popup .actions .footer-links { margin-top: 0; }
+.popup .idle-row { flex-direction: row; text-align: left; }
+.popup .idle-row .clew { width: 84px; height: 84px; }
+.popup .error-row { flex-wrap: wrap; }
+.popup .state-text { font-size: 14px; }

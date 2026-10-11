@@ -165,10 +165,12 @@ test('rescan wiring: the banner sits above the report, and a scan only ever redr
   assert.equal((app.match(/showReport\(result\.report/g) ?? []).length, 1, 'only runScan shows a scanned report');
 });
 test('count chips are buttons with a "go to section" name, wired to goToSection', () => {
-  const render = src('render.js');
-  assert.match(render, /el\('button', `chip b-\$\{c\.bucket\}`, null, \{ type: 'button', 'aria-label': chipLabel\(c\.bucket, c\.count\) \}\)/);
-  assert.match(render, /chip\.addEventListener\('click', \(\) => goToSection\(c\.bucket\)\)/);
-  assert.doesNotMatch(render, /el\('div', `chip/);
+  const strips = src('render-strips.js');
+  assert.match(strips, /if \(onChip\) \{\s*chip = el\('button', `chip b-\$\{c\.bucket\}`, null, \{ type: 'button', 'aria-label': chipLabel\(c\.bucket, c\.count\) \}\);/);
+  assert.match(strips, /chip\.addEventListener\('click', \(\) => onChip\(c\.bucket\)\)/);
+  // the page passes goToSection; without onChip (the popup) the chips are plain boxes
+  assert.match(src('render.js'), /renderCounts\(report\.counts, \(bucket\) => goToSection\(bucket\)\)/);
+  assert.match(strips, /\} else \{\s*chip = el\('div', `chip b-\$\{c\.bucket\}`/);
 });
 test('bucket notes: a line under the header only when a note exists, as text, with no placeholder', () => {
   const sections = src('render-sections.js');

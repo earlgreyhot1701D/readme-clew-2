@@ -245,3 +245,9 @@ Approved after one of two production demo scans fell back to the fixed clew line
 5. **TRY AGAIN** button on the error strip: re-sends the same repo, one click, never automatic, gone while scanning. Not offered for bad input, not found, or not JS/TS.
 
 Tests: 420 total, 420 pass, 0 fail, 0 cancelled, 0 skipped, 0 todo (353 before). New files: `haiku-retry.test.js` (24, with `summarize.test.js`), `jev-retry.test.js` (20), `retry-receipt.test.js` (13), `try-again.test.js` (13). The retry rules use a fake fetch and a fake clock, so no test waits or touches the network. Shown failing: 63 deliberate breaks, one at a time. 61 turned a test red the first time. Two did not ("timeout made retryable" and "the retry timer is not cut to the remaining budget"), because the existing tests could not tell them apart. Two tests were added and both breaks now go red. Real-browser check of TRY AGAIN: all 24 behaviors pass at 1200 px and 390 px.
+
+## Block 6: Chrome extension popup
+
+Built in the last session, finished and checked here. Popup 400 px wide, activeTab plus one API host permission, click to scan (opening the popup never scans). Shows the top 3 Contradicted, else the top 3 Missing. OPEN FULL REPORT (opens the site with ?repo=) with the note, and DOWNLOAD JSON from the report in hand. No input, HOW? or KEY. Shared files are copied from web/ by scripts/sync-extension.mjs; a drift test fails if they differ. content.js is a stub (STRETCH X1), not in the manifest.
+
+Tests: 452 total, 452 pass, 0 fail. Real-Chrome QA (Chrome 155, unpacked, mocked API): not a repo page, idle, scanning, error with TRY AGAIN, report. Shots in design/shots/ext-*.png. Production already served 3d4f4bc (TRY AGAIN live).

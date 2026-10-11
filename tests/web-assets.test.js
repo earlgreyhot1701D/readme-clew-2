@@ -45,8 +45,8 @@ test('the five clew PNGs exist, are square and sharp enough for 120 px, and no S
   }
   assert.deepEqual(readdirSync(new URL('../web/mascot/', import.meta.url)).sort(), MASCOTS.map((m) => `${m}.png`).sort());
 });
-test('render.js shows the mascot as a 120 px PNG with width, height, and short mood alt text', () => {
-  const src = read('web/render.js');
+test('the shared strips show the mascot as a 120 px PNG with width, height, and short mood alt text', () => {
+  const src = read('web/render-strips.js');
   assert.match(src, /src: `mascot\/\$\{file\}\.png`/); // one helper builds every clew picture
   assert.match(src, /alt: `The clew, \$\{mood\}`/);
   assert.match(src, /width: '120', height: '120'/);

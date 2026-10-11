@@ -6,7 +6,7 @@ import { initialState, step, retryTarget, retryableError } from '../web/scan-sta
 import { STATES, errorState } from '../web/view-model.js';
 
 const app = readFileSync(new URL('../web/app.js', import.meta.url), 'utf8');
-const render = readFileSync(new URL('../web/render.js', import.meta.url), 'utf8');
+const render = readFileSync(new URL('../web/render-strips.js', import.meta.url), 'utf8'); // the shared strips, including the error strip
 const repo = { owner: 'o', name: 'r', url: 'https://github.com/o/r' };
 const run = (...events) => events.reduce((s, e) => step(s, e), initialState());
 const reportA = { id: 'A', repo: { owner: 'o', name: 'a' }, counts: {}, findings: [] };
@@ -71,13 +71,16 @@ test('wiring: TRY AGAIN calls runScan with the stored repo, runScan ignores a cl
   assert.match(app, /async function runScan\(p\) \{\s*if \(!state\.canScan\) return;/);
   assert.match(app, /dispatch\(\{ type: 'fail', text: result\.error, retry: result\.retryable \? \{ owner: p\.owner, name: p\.name, url: p\.url \} : null \}\)/);
   assert.match(app, /await runScan\(p\);/);
-  assert.equal((app.match(/fetchReport\(/g) ?? []).length, 2, 'the definition and one call, inside runScan');
+  assert.equal((app.match(/fetchScan\(/g) ?? []).length, 1, 'one call, inside runScan (the client itself is in scan-client.js)');
   assert.equal((app.match(/runScan\(/g) ?? []).length, 3, 'definition, the strip button, and the form');
 });
 test('wiring: nothing retries by itself, there is no timer, loop, or retry count in the page code', () => {
   const code = app.replace(/\/\/.*$/gm, '');
   assert.doesNotMatch(code, /setInterval|setTimeout\(\s*\(\)\s*=>\s*runScan|retries|attempt|backoff|while \(/);
-  assert.equal((code.match(/setTimeout/g) ?? []).length, 1, 'only the request timeout uses a timer');
+  assert.equal((code.match(/setTimeout/g) ?? []).length, 0, 'the page code has no timers at all');
+  const client = readFileSync(new URL('../web/scan-client.js', import.meta.url), 'utf8').replace(/\/\/.*$/gm, '');
+  assert.equal((client.match(/setTimeout/g) ?? []).length, 1, 'the scan client has one timer: the request timeout');
+  assert.doesNotMatch(client, /retry\(|attempt|backoff|while \(|for \(/);
 });
 test('wiring: the button is a real button on error strips only, labelled TRY AGAIN, and it only fires on a click', () => {
   assert.match(render, /else if \(kind === 'error' && onRetry\)/);
