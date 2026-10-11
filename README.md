@@ -1,10 +1,142 @@
 # README Clew 2
 
-Checks whether your README matches your code. A Chrome extension and web page for any public JavaScript or TypeScript repo on GitHub.
+Checks whether a GitHub README matches its code.
 
-Rules and five deterministic verifiers decide what's true. Jev labels README lines with calibrated confidence. Haiku explains the findings.
+**Live:** https://readme-clew-2.vercel.app
 
-**Status:** in progress for the AdaL "What Would Jev Do?" hackathon (Oct 6 to 11, 2026). The full README, with setup steps and honest limitations, lands before submission.
+Paste a public JavaScript or TypeScript repo, press SCAN, and get a claim ledger: every checkable line of the README, what the code says about it, and who decided.
+
+Built for the AdaL "What Would Jev Do?" hackathon, October 6 to 11, 2026.
+
+---
+
+## What it does
+
+READMEs drift. A command gets renamed, an env var gets dropped, a package gets swapped, and the README keeps promising the old thing. README Clew 2 reads the README line by line and sorts each line into one of four buckets:
+
+| Bucket | Means |
+|---|---|
+| **Contradicted** | The README says it, the code disagrees. Example: the README tells you to run a start script that `package.json` doesn't have |
+| **Missing** | The code does it, the README never mentions it. Example: the code imports a package the README never names |
+| **Unverifiable** | No code check can test it (opinions, scope notes, design claims), or Jev wasn't sure what kind of line it was |
+| **Verified** | The README and the code agree |
+
+Every row shows the exact README line (with a link to that line on GitHub), the code evidence, and **who decided: a rule or Jev.**
+
+## Who it's for
+
+Anyone who maintains or evaluates a JS/TS repo: open source maintainers before a release, hackathon judges reading a submission, and new contributors who want to know which parts of a README they can trust.
+
+## How it decides (and who doesn't)
+
+The design rule: **models never decide what's true.**
+
+1. **Rules first.** Code splits the README into lines and settles the obvious ones (headings, badges, blank lines) without any model.
+2. **Jev labels.** For lines rules can't classify, [Jev](https://typesafe.ai) (TypeSafe's decision model, `jev-1.13.0`, called through [Glasser](https://glasser.ai)) picks what kind of claim the line is: a dependency, a command, an env var, a file or URL, or something no code check covers. Jev only picks labels.
+3. **The 0.8 gate.** A line goes to a code check only if Jev is at least 0.8 confident it's one of those four checkable kinds. Below that, it's Unverifiable, tagged "Jev wasn't sure."
+4. **Five deterministic verifiers decide.** Dependencies, commands, env vars, file and URL references, and code-vs-package coverage. They read `package.json`, the file tree and the source. Same input, same answer.
+5. **Claude Haiku explains.** Haiku writes the short summary from the structured results only (counts, claim types and names). It never sees the README lines themselves and never decides a bucket. If Haiku fails, the report is still complete.
+
+When in doubt, README Clew 2 says "can't tell." Calling a correct README wrong is the one mistake the design works hardest to avoid.
+
+### Where Jev matters
+
+Jev is what lets this work on real READMEs, which are mostly prose. Regex finds candidate names; Jev decides whether a line like "Run the dev server" is a command claim worth checking, and how sure it is. Its calibrated confidence is what the 0.8 gate stands on.
+
+Measured on a held-out set of 32 README lines, frozen configuration, run twice:
+
+| Measure | Run 1 | Run 2 |
+|---|---|---|
+| Wrong routes passing the 0.8 gate | 0 | 0 |
+| False Contradicted (end-to-end scan) | 0 | 0 |
+| Real drift found | 3 of 3 | 3 of 3 |
+| Lines whose label changed between runs | 0 of 32 | |
+
+The sample is small, so this supports "safe enough to ship," not a measured error rate. Full numbers and caveats are in [LEDGER.md](LEDGER.md).
+
+Cost per scan is about a penny: roughly $0.009 for Jev and $0.0005 for Haiku. Glasser's own run and balance history for the build is in [evaluation/usage_report.md](evaluation/usage_report.md).
+
+## Try it
+
+### Live page (no install)
+
+1. Open https://readme-clew-2.vercel.app
+2. Press **USE DEMO REPO**, then **SCAN**. The demo is README Clew v1, this project's predecessor.
+3. Open **KEY** for what each bucket and label means, and **ABOUT** for limits and links.
+
+Deep links work too: `https://readme-clew-2.vercel.app/?repo=owner/name` fills in the repo. The page never scans until you press SCAN.
+
+### Chrome extension (load unpacked)
+
+1. Download the extension ZIP (version 0.1.0) from this repo's [Releases](https://github.com/earlgreyhot1701D/readme-clew-2/releases) and unzip it.
+2. Open `chrome://extensions` and turn on **Developer mode**.
+3. Click **Load unpacked** and choose the unzipped folder.
+4. Open any public JS/TS repo on GitHub, click the clew icon, and press **SCAN**.
+
+The extension asks for `activeTab` and the one API address only. It reads the current tab's URL when you click, and nothing else.
+
+### Bookmarklet (any browser)
+
+Drag the bookmarklet from the **ABOUT** tab to your bookmarks bar. On a GitHub repo page, click it to open the live page with that repo filled in. It only navigates. It never reads the page or sends anything. Source: [bookmarklet/bookmarklet.js](bookmarklet/bookmarklet.js).
+
+## Honest limitations
+
+- **JavaScript and TypeScript only.** Every check needs a source of truth inside the repo, and in JS/TS that's one file, `package.json`, which lists both the packages and the commands. Python spreads the same facts across several optional files. Other languages are planned, not built. A repo with no `package.json` gets a clear "not a JS/TS repo" message, and no model is called.
+- **Most lines end up Unverifiable.** That's expected. Most README text is prose that no code check can test. Unverifiable means "can't tell," not "wrong."
+- **Monorepos:** reads the pnpm workspace file and the workspaces field in `package.json`, with simple folder patterns only (one level of wildcard, or an exact folder), up to 30 workspaces. Beyond that, Missing turns into Unverifiable. A recursive pnpm command counts as verified if any one workspace has that script.
+- **Example, demo, test, fixture and docs folders** are skipped when looking for Missing packages, because they usually have their own `package.json`.
+- **Size:** READMEs over 50 KB are cut, and at most 20 source files are read per scan.
+- **Labels can drift by a line.** The same README scanned twice can move one borderline line between buckets. The 0.8 gate keeps that drift away from Contradicted.
+- **No badge.** A live README badge would re-run a scan, and bill the owner, every time someone viewed it. Without storage there's no safe way to cache it, so it's not built.
+- **The summary can be unavailable.** If Haiku times out or fails, the report shows a fixed line instead. Everything else still works.
+
+## Privacy and security
+
+- **Scans are never stored.** No database. The report lives in your browser until you leave or press CLEAR. DOWNLOAD JSON saves it as a file on your machine.
+- Page views are counted anonymously through Vercel Analytics, with no cookies.
+- Public repos only. Private or missing repos get "repo not found or not public."
+- API keys live only in server-side environment variables: `GLASSER_API_KEY`, `ANTHROPIC_API_KEY` and `GITHUB_TOKEN`. Never in the page, the extension or the repo.
+- All repo text is rendered with `textContent`. The README text is never sent to Haiku, so a README can't talk to the summary model.
+- Input is validated in the page and again on the server. The scan API is rate-limited.
+
+## How it was built
+
+Built in five days in the [AdaL](https://adalagent.ai) desktop app, block by block, with propose-first prompts and an `AGENTS.md` it read every turn. Claude wrote the PRD, the architecture and the docs, and reviewed AdaL's work at each checkpoint.
+
+- **AdaL** wrote the code and tests, ran the Jev evaluation, found the 100-question-per-call limit, deployed to Vercel, and drove a real browser for QA. It turns capabilities on by itself when a task needs them: it switched on its browser tool to screenshot and time the UI without being asked.
+- **Glasser** is how Jev is called: plain Glasser runs (`POST /v1/runs`), one run per batch of up to 100 questions. Failed runs cost nothing, and every run reports its exact charge. The build's usage report is generated from Glasser's run and balance history.
+- **Workflows and Sandboxes:** not used.
+
+Things that went wrong, kept on the record:
+
+- The first real test, scanning README Clew v1, falsely called three lines Contradicted. v1 is a pnpm monorepo in folders the workspace finder didn't know, and pnpm's filter option was read as a script name. Fixed and saved as a regression test.
+- A second live test found 14 Missing packages that all came from an examples folder with its own package file. Fixed the same way.
+- The test suite grew to over 450 tests in five days. The ones that matter most guard the core promise: verifiers, the gate, the prose guard and the monorepo regressions. Many of the rest re-prove UI wiring that a browser check already covers. Lesson noted.
+
+The decision log is [LEDGER.md](LEDGER.md). The block-by-block log is [BUILD-LOG.md](BUILD-LOG.md). The spec is [PRD.md](PRD.md).
+
+## For developers
+
+Requires Node.js 22 or newer. No runtime dependencies.
+
+```
+npm test
+```
+
+Runs the full suite offline with recorded Jev answers. No network, no keys needed.
+
+| Folder | Holds |
+|---|---|
+| `api/` | The Vercel function for scans |
+| `lib/` | One file per job: line splitting, candidates, Jev client, gate, buckets, summary, receipt |
+| `lib/verifiers/` | The five deterministic checks |
+| `web/` | The live page, plain HTML and JavaScript, no build step |
+| `extension/` | The Chrome popup (Manifest V3), sharing code synced from `web/` |
+| `bookmarklet/` | Bookmarklet source |
+| `fixtures/` | Sample READMEs, recorded Jev answers, expected reports |
+| `evaluation/` | The Jev evaluation runner, results and usage report |
+
+To run your own copy, set `GLASSER_API_KEY`, `ANTHROPIC_API_KEY` and `GITHUB_TOKEN` as environment variables on Vercel and deploy the repo. The site is served from `web/`.
 
 ## Credits
 
@@ -19,7 +151,23 @@ MLH measured Jev on a routing job close to ours: deciding which deterministic ch
 - **One test question.** "Imagine the verifier finds this name in the code. Would that prove this line is a true claim about this repo?" If not, the line isn't sent to a verifier.
 - **No worked examples in Jev's criteria.** In MLH's tests, adding examples made Jev's dangerous mistakes worse.
 - **Count mistakes per line, not per run.** Jev's errors tend to repeat on the same line, which a better question can fix.
-- **A 0.8 confidence bar** is our starting point for the confidence gate, set on half our test lines and checked on the other half.
+- **A 0.8 confidence bar,** checked on half our test lines after tuning on the other half.
+
+### Further reading
+
+DigitalOcean, ["Jev: an AI model that can't write a sentence"](https://dev.to/digitalocean/jev-an-ai-model-that-cant-write-a-sentence-3cj), DEV Community, October 9, 2026. Where we first saw Jev's input limits. The limits the code enforces come from TypeSafe's model page.
+
+### Art
+
+The clew mascot and the social card were generated with ChatGPT by the author, then cut out and sized by Claude.
+
+### Built with
+
+AdaL, Jev by TypeSafe via Glasser, Claude Haiku, Vercel. A [Clew Labs](https://clewlabs.org) project.
+
+## License
+
+Apache 2.0. See [LICENSE](LICENSE).
 
 ---
 
