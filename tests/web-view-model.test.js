@@ -203,3 +203,9 @@ test('fixture mode: the allowlist matches the files in fixtures/expected exactly
   await assert.rejects(loadFixture('../../package'), /Unknown fixture/);
   assert.throws(() => FIXTURES.push('x'), TypeError); // frozen
 });
+
+// Vercel Hobby firewall rate limits can only Deny with 403 (429 is Pro), so a bare 403 from /api/scan means too many scans.
+test('errorState: a 403 from the firewall gives the rate-limit message', () => {
+  assert.equal(errorState(403, undefined), STATES.rateLimited);
+  assert.equal(errorState(403, ''), STATES.rateLimited);
+});

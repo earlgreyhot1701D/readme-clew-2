@@ -180,7 +180,7 @@ export function loadingText(owner, name) { return `SCANNING ${owner}/${name} ...
 export function errorState(httpStatus, code) {
   if (httpStatus === 404 || code === 'github_not_found' || code === 'github_no_readme') return STATES.notFound;
   if (code === 'not_js_repo') return STATES.notJs;
-  if (httpStatus === 429 || code === 'rate_limited') return STATES.rateLimited;
+  if (httpStatus === 429 || httpStatus === 403 || code === 'rate_limited') return STATES.rateLimited;
   if (httpStatus === 400 && (code === 'bad_url' || code === 'missing_repo')) return STATES.badInput;
   return STATES.failed;
 }
