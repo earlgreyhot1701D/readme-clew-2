@@ -169,6 +169,34 @@ The file holds every finding with its README line, code evidence, bucket, who de
 
 No model writes any part of the receipt. Ways to use the file: attach it to a pull request before a release, keep it as a before-and-after record when you fix your README, or hand it to a reviewer as evidence.
 
+## Testing
+
+**465 tests, all offline.** `npm test` runs them with Node's built-in test runner. No network and no keys: Jev's answers come from recorded fixtures, so the suite gives the same result every time.
+
+The tests that matter most guard the promise that a correct README is never called wrong:
+
+| Guard | What it proves |
+|---|---|
+| The five verifiers | Each check gives the right bucket on known cases, including drift it must catch |
+| The 0.8 gate | Lines Jev isn't sure about go to Unverifiable, never to a verifier |
+| The prose guard | A name that only appears in prose can never be marked Contradicted, however confident Jev is |
+| A confidently wrong Jev | A fixture where Jev mislabels a line with high confidence still produces no false Contradicted |
+| Monorepo regressions | The real layouts of README Clew v1 and polka, the two cases that fooled earlier versions, stay fixed |
+| Not a JS/TS repo | The scan stops before Jev is ever called |
+| Prompt injection | A README with planted instructions: the text becomes the quoted line but never reaches the summary model |
+| The product promise | Every fixture end to end, twice: once normally, once with Jev and Haiku forced to fail. The report still renders, with an honest error or no summary |
+| Safe rendering | The build fails if any page or extension file uses `innerHTML` or `eval` |
+
+**Every new guard was shown failing once** (the code was broken on purpose, the test went red, the code was restored), so no test passes by accident.
+
+**Beyond the suite:**
+- **A live Jev evaluation** on 64 hand-labeled lines from four real READMEs and one made-up README of hard cases, tuned on half and checked on the held-out half (results under "Where Jev matters").
+- **Real-browser QA** at desktop and phone widths at the end of each build block, in Chrome with the production security headers.
+- **Live scans** of real repos, which is how both monorepo bugs were found.
+- **The self-scan:** README Clew 2 scanned its own README before submission. 0 Contradicted.
+
+Honest note: 465 is more than a five-day build needed. Many tests re-prove page wiring that the browser checks already cover. The guards in the table above are the ones worth keeping.
+
 ## How it was built
 
 Built in five days in the [AdaL](https://adalagent.ai) desktop app, block by block, with propose-first prompts and an `AGENTS.md` it read every turn. Claude wrote the PRD, the architecture and the docs, and reviewed AdaL's work at each checkpoint.
@@ -186,7 +214,7 @@ Things that went wrong, kept on the record:
 
 - The first real test, scanning README Clew v1, falsely called three lines Contradicted. v1 is a pnpm monorepo in folders the workspace finder didn't know, and pnpm's filter option was read as a script name. Fixed and saved as a regression test.
 - A second live test found 14 Missing packages that all came from an examples folder with its own package file. Fixed the same way.
-- The test suite grew to over 450 tests in five days. The ones that matter most guard the core promise: verifiers, the gate, the prose guard and the monorepo regressions. Many of the rest re-prove UI wiring that a browser check already covers. Lesson noted.
+- The test suite grew to 465 tests in five days, more than it needed. See "Testing" for which ones matter.
 
 The decision log is [LEDGER.md](LEDGER.md). The block-by-block log is [BUILD-LOG.md](BUILD-LOG.md). The spec is [PRD.md](PRD.md).
 
