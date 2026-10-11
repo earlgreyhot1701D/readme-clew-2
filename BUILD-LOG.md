@@ -96,3 +96,24 @@ Oct 9, 2026, evening
 - `spike/s6/package.json`, `spike/s6/api/card.js`
 
 Outside `spike/`: `LICENSE`, `LEDGER.md`, `BUILD-LOG.md`. `.gitignore` was already correct.
+
+## Block 5 (in progress): live page
+
+Done so far: `web/` (index.html, app.js, view-model.js, render.js, fixture-mode.js, tokens.css, layout.css, findings.css, mascot/ with 5 SVGs) and `scripts/dev-server.mjs` (local only, serves web/ plus fixtures/expected/). Fixture mode renders from `fixtures/expected/*.json` on localhost only. The API wiring is in `app.js` but untested against the live API. Screenshots are in `design/shots/` (gitignored). Still to do: view-model and DOM-safety tests, vercel.json (outputDirectory, CSP), preview deploy, QA checkpoint, commit with the `.gitignore` change.
+
+## Block 5a: verifier fix for pnpm monorepos (2026-10-10, Working tier)
+
+Why: the demo repo (`earlgreyhot1701D/readme-clew`) showed 7 false positives. Details in LEDGER ("Found in the demo").
+
+What I did:
+
+1. `lib/workspaces.js` (new, pure): parses `pnpm-workspace.yaml` `packages:` and root `workspaces`, expands `dir/*` and exact dirs, resolves a package name or path to a workspace.
+2. `lib/github.js`: reads `pnpm-workspace.yaml` (one extra raw read, no extra API call), uses declared workspaces and keeps the old folder regex as the fallback. `MAX_WORKSPACES` 10 to 30. Sets `snapshot.workspacesTruncated`.
+3. `lib/verifiers/commands.js`: workspace targeting (`--filter/-F`, `--workspace/-w`, `yarn workspace`), value-taking flags consumed, directory flags Unverifiable, unresolved targets Unverifiable.
+4. `lib/verifiers/dependencies.js` and `coverage.js`: when workspaces were truncated, "not declared" is Unverifiable and the Missing wording is neutral. (`coverage.js` was not named in the proposal. It carries the "not listed in package.json" wording, so it needed the one-line change.)
+5. Fixtures: `pnpm-monorepo`, `readme-clew-v1-regression`, and `fixtures/v1-pnpm-workspace.yaml` (v1's real file). Both new expected files were generated from the pipeline, then reviewed line by line against intent. Added both names to `tests/helpers.js`.
+6. Tests: 197 to 222 (all pass, 0 fail, 0 cancelled, 0 skipped, 0 todo). New: `tests/workspaces.test.js` (8), github (4), verifiers (9), fixtures (4 including the 2 report-equals tests).
+7. Showed the new tests failing: 19 deliberate breaks, one at a time, each restored by a throwaway script outside the repo. Every break turned at least one new test red. The full suite was re-run green afterwards.
+8. One live rescan of v1 from this machine (GitHub + Jev, keys from `.env`, never printed): 0 contradicted, 4 missing, 8 verified, 140 unverifiable.
+
+Not touched: PRD.md, AGENTS.md, README.md, api/, web/.

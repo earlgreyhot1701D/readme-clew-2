@@ -1,0 +1,213 @@
+{
+  "repo": {
+    "owner": "fixture",
+    "name": "readme-clew-v1-regression",
+    "readmePath": "README.md"
+  },
+  "counts": {
+    "verified": 3,
+    "unverifiable": 0,
+    "missing": 8,
+    "contradicted": 0
+  },
+  "findings": [
+    {
+      "id": "f-01",
+      "bucket": "missing",
+      "claimType": "dependency",
+      "line": null,
+      "quote": null,
+      "name": "esbuild",
+      "evidence": {
+        "file": "artifacts/api-server/build.mjs",
+        "detail": "artifacts/api-server/build.mjs imports esbuild (devDependencies has it); the README never mentions it"
+      },
+      "decidedBy": "rule",
+      "confidence": null,
+      "lowConfidence": false,
+      "verifier": "coverage",
+      "link": null
+    },
+    {
+      "id": "f-02",
+      "bucket": "missing",
+      "claimType": "dependency",
+      "line": null,
+      "quote": null,
+      "name": "esbuild-plugin-pino",
+      "evidence": {
+        "file": "artifacts/api-server/build.mjs",
+        "detail": "artifacts/api-server/build.mjs imports esbuild-plugin-pino (devDependencies has it); the README never mentions it"
+      },
+      "decidedBy": "rule",
+      "confidence": null,
+      "lowConfidence": false,
+      "verifier": "coverage",
+      "link": null
+    },
+    {
+      "id": "f-03",
+      "bucket": "missing",
+      "claimType": "dependency",
+      "line": null,
+      "quote": null,
+      "name": "orval",
+      "evidence": {
+        "file": "lib/api-spec/orval.config.ts",
+        "detail": "lib/api-spec/orval.config.ts imports orval (devDependencies has it); the README never mentions it"
+      },
+      "decidedBy": "rule",
+      "confidence": null,
+      "lowConfidence": false,
+      "verifier": "coverage",
+      "link": null
+    },
+    {
+      "id": "f-04",
+      "bucket": "missing",
+      "claimType": "dependency",
+      "line": null,
+      "quote": null,
+      "name": "drizzle-kit",
+      "evidence": {
+        "file": "lib/db/drizzle.config.ts",
+        "detail": "lib/db/drizzle.config.ts imports drizzle-kit (devDependencies has it); the README never mentions it"
+      },
+      "decidedBy": "rule",
+      "confidence": null,
+      "lowConfidence": false,
+      "verifier": "coverage",
+      "link": null
+    },
+    {
+      "id": "f-05",
+      "bucket": "missing",
+      "claimType": "dependency",
+      "line": null,
+      "quote": null,
+      "name": "express",
+      "evidence": {
+        "file": "artifacts/api-server/src/app.ts",
+        "detail": "artifacts/api-server/src/app.ts imports express (dependencies has it); the README never mentions it"
+      },
+      "decidedBy": "rule",
+      "confidence": null,
+      "lowConfidence": false,
+      "verifier": "coverage",
+      "link": null
+    },
+    {
+      "id": "f-06",
+      "bucket": "missing",
+      "claimType": "dependency",
+      "line": null,
+      "quote": null,
+      "name": "cors",
+      "evidence": {
+        "file": "artifacts/api-server/src/app.ts",
+        "detail": "artifacts/api-server/src/app.ts imports cors (dependencies has it); the README never mentions it"
+      },
+      "decidedBy": "rule",
+      "confidence": null,
+      "lowConfidence": false,
+      "verifier": "coverage",
+      "link": null
+    },
+    {
+      "id": "f-07",
+      "bucket": "missing",
+      "claimType": "dependency",
+      "line": null,
+      "quote": null,
+      "name": "helmet",
+      "evidence": {
+        "file": "artifacts/api-server/src/app.ts",
+        "detail": "artifacts/api-server/src/app.ts imports helmet (not listed in package.json); the README never mentions it"
+      },
+      "decidedBy": "rule",
+      "confidence": null,
+      "lowConfidence": false,
+      "verifier": "coverage",
+      "link": null
+    },
+    {
+      "id": "f-08",
+      "bucket": "missing",
+      "claimType": "dependency",
+      "line": null,
+      "quote": null,
+      "name": "pino-http",
+      "evidence": {
+        "file": "artifacts/api-server/src/app.ts",
+        "detail": "artifacts/api-server/src/app.ts imports pino-http (dependencies has it); the README never mentions it"
+      },
+      "decidedBy": "rule",
+      "confidence": null,
+      "lowConfidence": false,
+      "verifier": "coverage",
+      "link": null
+    },
+    {
+      "id": "f-09",
+      "bucket": "verified",
+      "claimType": "command",
+      "line": 6,
+      "quote": "pnpm --filter @workspace/api-server run dev",
+      "name": "pnpm --filter @workspace/api-server run dev",
+      "evidence": {
+        "file": "artifacts/api-server/package.json",
+        "detail": "scripts has dev"
+      },
+      "decidedBy": "rule",
+      "confidence": null,
+      "lowConfidence": false,
+      "verifier": "commands",
+      "link": "https://github.com/fixture/readme-clew-v1-regression/blob/HEAD/README.md?plain=1#L6"
+    },
+    {
+      "id": "f-10",
+      "bucket": "verified",
+      "claimType": "command",
+      "line": 7,
+      "quote": "pnpm --filter @workspace/frontend run dev",
+      "name": "pnpm --filter @workspace/frontend run dev",
+      "evidence": {
+        "file": "artifacts/frontend/package.json",
+        "detail": "scripts has dev"
+      },
+      "decidedBy": "rule",
+      "confidence": null,
+      "lowConfidence": false,
+      "verifier": "commands",
+      "link": "https://github.com/fixture/readme-clew-v1-regression/blob/HEAD/README.md?plain=1#L7"
+    },
+    {
+      "id": "f-11",
+      "bucket": "verified",
+      "claimType": "command",
+      "line": 8,
+      "quote": "pnpm --filter @workspace/api-server run test:fixtures",
+      "name": "pnpm --filter @workspace/api-server run test:fixtures",
+      "evidence": {
+        "file": "artifacts/api-server/package.json",
+        "detail": "scripts has test:fixtures"
+      },
+      "decidedBy": "rule",
+      "confidence": null,
+      "lowConfidence": false,
+      "verifier": "commands",
+      "link": "https://github.com/fixture/readme-clew-v1-regression/blob/HEAD/README.md?plain=1#L8"
+    }
+  ],
+  "notes": null,
+  "mood": "worried",
+  "tilt": false,
+  "meta": {
+    "jevModel": "jev-1.13.0",
+    "readmeTruncated": false,
+    "linesTotal": 9,
+    "linesToJev": 1,
+    "ms": 0
+  },
+  "receipt": null
+}

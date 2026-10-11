@@ -139,3 +139,66 @@ test('coverage: built-ins, relative imports, and scoped names', () => {
   const r = { ...repo, sources: { 'a.js': "import fs from 'fs';\nimport x from './x.js';\nimport y from '@scope/pkg/deep';\n" } };
   assert.deepEqual(verifyCoverage('nothing here', r).map((m) => m.name), ['@scope/pkg']);
 });
+
+// Workspace targeting (Block 5a: v1 false positives). --filter used to leave its value behind as the "subcommand".
+const wsRepo = {
+  pkg: { name: 'root', scripts: { dev: 'root-dev', build: 'pnpm -r run build' } },
+  workspaces: [
+    { path: 'artifacts/api', pkg: { name: '@w/api', scripts: { dev: 'tsx', test: 'node --test', 'test:fixtures': 'x' } } },
+    { path: 'artifacts/web', pkg: { name: '@w/web', scripts: { build: 'vite build' } } },
+    { path: 'lib/shared', pkg: { name: '@w/shared' } },
+  ],
+  files: [], sources: {},
+};
+test('commands: pnpm --filter <name> run <script> checks that workspace, not a root script named after the package', () => {
+  const r = verifyCommand('pnpm --filter @w/api run dev', wsRepo);
+  assert.equal(r.bucket, 'verified');
+  assert.deepEqual(r.evidence, { file: 'artifacts/api/package.json', detail: 'scripts has dev' });
+  assert.equal(verifyCommand('pnpm --filter @w/api run test:fixtures', wsRepo).bucket, 'verified');
+});
+test('commands: --filter=X, -F X, and no "run" all resolve the same way', () => {
+  for (const c of ['pnpm --filter=@w/api dev', 'pnpm -F @w/api run dev', 'pnpm --filter @w/api dev', 'pnpm --filter ./artifacts/api dev', 'bun --filter @w/api run dev']) {
+    assert.equal(verifyCommand(c, wsRepo).evidence.file, 'artifacts/api/package.json', c);
+  }
+});
+test('commands: npm -w / --workspace before or after the script, and yarn workspace', () => {
+  for (const c of ['npm run dev -w @w/api', 'npm -w @w/api run dev', 'npm run dev --workspace=@w/api', 'npm run dev --workspace @w/api', 'yarn workspace @w/api dev', 'yarn workspace @w/api run dev']) {
+    const r = verifyCommand(c, wsRepo);
+    assert.equal(r.bucket, 'verified', c);
+    assert.equal(r.evidence.file, 'artifacts/api/package.json', c);
+  }
+});
+test('commands: a resolved workspace without the script is Contradicted and names that package.json', () => {
+  const r = verifyCommand('pnpm --filter @w/web run dev', wsRepo); // root has dev, @w/web does not
+  assert.equal(r.bucket, 'contradicted');
+  assert.deepEqual(r.evidence, { file: 'artifacts/web/package.json', detail: 'scripts has no dev' });
+});
+test('commands: an unresolved target is Unverifiable, never Contradicted (name, glob, range, negation, two targets)', () => {
+  for (const c of ['pnpm --filter @w/ghost run dev', 'pnpm --filter "@w/*" dev', 'pnpm --filter ...@w/api dev', 'pnpm --filter @w/api... dev',
+    'pnpm --filter !@w/api dev', 'pnpm --filter {./artifacts/api} dev', 'yarn workspace @w/ghost dev', 'pnpm --filter @w/api --filter @w/web dev']) {
+    assert.equal(verifyCommand(c, wsRepo).bucket, 'unverifiable', c);
+  }
+});
+test('commands: no workspaces read, or a truncated list, makes a filtered command Unverifiable', () => {
+  assert.equal(verifyCommand('pnpm --filter @w/api run dev', { ...wsRepo, workspaces: [] }).bucket, 'unverifiable');
+  const t = verifyCommand('pnpm --filter @w/ghost run dev', { ...wsRepo, workspacesTruncated: true });
+  assert.equal(t.bucket, 'unverifiable');
+  assert.match(t.evidence.detail, /not read/);
+});
+test('commands: directory flags are Unverifiable, and value flags never become the subcommand', () => {
+  for (const c of ['npm --prefix web run dev', 'pnpm -C web run nope', 'pnpm --dir=web run nope', 'npm run nope --prefix=web']) assert.equal(verifyCommand(c, wsRepo).bucket, 'unverifiable', c);
+  assert.equal(verifyCommand('npm --registry https://r.example run dev', wsRepo).bucket, 'verified');
+});
+test('commands: recursive runs still check every workspace, and yarn workspaces foreach is not checked', () => {
+  assert.equal(verifyCommand('pnpm -r run test', wsRepo).bucket, 'verified');
+  assert.equal(verifyCommand('pnpm -r run nope', wsRepo).bucket, 'contradicted');
+  assert.equal(verifyCommand('yarn workspaces foreach run dev', wsRepo).bucket, 'unverifiable');
+});
+test('dependencies and coverage: with unread workspaces, "not declared" is Unverifiable and the wording is neutral', () => {
+  const t = { ...repo, workspacesTruncated: true };
+  const ctx = { text: '`left-pad`', inFence: false };
+  assert.equal(verifyDependency('left-pad', repo, ctx).bucket, 'contradicted');
+  assert.equal(verifyDependency('left-pad', t, ctx).bucket, 'unverifiable');
+  const out = verifyCoverage('nothing', { ...t, sources: { 'a.js': "import z from 'zed';\n" } });
+  assert.match(out[0].evidence.detail, /not found in the package\.json files read/);
+});

@@ -114,3 +114,23 @@ test('name-pick: Jev picks one of two names; none_of_these leaves the line Unver
 test('a missing mocked Jev answer is an error, not a silent skip', () => {
   assert.throws(() => runFixture('frontend-vite', { jev: { labels: {}, names: {} } }), /No Jev answer for line 3/);
 });
+
+test('pnpm-monorepo: filtered commands verify against the right workspace; one real drift; an unknown package stays Unverifiable', () => {
+  const { report } = runFixture('pnpm-monorepo');
+  const by = (q) => report.findings.find((f) => f.quote === q);
+  assert.equal(by('pnpm --filter @acme/api run lint').bucket, 'contradicted');
+  assert.equal(by('pnpm --filter @acme/ghost run dev').bucket, 'unverifiable');
+  for (const q of ['pnpm --filter @acme/api run dev', 'pnpm --filter @acme/web dev', 'pnpm -F @acme/api test']) assert.equal(by(q).bucket, 'verified', q);
+  assert.equal(report.counts.missing, 0); // fastify and react are declared only in workspace packages
+});
+test('readme-clew-v1-regression: the 3 false Contradicted rows are gone and the Missing evidence is true', () => {
+  const { report } = runFixture('readme-clew-v1-regression');
+  assert.equal(report.counts.contradicted, 0);
+  assert.equal(report.findings.filter((f) => f.verifier === 'commands' && f.bucket === 'verified').length, 3);
+  const missing = Object.fromEntries(report.findings.filter((f) => f.bucket === 'missing').map((f) => [f.name, f.evidence.detail]));
+  for (const dep of ['esbuild-plugin-pino', 'orval', 'drizzle-kit', 'pino-http']) {
+    assert.match(missing[dep], /has it\)/, dep); // declared in a workspace package.json, so never "not listed"
+    assert.doesNotMatch(missing[dep], /not listed in package\.json/, dep);
+  }
+  assert.match(missing.helmet, /not listed in package\.json/); // helmet really is undeclared in v1
+});

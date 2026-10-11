@@ -1,0 +1,145 @@
+{
+  "repo": {
+    "owner": "fixture",
+    "name": "pnpm-monorepo",
+    "readmePath": "README.md"
+  },
+  "counts": {
+    "verified": 5,
+    "unverifiable": 1,
+    "missing": 0,
+    "contradicted": 1
+  },
+  "findings": [
+    {
+      "id": "f-01",
+      "bucket": "contradicted",
+      "claimType": "command",
+      "line": 9,
+      "quote": "pnpm --filter @acme/api run lint",
+      "name": "pnpm --filter @acme/api run lint",
+      "evidence": {
+        "file": "artifacts/api/package.json",
+        "detail": "scripts has no lint"
+      },
+      "decidedBy": "rule",
+      "confidence": null,
+      "lowConfidence": false,
+      "verifier": "commands",
+      "link": "https://github.com/fixture/pnpm-monorepo/blob/HEAD/README.md?plain=1#L9"
+    },
+    {
+      "id": "f-02",
+      "bucket": "unverifiable",
+      "claimType": "command",
+      "line": 10,
+      "quote": "pnpm --filter @acme/ghost run dev",
+      "name": "pnpm --filter @acme/ghost run dev",
+      "evidence": {
+        "file": null,
+        "detail": "Workspace \"@acme/ghost\" could not be matched (it is not an exact package name or path)"
+      },
+      "decidedBy": "rule",
+      "confidence": null,
+      "lowConfidence": false,
+      "verifier": "commands",
+      "link": "https://github.com/fixture/pnpm-monorepo/blob/HEAD/README.md?plain=1#L10"
+    },
+    {
+      "id": "f-03",
+      "bucket": "verified",
+      "claimType": "command",
+      "line": 6,
+      "quote": "pnpm --filter @acme/api run dev",
+      "name": "pnpm --filter @acme/api run dev",
+      "evidence": {
+        "file": "artifacts/api/package.json",
+        "detail": "scripts has dev"
+      },
+      "decidedBy": "rule",
+      "confidence": null,
+      "lowConfidence": false,
+      "verifier": "commands",
+      "link": "https://github.com/fixture/pnpm-monorepo/blob/HEAD/README.md?plain=1#L6"
+    },
+    {
+      "id": "f-04",
+      "bucket": "verified",
+      "claimType": "command",
+      "line": 7,
+      "quote": "pnpm --filter @acme/web dev",
+      "name": "pnpm --filter @acme/web dev",
+      "evidence": {
+        "file": "artifacts/web/package.json",
+        "detail": "scripts has dev"
+      },
+      "decidedBy": "rule",
+      "confidence": null,
+      "lowConfidence": false,
+      "verifier": "commands",
+      "link": "https://github.com/fixture/pnpm-monorepo/blob/HEAD/README.md?plain=1#L7"
+    },
+    {
+      "id": "f-05",
+      "bucket": "verified",
+      "claimType": "command",
+      "line": 8,
+      "quote": "pnpm -F @acme/api test",
+      "name": "pnpm -F @acme/api test",
+      "evidence": {
+        "file": "artifacts/api/package.json",
+        "detail": "scripts has test"
+      },
+      "decidedBy": "rule",
+      "confidence": null,
+      "lowConfidence": false,
+      "verifier": "commands",
+      "link": "https://github.com/fixture/pnpm-monorepo/blob/HEAD/README.md?plain=1#L8"
+    },
+    {
+      "id": "f-06",
+      "bucket": "verified",
+      "claimType": "dependency",
+      "line": 13,
+      "quote": "The API is built on `fastify`.",
+      "name": "fastify",
+      "evidence": {
+        "file": "artifacts/api/package.json",
+        "detail": "dependencies has fastify"
+      },
+      "decidedBy": "jev",
+      "confidence": 0.97,
+      "lowConfidence": false,
+      "verifier": "dependencies",
+      "link": "https://github.com/fixture/pnpm-monorepo/blob/HEAD/README.md?plain=1#L13"
+    },
+    {
+      "id": "f-07",
+      "bucket": "verified",
+      "claimType": "dependency",
+      "line": 15,
+      "quote": "The web app is built on `react`.",
+      "name": "react",
+      "evidence": {
+        "file": "artifacts/web/package.json",
+        "detail": "dependencies has react"
+      },
+      "decidedBy": "jev",
+      "confidence": 0.97,
+      "lowConfidence": false,
+      "verifier": "dependencies",
+      "link": "https://github.com/fixture/pnpm-monorepo/blob/HEAD/README.md?plain=1#L15"
+    }
+  ],
+  "notes": null,
+  "mood": "tangled",
+  "tilt": false,
+  "meta": {
+    "jevModel": "jev-1.13.0",
+    "readmeTruncated": false,
+    "linesTotal": 15,
+    "linesToJev": 3,
+    "ms": 0
+  },
+  "receipt": null
+}

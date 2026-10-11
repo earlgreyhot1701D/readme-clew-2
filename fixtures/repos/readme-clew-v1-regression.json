@@ -1,0 +1,245 @@
+{
+  "pkg": {
+    "name": "workspace",
+    "private": true,
+    "scripts": {
+      "preinstall": "sh -c 'rm -f package-lock.json yarn.lock; case \"$npm_config_user_agent\" in pnpm/*) ;; *) echo \"Use pnpm instead\" >&2; exit 1 ;; esac'",
+      "build": "pnpm run typecheck && pnpm -r --if-present run build",
+      "typecheck:libs": "tsc --build",
+      "typecheck": "pnpm run typecheck:libs && pnpm -r --filter \"./artifacts/**\" --filter \"./scripts\" --if-present run typecheck"
+    }
+  },
+  "workspaces": [
+    {
+      "path": "artifacts/api-server",
+      "pkg": {
+        "name": "@workspace/api-server",
+        "scripts": {
+          "dev": "export NODE_ENV=development && pnpm run build && pnpm run start",
+          "build": "node ./build.mjs",
+          "start": "node --enable-source-maps ./dist/index.mjs",
+          "typecheck": "tsc -p tsconfig.json --noEmit",
+          "test:fixtures": "node run-extraction-tests.js"
+        },
+        "dependencies": {
+          "@anthropic-ai/sdk": "^0.92.0",
+          "@workspace/api-zod": "workspace:*",
+          "@workspace/db": "workspace:*",
+          "acorn": "^8.16.0",
+          "acorn-jsx": "^5.3.2",
+          "acorn-walk": "^8.3.5",
+          "cookie-parser": "^1.4.7",
+          "cors": "^2",
+          "drizzle-orm": "catalog:",
+          "express": "^5",
+          "pino": "^9",
+          "pino-http": "^10"
+        },
+        "devDependencies": {
+          "@types/acorn": "^6.0.4",
+          "@types/cookie-parser": "^1.4.10",
+          "@types/cors": "^2.8.19",
+          "@types/express": "^5.0.6",
+          "@types/node": "catalog:",
+          "esbuild": "^0.27.3",
+          "esbuild-plugin-pino": "^2.3.3",
+          "pino-pretty": "^13",
+          "thread-stream": "3.1.0"
+        }
+      }
+    },
+    {
+      "path": "artifacts/frontend",
+      "pkg": {
+        "name": "@workspace/frontend",
+        "scripts": {
+          "dev": "vite --config vite.config.ts --host 0.0.0.0",
+          "build": "vite build --config vite.config.ts",
+          "serve": "vite preview --config vite.config.ts --host 0.0.0.0",
+          "typecheck": "tsc -p tsconfig.json --noEmit"
+        },
+        "dependencies": {},
+        "devDependencies": {
+          "@types/node": "catalog:",
+          "vite": "catalog:"
+        }
+      }
+    },
+    {
+      "path": "lib/api-client-react",
+      "pkg": {
+        "name": "@workspace/api-client-react",
+        "scripts": {},
+        "dependencies": {
+          "@tanstack/react-query": "catalog:"
+        },
+        "devDependencies": {}
+      }
+    },
+    {
+      "path": "lib/api-spec",
+      "pkg": {
+        "name": "@workspace/api-spec",
+        "scripts": {
+          "codegen": "orval --config ./orval.config.ts && pnpm -w run typecheck:libs"
+        },
+        "dependencies": {},
+        "devDependencies": {
+          "orval": "^8.5.2"
+        }
+      }
+    },
+    {
+      "path": "lib/api-zod",
+      "pkg": {
+        "name": "@workspace/api-zod",
+        "scripts": {},
+        "dependencies": {
+          "zod": "catalog:"
+        },
+        "devDependencies": {}
+      }
+    },
+    {
+      "path": "lib/db",
+      "pkg": {
+        "name": "@workspace/db",
+        "scripts": {
+          "push": "drizzle-kit push --config ./drizzle.config.ts",
+          "push-force": "drizzle-kit push --force --config ./drizzle.config.ts"
+        },
+        "dependencies": {
+          "drizzle-orm": "catalog:",
+          "drizzle-zod": "^0.8.3",
+          "pg": "^8.20.0",
+          "zod": "catalog:"
+        },
+        "devDependencies": {
+          "@types/node": "catalog:",
+          "@types/pg": "^8.18.0",
+          "drizzle-kit": "^0.31.9"
+        }
+      }
+    },
+    {
+      "path": "scripts",
+      "pkg": {
+        "name": "@workspace/scripts",
+        "scripts": {
+          "hello": "tsx ./src/hello.ts",
+          "typecheck": "tsc -p tsconfig.json --noEmit"
+        },
+        "dependencies": {},
+        "devDependencies": {
+          "@types/node": "catalog:",
+          "tsx": "catalog:"
+        }
+      }
+    }
+  ],
+  "files": [
+    ".gitignore",
+    ".npmrc",
+    "LICENSE",
+    "README.md",
+    "artifacts/api-server/.replit-artifact/artifact.toml",
+    "artifacts/api-server/build.mjs",
+    "artifacts/api-server/package.json",
+    "artifacts/api-server/public/app.js",
+    "artifacts/api-server/public/cover-artwork.jpg",
+    "artifacts/api-server/public/index.html",
+    "artifacts/api-server/public/style.css",
+    "artifacts/api-server/run-extraction-tests.js",
+    "artifacts/api-server/src/app.ts",
+    "artifacts/api-server/src/extract.ts",
+    "artifacts/api-server/src/github.ts",
+    "artifacts/api-server/src/index.ts",
+    "artifacts/api-server/src/lib/logger.ts",
+    "artifacts/api-server/src/orchestrator.ts",
+    "artifacts/api-server/src/routes/badge.ts",
+    "artifacts/api-server/src/routes/health.ts",
+    "artifacts/api-server/src/routes/index.ts",
+    "artifacts/api-server/src/routes/og.ts",
+    "artifacts/api-server/src/routes/scan.ts",
+    "artifacts/api-server/src/scan-cache.ts",
+    "artifacts/api-server/src/summarize.ts",
+    "artifacts/api-server/src/validate.ts",
+    "artifacts/api-server/src/verifiers/commands.ts",
+    "artifacts/api-server/src/verifiers/coverage.ts",
+    "artifacts/api-server/src/verifiers/dependencies.ts",
+    "artifacts/api-server/src/verifiers/envvars.ts",
+    "artifacts/api-server/src/verifiers/references.ts",
+    "artifacts/api-server/src/verifiers/types.ts",
+    "artifacts/api-server/tsconfig.json",
+    "artifacts/frontend/.replit-artifact/artifact.toml",
+    "artifacts/frontend/components.json",
+    "artifacts/frontend/index.html",
+    "artifacts/frontend/package.json",
+    "artifacts/frontend/public/app.js",
+    "artifacts/frontend/public/cover-artwork.jpg",
+    "artifacts/frontend/public/favicon-16.png",
+    "artifacts/frontend/public/favicon-32.png",
+    "artifacts/frontend/public/favicon-r.png",
+    "artifacts/frontend/public/favicon.ico",
+    "artifacts/frontend/public/favicon.svg",
+    "artifacts/frontend/public/opengraph.jpg",
+    "artifacts/frontend/public/robots.txt",
+    "artifacts/frontend/public/site.webmanifest",
+    "artifacts/frontend/public/sitemap.xml",
+    "artifacts/frontend/public/style.css",
+    "artifacts/frontend/tsconfig.json",
+    "artifacts/frontend/vite.config.ts",
+    "docs/features.png",
+    "docs/hero.png",
+    "fixtures/01-clean-minimal.md",
+    "fixtures/02-real-vite-react.md",
+    "fixtures/03-real-express-api.md",
+    "fixtures/04-shara-memoria.md",
+    "fixtures/05-shara-petitmot.md",
+    "fixtures/06-edge-empty.md",
+    "fixtures/07-edge-no-claims.md",
+    "fixtures/08-edge-conditional.md",
+    "fixtures/09-edge-monorepo.md",
+    "fixtures/10-edge-malformed.md",
+    "fixtures/expected/01.json",
+    "fixtures/expected/06.json",
+    "fixtures/expected/07.json",
+    "fixtures/run-extraction-tests.js",
+    "lib/api-client-react/package.json",
+    "lib/api-client-react/src/custom-fetch.ts",
+    "lib/api-client-react/src/generated/api.schemas.ts",
+    "lib/api-client-react/src/generated/api.ts",
+    "lib/api-client-react/src/index.ts",
+    "lib/api-client-react/tsconfig.json",
+    "lib/api-spec/openapi.yaml",
+    "lib/api-spec/orval.config.ts",
+    "lib/api-spec/package.json",
+    "lib/api-zod/package.json",
+    "lib/api-zod/src/generated/api.ts",
+    "lib/api-zod/src/generated/types/healthStatus.ts",
+    "lib/api-zod/src/generated/types/index.ts",
+    "lib/api-zod/src/index.ts",
+    "lib/api-zod/tsconfig.json",
+    "lib/db/drizzle.config.ts",
+    "lib/db/package.json",
+    "lib/db/src/index.ts",
+    "lib/db/src/schema/index.ts",
+    "lib/db/tsconfig.json",
+    "package.json",
+    "pnpm-lock.yaml",
+    "pnpm-workspace.yaml",
+    "replit.md",
+    "scripts/package.json",
+    "scripts/post-merge.sh",
+    "scripts/src/hello.ts",
+    "scripts/tsconfig.json",
+    "tsconfig.base.json",
+    "tsconfig.json"
+  ],
+  "sources": {
+    "artifacts/api-server/build.mjs": "import { createRequire } from \"node:module\";\nimport path from \"node:path\";\nimport { fileURLToPath } from \"node:url\";\nimport { build as esbuild } from \"esbuild\";\nimport esbuildPluginPino from \"esbuild-plugin-pino\";\nimport { rm } from \"node:fs/promises\";\nimport __bannerPath from 'node:path';\nimport __bannerUrl from 'node:url';\n",
+    "lib/api-spec/orval.config.ts": "import { defineConfig, InputTransformerFn } from \"orval\";\nimport path from \"path\";\n",
+    "lib/db/drizzle.config.ts": "import { defineConfig } from \"drizzle-kit\";\nimport path from \"path\";\n",
+    "artifacts/api-server/src/app.ts": "import express, { type Express } from \"express\";\nimport cors from \"cors\";\nimport helmet from \"helmet\";\nimport path from \"path\";\nimport pinoHttp from \"pino-http\";\nimport router from \"./routes/index.js\";\nimport { logger } from \"./lib/logger.js\";\n"
+  }
+}

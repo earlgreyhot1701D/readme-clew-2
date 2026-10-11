@@ -89,3 +89,36 @@ test('README over 50 KB is cut at a line boundary and flagged', () => {
   assert.ok(!t.endsWith('lin'));
   assert.deepEqual(cutReadme('small'), { text: 'small', truncated: false });
 });
+
+// Workspace discovery (Block 5a: v1 false positives)
+const V1_YAML = 'packages:\n  - artifacts/*\n  - lib/*\n  - lib/integrations/*\n  - scripts\n';
+test('workspaces come from pnpm-workspace.yaml, not only packages/apps/libs/services', async () => {
+  const fx = fakeGithub({ files: { ...base, 'pnpm-workspace.yaml': V1_YAML,
+    'artifacts/api/package.json': '{"name":"@w/api"}', 'lib/db/package.json': '{"name":"@w/db"}',
+    'lib/integrations/x/package.json': '{"name":"@w/x"}', 'scripts/package.json': '{"name":"@w/scripts"}', 'docs/package.json': '{"name":"not-a-workspace"}' } });
+  const r = await fetchRepo({ owner: 'o', name: 'r' }, { fetchImpl: fx });
+  assert.deepEqual(r.snapshot.workspaces.map((w) => w.path), ['artifacts/api', 'lib/db', 'lib/integrations/x', 'scripts']);
+  assert.equal(r.snapshot.workspacesTruncated, false);
+});
+test('workspaces come from root package.json "workspaces" (array and {packages})', async () => {
+  for (const ws of [['pkgs/*'], { packages: ['pkgs/*'] }]) {
+    const fx = fakeGithub({ files: { 'README.md': '# x', 'package.json': JSON.stringify({ name: 'r', workspaces: ws }), 'pkgs/a/package.json': '{"name":"a"}' } });
+    const r = await fetchRepo({ owner: 'o', name: 'r' }, { fetchImpl: fx });
+    assert.deepEqual(r.snapshot.workspaces, [{ path: 'pkgs/a', pkg: { name: 'a' } }]);
+  }
+});
+test('declared workspaces win over the folder fallback; the fallback still works with no config', async () => {
+  const files = { ...base, 'pnpm-workspace.yaml': 'packages:\n  - apps/*\n', 'apps/web/package.json': '{"name":"web"}', 'packages/old/package.json': '{"name":"old"}' };
+  const declared = await fetchRepo({ owner: 'o', name: 'r' }, { fetchImpl: fakeGithub({ files }) });
+  assert.deepEqual(declared.snapshot.workspaces.map((w) => w.path), ['apps/web']);
+  delete files['pnpm-workspace.yaml'];
+  const fallback = await fetchRepo({ owner: 'o', name: 'r' }, { fetchImpl: fakeGithub({ files }) });
+  assert.deepEqual(fallback.snapshot.workspaces.map((w) => w.path), ['apps/web', 'packages/old']);
+});
+test('more than 30 workspaces: the first 30 are read and workspacesTruncated is set', async () => {
+  const files = { ...base, 'package.json': JSON.stringify({ name: 'r', workspaces: ['pkgs/*'] }) };
+  for (let i = 0; i < 35; i++) files[`pkgs/p${String(i).padStart(2, '0')}/package.json`] = `{"name":"p${i}"}`;
+  const r = await fetchRepo({ owner: 'o', name: 'r' }, { fetchImpl: fakeGithub({ files }) });
+  assert.equal(r.snapshot.workspaces.length, 30);
+  assert.equal(r.snapshot.workspacesTruncated, true);
+});

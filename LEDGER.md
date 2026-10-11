@@ -318,3 +318,32 @@ Oct 9, 2026, evening. Status: code and offline tests done (197 pass, 0 fail, 0 c
 3. Large READMEs cost more: the 647-line README above cost $0.009, near the old $0.01 target, because each of 373 questions carries the criteria text.
 4. The per-IP limiter is best effort (in memory, per instance). The Vercel firewall rule and the prepaid balances are the real ceilings (PRD 7.4).
 5. The token estimate is conservative and not calibrated against Jev's tokenizer, so some trimming may happen that was not strictly needed.
+
+## Found in the demo: false positives on a pnpm monorepo (Block 5a, 2026-10-10)
+
+Scanning `earlgreyhot1701D/readme-clew` (v1, a Replit-style pnpm monorepo) for the live-page demo gave 3 Contradicted and 4 Missing. The owner checked v1: the 3 Contradicted were false, and the Missing evidence ("not listed in package.json") was false.
+
+Two causes:
+
+1. **Workspace discovery** (`lib/github.js`). It only read `packages|apps|libs|services/*/package.json`. v1's `pnpm-workspace.yaml` lists `artifacts/*`, `lib/*`, `lib/integrations/*`, and `scripts`, so those package.json files were never read. Every dependency declared in them looked undeclared.
+2. **`--filter`** (`lib/verifiers/commands.js`). `args()` dropped the flag but kept its value, so `pnpm --filter @workspace/api-server run dev` was checked as a root script named `@workspace/api-server`. The same bug hit every flag that takes a value (`npm --prefix web run dev` checked a script named `web`).
+
+Fix:
+
+- Workspaces now come from `pnpm-workspace.yaml` `packages:` and the root `workspaces` field. Only `dir/*` and exact dirs are supported. Negations, `**`, and mid-path globs are ignored. The old folder regex is the fallback. A small line parser reads the YAML (no dependency). New file `lib/workspaces.js`.
+- `MAX_WORKSPACES` went from 10 to 30. v1 has 7, but `artifacts/* + lib/* + lib/integrations/*` passes 10 quickly on Replit-style repos. If the cap still cuts a repo off, `snapshot.workspacesTruncated` is set.
+- `--filter/-F` (pnpm, bun), `--workspace/-w` (npm), and `yarn workspace <name>` resolve the name to a workspace and check only that package's scripts. An unresolved name, glob, range (`...x`), negation, or a second target is Unverifiable, never Contradicted.
+- Directory flags (`--prefix`, `-C`, `--dir`, `--cwd`) give Unverifiable. Other value flags (`--registry` and similar) are consumed with their value.
+- When workspaces were truncated, "not declared" is Unverifiable (`dependencies.js`), and the Missing wording stops claiming "not listed in package.json" (`coverage.js`).
+
+Rescan of v1 after the fix (local `scanRepo`, live GitHub and Jev): 8 verified, 140 unverifiable, 4 missing, 0 contradicted. The 3 commands now Verify against their own workspace's scripts.
+
+**The 4 Missing rows did not go away, and I think they are correct by the current rule.** `esbuild-plugin-pino`, `orval`, `drizzle-kit`, and `pino-http` are imported by code, and v1's README never mentions them. Coverage (PRD 3 and 4: "what code does that the README never mentions") flags that whether or not the package is declared. What changed is the evidence: it now says "devDependencies has it" or "dependencies has it" instead of the false "not listed in package.json". If the owner wants Missing to mean "undeclared and unmentioned", that is a rule change in `coverage.js`, not a bug fix, and it needs a PRD decision. Related, `helmet` is really undeclared in v1 (the regression fixture keeps it as the one true "not listed" case).
+
+Regression fixtures: `pnpm-monorepo` (3 `--filter` commands verify, 1 real drift, 1 unknown package stays Unverifiable, workspace-only deps are not Missing) and `readme-clew-v1-regression` (the real v1 workspace layout at commit `cfab5aa`, trimmed to the 3 commands and the 4 source imports). `fixtures/v1-pnpm-workspace.yaml` is v1's real file, used by a parser test.
+
+Other notes from this fix:
+
+- The Haiku summary was skipped in the local rescan (`receipt.calls` shows Anthropic `skipped`, `notes.summary` null). Not looked into; `lib/summarize.js` was not part of this block.
+- The coverage verifier also counts imports in `examples/` and `docs/` (known limit 1 above). It does not apply to v1, but it would on other repos.
+- Known gap left alone: `yarn workspaces foreach ...` is now Unverifiable (it used to be checked as a script named `workspaces`). Nothing else about foreach/`pnpm -r` filtering is modeled: `pnpm -r run x` still passes if any workspace has script `x`.

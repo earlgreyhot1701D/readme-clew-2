@@ -1,0 +1,13 @@
+{
+  "pkg": { "name": "acme", "private": true, "scripts": { "build": "pnpm -r run build" } },
+  "workspaces": [
+    { "path": "artifacts/api", "pkg": { "name": "@acme/api", "scripts": { "dev": "tsx watch src/server.js", "test": "node --test" }, "dependencies": { "fastify": "^4.28.0" } } },
+    { "path": "artifacts/web", "pkg": { "name": "@acme/web", "scripts": { "dev": "vite" }, "dependencies": { "react": "^18.3.0" } } },
+    { "path": "lib/shared", "pkg": { "name": "@acme/shared" } }
+  ],
+  "files": ["package.json", "pnpm-workspace.yaml", "README.md", "artifacts/api/package.json", "artifacts/api/src/server.js", "artifacts/web/package.json", "artifacts/web/src/main.jsx", "lib/shared/package.json"],
+  "sources": {
+    "artifacts/api/src/server.js": "import Fastify from 'fastify';\n",
+    "artifacts/web/src/main.jsx": "import React from 'react';\n"
+  }
+}
