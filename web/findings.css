@@ -20,6 +20,10 @@
 }
 .acc-head:hover { text-decoration: underline; }
 .finding:focus { outline: 2px solid var(--text); outline-offset: 2px; }
+
+/* One line of Haiku text under a bucket header. The element only exists when there is a note. */
+.bucket-note { margin: 0 0 8px; color: var(--muted); font-size: 14px; overflow-wrap: anywhere; }
+
 [hidden] { display: none !important; }
 
 .finding {
@@ -61,3 +65,10 @@
 .bucket.b-missing .strip-title { color: var(--missing); }
 .bucket.b-unverifiable .strip-title { color: var(--unverifiable); }
 .bucket.b-verified .strip-title { color: var(--verified); }
+
+/* Phones. Keep this block last: the base .conf and .track rules above would win over it if they came after. */
+@media (max-width: 600px) {
+  .conf { flex-direction: column; align-items: stretch; gap: 4px; }
+  .track { width: 100%; }
+  .finding-top .meta { flex-basis: 100%; }
+}

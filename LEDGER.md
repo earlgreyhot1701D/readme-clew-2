@@ -319,6 +319,15 @@ Oct 9, 2026, evening. Status: code and offline tests done (197 pass, 0 fail, 0 c
 4. The per-IP limiter is best effort (in memory, per instance). The Vercel firewall rule and the prepaid balances are the real ceilings (PRD 7.4).
 5. The token estimate is conservative and not calibrated against Jev's tokenizer, so some trimming may happen that was not strictly needed.
 
+## Phase C findings (UI polish, 2026-10-10)
+
+- **A hidden element cannot be focused.** The strip reveal used `visibility: hidden` during its 60 ms stagger delay, so `focus()` right after a scan rendered silently did nothing and focus fell to the page. Unit tests with a fake DOM passed. Only a real browser with motion on caught it. Rule for later blocks: test focus and scroll behavior in a real browser, with `prefers-reduced-motion` both on and off.
+- **Rule order matters for phone CSS.** A `max-width: 600px` block placed above the base rules loses to them (same specificity, later wins). The confidence track stayed 140 px on a 390 px phone. Keep media blocks last.
+- **Where DOWNLOAD JSON lives.** It is in the report footer, so it exists only once a report does ("disabled until a report exists" is met by there being no button before that). During a rescan it stays and saves the report still on screen.
+- **Landing after a scan does not open a closed section.** Unverifiable starts closed. If it is the first non-empty bucket, the header gets focus but the rows stay hidden until the reader opens it, so the reader's defaults are not overridden. Easy to change in `navigate.js` (`open: true`).
+- **The Haiku bucket notes are plain.** Live example: "4 dependencies were missing: esbuild-plugin-pino, orval, drizzle-kit, and pino-http." and "No claims were contradicted." They only restate counts, which is what the rule allows. The empty-bucket note ("No claims were contradicted.") appears next to NONE FOUND, so an empty bucket says it twice.
+- The browser checks used mocked `/api/scan` responses built from the real live response, so no extra scan was billed. The one live scan for Phase A remains the only one this block.
+
 ## Mascot art and social card (Block 5 Phase B, 2026-10-10)
 
 - **The clew art is AI-generated.** Shara made it with ChatGPT, and Claude cut the backgrounds out and cleaned the files (transparent PNGs). It replaces the PRD line "hand-made SVG poses" (PRD section 5: "Poses are hand-made SVG states. No generated art at runtime."). The art is still fixed files, made ahead of time, with nothing generated at runtime. Claude updates the PRD; this agent does not touch PRD.md.

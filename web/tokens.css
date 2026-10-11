@@ -57,6 +57,10 @@ body::before {
   opacity: 0.6;
 }
 
+@media (max-width: 600px) {
+  body::before { opacity: 0.25; } /* lighter scanlines on small screens, where text is already small */
+}
+
 @media (prefers-reduced-motion: reduce) {
   body::before { display: none; }
 }

@@ -3,7 +3,7 @@
 // textContent only (via el()).
 import { el } from './dom.js';
 import { bindDisclosure } from './disclosure.js';
-import { ROW_LIMIT, visibleRows, showAllLabel } from './ui-state.js';
+import { ROW_LIMIT, visibleRows, showAllLabel, sectionId } from './ui-state.js';
 
 export function renderRow(r) {
   const row = el('article', `finding b-${r.bucket}`);
@@ -50,13 +50,15 @@ function fillRows(body, sec) {
 
 export function renderSection(sec) {
   const s = el('section', `strip bucket b-${sec.bucket}`);
-  const id = `sec-${sec.bucket}`;
+  const id = sectionId(sec.bucket);
   const head = el('h2', 'strip-title');
   const btn = el('button', 'acc-head', null, { type: 'button', 'aria-controls': id });
   const body = el('div', 'rows', null, { id });
   let built = false;
   head.append(btn);
-  s.append(head, body);
+  s.append(head);
+  if (sec.note) s.append(el('p', 'bucket-note', sec.note)); // Haiku's line for this bucket. No note, no element.
+  s.append(body);
   bindDisclosure(btn, body, {
     open: sec.open,
     onToggle: (open) => {

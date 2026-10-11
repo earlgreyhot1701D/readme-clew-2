@@ -1,6 +1,9 @@
 // DOM rendering for a report. textContent only: every repo-derived string goes through el(). No HTML string sinks.
 import { el } from './dom.js';
 import { renderSection } from './render-sections.js';
+import { goToSection } from './navigate.js';
+import { downloadReport } from './download.js';
+import { chipLabel } from './ui-state.js';
 import { statusStrip, bubbleText, clewPose, bucketSections, countChips, recordFields, footerText } from './view-model.js';
 
 function strip(cls) { return el('section', `strip ${cls ?? ''}`.trim()); }
@@ -18,11 +21,13 @@ export function renderRecord(report) {
   return s;
 }
 
+// Each count chip is a button: it opens its section if closed, scrolls there, and focuses the section header.
 export function renderCounts(counts) {
   const s = strip('counts');
   for (const c of countChips(counts)) {
-    const chip = el('div', `chip b-${c.bucket}`);
+    const chip = el('button', `chip b-${c.bucket}`, null, { type: 'button', 'aria-label': chipLabel(c.bucket, c.count) });
     chip.append(el('span', 'label', c.label), el('span', 'num', String(c.count)));
+    chip.addEventListener('click', () => goToSection(c.bucket));
     s.append(chip);
   }
   return s;
@@ -45,8 +50,10 @@ export function renderFooter(report) {
   const s = strip('footer');
   s.append(el('p', 'value', footerText(report)));
   const links = el('div', 'footer-links');
-  // Block 6b (M18): wire this to the JSON export. Stub only here, so the button is disabled.
-  links.append(el('button', 'btn', 'DOWNLOAD JSON', { type: 'button', disabled: '', title: 'Coming in a later block' }));
+  // M18: saves this exact report object as a .json file on this machine. The button only exists once a report does.
+  const save = el('button', 'btn', 'DOWNLOAD JSON', { type: 'button' });
+  save.addEventListener('click', () => downloadReport(report));
+  links.append(save);
   // Opens the ABOUT tab, where the limits are written down (tabs.js handles data-goto-tab).
   links.append(el('button', 'linkbtn', 'HONEST LIMITATIONS', { type: 'button', 'data-goto-tab': 'about' }));
   s.append(links);

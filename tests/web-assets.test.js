@@ -84,6 +84,41 @@ test('the CSS follows the style guide: tokens defined, zero border-radius, no gr
   assert.match(css, /prefers-reduced-motion/);
   assert.match(css, /:focus-visible\s*\{\s*outline:\s*2px solid var\(--text\)/);
 });
+test('phones (under 600 px): the confidence row stacks, the track is full width, metadata wraps, and scanlines are lighter', () => {
+  const findings = read('web/findings.css');
+  const block = findings.slice(findings.indexOf('@media (max-width: 600px)'));
+  assert.ok(block.length > 20, 'the 600 px block is missing from findings.css');
+  assert.match(block, /\.conf\s*\{[^}]*flex-direction:\s*column/);
+  assert.match(block, /\.conf\s*\{[^}]*align-items:\s*stretch/);
+  assert.match(block, /\.track\s*\{[^}]*width:\s*100%/);
+  assert.match(block, /\.finding-top \.meta\s*\{[^}]*flex-basis:\s*100%/);
+  // The phone rules only win if they come after the base .conf and .track rules (same specificity, later wins).
+  // This was a real bug: a 140 px track on a 390 px phone, because the media block sat above the base rules.
+  const at = (re) => findings.search(re);
+  assert.ok(at(/@media \(max-width: 600px\)/) > at(/^\.track\s*\{/m), 'phone block must come after .track');
+  assert.ok(at(/@media \(max-width: 600px\)/) > at(/^\.conf\s*\{/m), 'phone block must come after .conf');
+  assert.ok(at(/@media \(max-width: 600px\)/) > at(/^\.finding-top\s*\{/m), 'phone block must come after .finding-top');
+  const tokens = read('web/tokens.css');
+  const base = Number(tokens.match(/body::before\s*\{[^}]*opacity:\s*([\d.]+)/)[1]);
+  const phone = Number(tokens.slice(tokens.indexOf('@media (max-width: 600px)')).match(/body::before\s*\{\s*opacity:\s*([\d.]+)/)[1]);
+  assert.ok(phone < base, `phone scanline opacity ${phone} should be lower than ${base}`);
+});
+test('state strips keep the repo name as typed: .state-text sets text-transform none after the shared uppercase rule', () => {
+  const tokens = read('web/tokens.css');
+  const layout = read('web/layout.css');
+  assert.match(tokens, /\.state-text[^{]*\{[^}]*text-transform:\s*uppercase/); // the shared rule still uppercases the label fonts
+  assert.match(layout, /\.state-text\s*\{[^}]*text-transform:\s*none/);
+  // every state text is already capitals, so nothing relies on the transform
+  const states = readFileSync(new URL('../web/view-model.js', import.meta.url), 'utf8').match(/export const STATES = \{[\s\S]*?\n\};/)[0];
+  for (const m of states.matchAll(/:\s*'([^']+)'/g)) assert.equal(m[1], m[1].toUpperCase().replace('HTTPS://GITHUB.COM/OWNER/REPO', 'https://github.com/owner/repo').replace('PACKAGE.JSON', 'package.json'), m[1]);
+});
+test('the staggered reveal hides strips with opacity, never visibility, so focus can land on them after a scan', () => {
+  const css = read('web/layout.css');
+  const frames = css.match(/@keyframes appear\s*\{[^@]*?\}\s*\}|@keyframes appear\s*\{[^}]*\}[^}]*\}/)?.[0] ?? '';
+  assert.ok(frames.includes('opacity'), 'the appear animation should fade with opacity');
+  assert.doesNotMatch(frames, /visibility|display/, 'a hidden strip cannot take focus: focus() would silently do nothing');
+  assert.doesNotMatch(css.replace(/\/\*[\s\S]*?\*\//g, ''), /@keyframes appear[^}]*visibility/);
+});
 test('vercel.json: web/ is the site root, the scan function keeps its limit, and the CSP forbids inline and remote code', () => {
   const v = JSON.parse(read('vercel.json'));
   assert.equal(v.outputDirectory, 'web');
@@ -95,7 +130,8 @@ test('vercel.json: web/ is the site root, the scan function keeps its limit, and
   assert.doesNotMatch(csp, /unsafe-inline|unsafe-eval|\*|https?:/);
 });
 test('nothing the page publishes holds a key, and web/ holds no fixture mode data path outside localhost', () => {
-  const js = ['app', 'render', 'render-sections', 'view-model', 'fixture-mode', 'ui-state', 'tabs', 'disclosure', 'dom', 'site'].map((n) => read(`web/${n}.js`)).join('\n');
+  const js = ['app', 'render', 'render-sections', 'view-model', 'fixture-mode', 'ui-state', 'tabs', 'disclosure', 'dom', 'site',
+    'scan-state', 'export', 'download', 'navigate'].map((n) => read(`web/${n}.js`)).join('\n');
   assert.doesNotMatch(js, /GLASSER|ANTHROPIC|GITHUB_TOKEN|process\.env|sk-ant|api[_-]?key/i);
   assert.match(read('web/fixture-mode.js'), /isDevHost\(hostname\)/);
 });

@@ -1,6 +1,7 @@
 // Pure UI rules (web/ui-state.js): tabs, accordion defaults, and the SHOW ALL threshold. Offline, no DOM.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { TABS, DEFAULT_TAB, ROW_LIMIT, nextTab, defaultOpen, visibleRows, showAllLabel } from '../web/ui-state.js';
 import { bucketSections } from '../web/view-model.js';
 
@@ -53,4 +54,42 @@ test('SHOW ALL on a 140-row bucket: 10 shown, 130 hidden, and showAll returns al
   const all = visibleRows(rows(140), true);
   assert.deepEqual([all.shown.length, all.hiddenCount], [140, 0]);
   assert.equal(showAllLabel(140), 'SHOW ALL 140'); // N is the bucket total
+});
+
+// Phase C: chip-to-section mapping, where to land after a scan, motion, and bucket notes.
+import { BUCKET_ORDER, sectionId, chipLabel, firstProblemBucket, scrollBehavior, bucketNote } from '../web/ui-state.js';
+
+test('chip to section: every bucket maps to the id its header controls, and anything else maps to nothing', () => {
+  assert.deepEqual(BUCKET_ORDER.map(sectionId), ['sec-contradicted', 'sec-missing', 'sec-unverifiable', 'sec-verified']);
+  for (const bad of ['', 'nope', null, undefined, '../x', 'Contradicted']) assert.equal(sectionId(bad), null, String(bad));
+  // the section element built by the renderer uses the same function, so chip and section cannot drift apart
+  assert.match(readFileSync(new URL('../web/render-sections.js', import.meta.url), 'utf8'), /const id = sectionId\(sec\.bucket\);/);
+});
+test('chip label: "Contradicted, 2, go to section" for every bucket, including zero', () => {
+  assert.equal(chipLabel('contradicted', 2), 'Contradicted, 2, go to section');
+  assert.equal(chipLabel('missing', 0), 'Missing, 0, go to section');
+  assert.equal(chipLabel('unverifiable', 140), 'Unverifiable, 140, go to section');
+  assert.equal(chipLabel('verified', 8), 'Verified, 8, go to section');
+});
+test('first problem bucket: Contradicted, then Missing, then Unverifiable; Verified never; all empty gives null', () => {
+  assert.equal(firstProblemBucket({ contradicted: 1, missing: 2, unverifiable: 3, verified: 9 }), 'contradicted');
+  assert.equal(firstProblemBucket({ contradicted: 0, missing: 2, unverifiable: 3, verified: 9 }), 'missing');
+  assert.equal(firstProblemBucket({ contradicted: 0, missing: 0, unverifiable: 3, verified: 9 }), 'unverifiable');
+  assert.equal(firstProblemBucket({ contradicted: 0, missing: 0, unverifiable: 0, verified: 9 }), null);
+  assert.equal(firstProblemBucket({ contradicted: 0, missing: 4, unverifiable: 140, verified: 8 }), 'missing'); // the v1 report
+  assert.equal(firstProblemBucket({}), null);
+  assert.equal(firstProblemBucket(null), null);
+  assert.equal(firstProblemBucket({ contradicted: 'x' }), null); // junk counts are not problems
+});
+test('scroll behavior: smooth, except when the reader asked for reduced motion', () => {
+  assert.equal(scrollBehavior(false), 'smooth');
+  assert.equal(scrollBehavior(true), 'auto');
+});
+test('bucket note: the Haiku line for that bucket, trimmed; null, empty, or missing gives null and never a placeholder', () => {
+  const report = { notes: { summary: 's', buckets: { verified: '  Eight claims match.  ', missing: 'Four imports are not mentioned.', unverifiable: '', contradicted: null } } };
+  assert.equal(bucketNote(report, 'verified'), 'Eight claims match.');
+  assert.equal(bucketNote(report, 'missing'), 'Four imports are not mentioned.');
+  assert.equal(bucketNote(report, 'unverifiable'), null);
+  assert.equal(bucketNote(report, 'contradicted'), null);
+  for (const r of [{ notes: null }, { notes: { summary: 's' } }, {}, null, { notes: { buckets: { missing: 42 } } }]) assert.equal(bucketNote(r, 'missing'), null);
 });

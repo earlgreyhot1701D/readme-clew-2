@@ -47,12 +47,16 @@
       <section class="strip input">
         <form id="scan-form" novalidate>
           <label class="prompt" for="repo-input">REPO &gt;</label>
-          <input id="repo-input" name="repo" type="text" inputmode="url" autocomplete="off" spellcheck="false" maxlength="300" placeholder="https://github.com/owner/repo">
+          <input id="repo-input" name="repo" type="text" inputmode="url" autocomplete="off" spellcheck="false" maxlength="300" placeholder="owner/repo or https://github.com/owner/repo">
           <button id="scan-btn" class="btn" type="submit">SCAN</button>
         </form>
-        <p class="hint">PUBLIC REPOS ONLY. NOTHING IS STORED.</p>
+        <div class="hint-row">
+          <p class="hint">PUBLIC REPOS ONLY. NOTHING IS STORED.</p>
+          <button id="demo-btn" class="btn btn-small" type="button">USE DEMO REPO</button>
+        </div>
       </section>
-      <div id="out" aria-live="polite"></div>
+      <div id="banner" aria-live="polite"></div>
+      <div id="out" aria-busy="false"></div>
     </div>
 
     <div id="panel-key" role="tabpanel" aria-labelledby="tab-key" hidden>

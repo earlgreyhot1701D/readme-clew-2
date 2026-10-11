@@ -35,6 +35,13 @@
 
 [role="tabpanel"] { margin: 0; }
 
+.hint-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-top: 8px; }
+.hint-row .hint { margin: 0; }
+
+/* Sections are scrolled to from the count chips and after a scan, so keep a little air above the header. */
+.strip { scroll-margin-top: 8px; }
+#banner:empty { display: none; }
+
 .site-footer p { margin: 0; color: var(--muted); font-size: 13px; overflow-wrap: anywhere; }
 
 .linkbtn {

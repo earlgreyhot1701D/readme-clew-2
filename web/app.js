@@ -1,7 +1,10 @@
-// Page wiring: form, deep link, state machine. Rendering is in render.js, pure logic in view-model.js.
-// Rule: a scan only starts on a click (or Enter in the form). ?repo= fills the field and nothing more.
+// Page wiring: form, deep link, and the scan flow. Rendering is in render.js, pure logic in view-model.js,
+// ui-state.js and scan-state.js.
+// Rule: a scan only starts on a click (or Enter in the form). ?repo= and USE DEMO REPO fill the field and nothing more.
 import { renderReport, renderState } from './render.js';
-import { parseRepoInput, deepLinkRepo, errorState, loadingText, formatScanTime, STATES, DEMO_REPO } from './view-model.js';
+import { parseRepoInput, deepLinkRepo, errorState, formatScanTime, STATES, DEMO_REPO, DEMO_SHORT } from './view-model.js';
+import { initialState, step } from './scan-state.js';
+import { landAfterScan } from './navigate.js';
 import { fixtureName, loadFixture } from './fixture-mode.js';
 import { initTabs } from './tabs.js';
 import { bindDisclosure } from './disclosure.js';
@@ -12,25 +15,33 @@ const form = document.getElementById('scan-form');
 const input = document.getElementById('repo-input');
 const button = document.getElementById('scan-btn');
 const stamp = document.getElementById('scan-time');
+const banner = document.getElementById('banner'); // idle, SCANNING, and error strips. The report stays below it.
 const out = document.getElementById('out');
-let busy = false;
-
-function setBusy(on) {
-  busy = on;
-  button.disabled = on;
-  button.textContent = on ? 'SCANNING' : 'SCAN';
-}
+let state = initialState();
 
 function looksLikeReport(r) {
   return r && typeof r === 'object' && r.counts && Array.isArray(r.findings) && r.repo && typeof r.mood === 'string';
 }
 
-function show(report) {
-  renderReport(report, out);
-  stamp.textContent = formatScanTime(report.receipt?.scannedAt ?? new Date());
+// Applies one event, then repaints the banner and the SCAN button. The report below is only redrawn on a new report.
+function dispatch(event) {
+  const next = step(state, event);
+  if (next === state) return;
+  state = next;
+  button.disabled = !state.canScan;
+  button.textContent = state.canScan ? 'SCAN' : 'SCANNING';
+  out.setAttribute('aria-busy', String(state.phase === 'loading'));
+  if (state.banner) renderState(banner, state.banner.text, state.banner.kind, state.banner.kind === 'loading');
+  else banner.replaceChildren();
 }
 
-async function scan(url) {
+function showReport(report, { land }) {
+  renderReport(report, out);
+  stamp.textContent = formatScanTime(report.receipt?.scannedAt ?? new Date());
+  if (land) landAfterScan(report.counts);
+}
+
+async function fetchReport(url) {
   const ctl = new AbortController();
   const timer = setTimeout(() => ctl.abort(), CLIENT_TIMEOUT_MS);
   try {
@@ -42,11 +53,11 @@ async function scan(url) {
     });
     let body = null;
     try { body = await res.json(); } catch { body = null; }
-    if (!res.ok) { renderState(out, errorState(res.status, body?.error?.code), 'error'); return; }
-    if (!looksLikeReport(body)) { renderState(out, STATES.failed, 'error'); return; }
-    show(body);
+    if (!res.ok) return { error: errorState(res.status, body?.error?.code) };
+    if (!looksLikeReport(body)) return { error: STATES.failed };
+    return { report: body };
   } catch {
-    renderState(out, STATES.failed, 'error'); // network failure or timeout
+    return { error: STATES.failed }; // network failure or timeout
   } finally {
     clearTimeout(timer);
   }
@@ -54,15 +65,26 @@ async function scan(url) {
 
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
-  if (busy) return;
+  if (!state.canScan) return;
   const p = parseRepoInput(input.value);
   input.setAttribute('aria-invalid', String(!p.ok));
-  if (!p.ok) { renderState(out, STATES.badInput, 'error'); input.focus(); return; }
+  if (!p.ok) { dispatch({ type: 'fail', text: STATES.badInput }); input.focus(); return; } // the old report stays
   input.value = p.url;
-  setBusy(true);
-  renderState(out, loadingText(p.owner, p.name), 'loading', true);
-  await scan(p.url);
-  setBusy(false);
+  dispatch({ type: 'start', owner: p.owner, name: p.name });
+  const result = await fetchReport(p.url);
+  if (result.report) {
+    dispatch({ type: 'ok', report: result.report });
+    showReport(result.report, { land: true });
+  } else {
+    dispatch({ type: 'fail', text: result.error }); // the old report stays
+  }
+});
+
+// USE DEMO REPO fills the field and nothing else.
+document.getElementById('demo-btn').addEventListener('click', () => {
+  input.value = DEMO_SHORT;
+  input.setAttribute('aria-invalid', 'false');
+  input.focus();
 });
 
 // Tabs, the HOW? toggle, and the clean public address in the ABOUT tab. None of these starts a scan.
@@ -78,12 +100,15 @@ function initChrome() {
 async function init() {
   initChrome();
   input.value = deepLinkRepo(location.search) ?? DEMO_REPO;
+  renderState(banner, state.banner.text, state.banner.kind);
   const fx = fixtureName(location.search, location.hostname);
   if (fx) {
-    try { show(await loadFixture(fx)); } catch { renderState(out, STATES.failed, 'error'); }
-    return;
+    try {
+      const report = await loadFixture(fx);
+      dispatch({ type: 'ok', report });
+      showReport(report, { land: false }); // dev only: stay at the top so screenshots are stable
+    } catch { dispatch({ type: 'fail', text: STATES.failed }); }
   }
-  renderState(out, STATES.idle, 'idle');
 }
 
 init();

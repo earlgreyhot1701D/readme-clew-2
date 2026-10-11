@@ -52,6 +52,12 @@
 /* Counts strip */
 .counts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
 .chip {
+  /* a button: reset the browser look, keep the ledger look */
+  background: var(--bg);
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+  width: 100%;
   border: 1px solid var(--rule);
   border-left: 4px solid var(--muted);
   padding: 6px 10px;
@@ -60,6 +66,11 @@
   align-items: baseline;
   font-size: 13px;
 }
+.chip:hover { border-color: var(--text); }
+.chip.b-contradicted:hover { border-left-color: var(--contradicted); }
+.chip.b-missing:hover { border-left-color: var(--missing); }
+.chip.b-unverifiable:hover { border-left-color: var(--unverifiable); }
+.chip.b-verified:hover { border-left-color: var(--verified); }
 .chip .num { font-family: var(--mono); font-size: 20px; }
 .chip.b-contradicted { border-left-color: var(--contradicted); }
 .chip.b-missing { border-left-color: var(--missing); }
@@ -106,7 +117,9 @@
 }
 
 /* State strips */
-.state-text { margin: 0; font-size: 16px; }
+/* The strip texts are already written in capitals. No text-transform here: the repo name in SCANNING owner/name
+   must show as typed, because GitHub names are case-sensitive. */
+.state-text { margin: 0; font-size: 16px; text-transform: none; }
 .s-error .state-text { color: var(--contradicted); }
 .s-idle .state-text, .s-loading .state-text { color: var(--text); }
 .cursor { display: inline-block; margin-left: 6px; animation: blink 1s steps(1) infinite; }
@@ -115,9 +128,10 @@
 .footer-links { display: flex; gap: 16px; align-items: center; margin-top: 10px; flex-wrap: wrap; }
 .footer .value { margin: 0; }
 
-/* Strips appear top to bottom, 60 ms apart, no easing. */
+/* Strips appear top to bottom, 60 ms apart, no easing. Opacity, not visibility: a strip that is visibility:hidden
+   cannot take focus, and the page moves focus to a section right after a scan renders. */
 #out > .strip { animation: appear 0s steps(1) both; animation-delay: calc(var(--i, 0) * 60ms); }
-@keyframes appear { from { visibility: hidden; } to { visibility: visible; } }
+@keyframes appear { from { opacity: 0; } to { opacity: 1; } }
 
 @media (max-width: 760px) {
   body { padding: 0 16px; }

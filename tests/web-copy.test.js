@@ -124,6 +124,63 @@ test('render-sections.js wires every section as a disclosure with the row limit 
   assert.match(src, /sec\.rows\.slice\(ROW_LIMIT\)/);
   assert.match(src, /if \(open && !built\)/, 'rows are built only when a section is first opened');
 });
+// ---- Phase C wiring (static checks on what the page is built from) ----
+const src = (p) => readFileSync(new URL(`../web/${p}`, import.meta.url), 'utf8');
+
+test('input: the placeholder names both accepted forms, and the parser really accepts both', async () => {
+  assert.match(html, /placeholder="owner\/repo or https:\/\/github\.com\/owner\/repo"/);
+  const { parseRepoInput } = await import('../web/view-model.js');
+  assert.equal(parseRepoInput('owner/repo').ok, true);
+  assert.equal(parseRepoInput('https://github.com/owner/repo').ok, true);
+});
+test('USE DEMO REPO is a button that fills the field with earlgreyhot1701D/readme-clew and never scans', async () => {
+  const btn = html.match(/<button id="demo-btn"[^>]*>USE DEMO REPO<\/button>/)?.[0];
+  assert.ok(btn, 'the button is missing');
+  assert.match(btn, /type="button"/); // not a submit button
+  assert.ok(panel('panel-scan').includes('id="demo-btn"'));
+  const { DEMO_SHORT, parseRepoInput } = await import('../web/view-model.js');
+  assert.equal(DEMO_SHORT, 'earlgreyhot1701D/readme-clew');
+  assert.equal(parseRepoInput(DEMO_SHORT).ok, true);
+  const app = src('app.js');
+  const handler = app.slice(app.indexOf("getElementById('demo-btn')"), app.indexOf('// Tabs, the HOW?'));
+  assert.match(handler, /input\.value = DEMO_SHORT/);
+  assert.doesNotMatch(handler, /fetch|dispatch|submit|requestSubmit|scan/i);
+});
+test('rescan wiring: the banner sits above the report, and a scan only ever redraws the banner until a new report arrives', () => {
+  const scanPanel = panel('panel-scan');
+  assert.ok(scanPanel.indexOf('id="banner"') > -1 && scanPanel.indexOf('id="banner"') < scanPanel.indexOf('id="out"'));
+  const app = src('app.js');
+  assert.match(app, /renderState\(banner,/);
+  assert.doesNotMatch(app, /renderState\(out/); // the report area is never replaced by a state strip
+  assert.match(app, /button\.disabled = !state\.canScan/);
+  assert.match(app, /out\.setAttribute\('aria-busy'/);
+  assert.match(app, /if \(!state\.canScan\) return;/);
+  // the old report is only replaced in the success branch
+  const submit = app.slice(app.indexOf("form.addEventListener('submit'"), app.indexOf('// USE DEMO REPO'));
+  assert.equal((submit.match(/showReport\(/g) ?? []).length, 1);
+  assert.ok(submit.indexOf('showReport(') > submit.indexOf('if (result.report)'));
+});
+test('count chips are buttons with a "go to section" name, wired to goToSection', () => {
+  const render = src('render.js');
+  assert.match(render, /el\('button', `chip b-\$\{c\.bucket\}`, null, \{ type: 'button', 'aria-label': chipLabel\(c\.bucket, c\.count\) \}\)/);
+  assert.match(render, /chip\.addEventListener\('click', \(\) => goToSection\(c\.bucket\)\)/);
+  assert.doesNotMatch(render, /el\('div', `chip/);
+});
+test('bucket notes: a line under the header only when a note exists, as text, with no placeholder', () => {
+  const sections = src('render-sections.js');
+  assert.match(sections, /if \(sec\.note\) s\.append\(el\('p', 'bucket-note', sec\.note\)\)/);
+  const [iHead, iNote, iBody] = ['s.append(head);', "el('p', 'bucket-note'", 's.append(body);'].map((t) => sections.indexOf(t));
+  assert.ok(iHead > -1 && iNote > -1 && iBody > -1, 'header, note, and body must all be appended');
+  assert.ok(iHead < iNote, 'the note sits under the header');
+  assert.ok(iNote < iBody, 'and above the rows');
+  assert.doesNotMatch(sections.replace(/\/\/.*$/gm, ''), /bucket-note[^\n]*(?:No note|unavailable|n\/a|\.\.\.)/i); // code only, comments aside
+});
+test('after a scan the page lands on the first problem bucket (real scans only, not the dev fixture render)', () => {
+  const app = src('app.js');
+  assert.match(app, /showReport\(result\.report, \{ land: true \}\)/);
+  assert.match(app, /showReport\(report, \{ land: false \}\)/);
+  assert.match(app, /if \(land\) landAfterScan\(report\.counts\)/);
+});
 test('the report footer links to the ABOUT tab, not to a GitHub anchor that may not exist', () => {
   const render = readFileSync(new URL('../web/render.js', import.meta.url), 'utf8');
   assert.match(render, /'HONEST LIMITATIONS'[^)]*'data-goto-tab': 'about'/);

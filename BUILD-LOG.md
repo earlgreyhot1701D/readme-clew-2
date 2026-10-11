@@ -167,3 +167,34 @@ What I did:
 8. One live rescan of v1 from this machine (GitHub + Jev, keys from `.env`, never printed): 0 contradicted, 4 missing, 8 verified, 140 unverifiable.
 
 Not touched: PRD.md, AGENTS.md, README.md, api/, web/.
+
+## Block 5 Phase B: raster clew art, favicons, social card (2026-10-10, commit `6f662f2`)
+
+- The 5 poses are PNGs in `web/mascot/` (calm, curious, worried, tangled, tilt), square, shown at 120 px with `width` and `height` set. Alt text is `The clew, <mood>`. The old SVGs are deleted. The A/B generator stays in `design/`.
+- `clewPose`: `tilt.png` for calm and curious when Jev was unsure. Worried and tangled keep their own picture (one picture per pose, no CSS rotation).
+- Favicons: `favicon-32.png` and `favicon-16.png` as `rel="icon"`, `favicon-180.png` as `apple-touch-icon`. No SVG favicon.
+- Social card: `web/social-card.png` (1200x630). Tags: `og:title`, `og:description`, `og:image` (absolute, `https://readme-clew-2.vercel.app/social-card.png`), `og:url`, `og:type`, `og:image:width/height`, `twitter:card=summary_large_image`. No code depends on the picture, only its size (test).
+- Tests 279 (all pass). Changed tests were shown failing: 17 breaks, all red, every binary file restored byte for byte.
+- LEDGER notes the art is AI-generated (ChatGPT by Shara, cut out by Claude). PRD.md not touched.
+
+## Block 5 Phase C: UI polish (2026-10-10, web/ only, no lib/ or api/ changes)
+
+1. **Input:** placeholder `owner/repo or https://github.com/owner/repo`, and a USE DEMO REPO button that fills `earlgreyhot1701D/readme-clew` and does not scan.
+2. **Count chips are buttons** (`aria-label` "Contradicted, 2, go to section"). A click opens the section if closed, scrolls to it, and focuses its header (`navigate.js`).
+3. **Bucket notes:** `notes.buckets[bucket]` as one line under the header, via `textContent`. No note means no element.
+4. **JSON export (M18, pulled forward from 6b):** DOWNLOAD JSON saves the exact report object as `readme-clew-2_<owner>_<repo>_<short sha>.json` from a Blob, then revokes the object URL. No request is made. The button lives in the report footer, so it exists only once a report does.
+5. **Rescan:** the old report stays while a new scan runs. A SCANNING strip shows above it and SCAN is disabled. Success replaces the report, error keeps the old one under an error strip. A state machine (`scan-state.js`) holds the rule.
+6. **Phones (under 600 px):** confidence row stacks, track is full width, metadata on its own line, scanlines at 0.25 instead of 0.6.
+7. **After a scan:** scroll to the first non-empty bucket among Contradicted, Missing, Unverifiable and focus its header. If all three are empty, focus the status strip. No smooth scrolling under reduced motion. A closed section stays closed.
+
+New files: `ui-state.js` (grown), `scan-state.js`, `export.js`, `download.js`, `navigate.js`. All under 200 lines.
+
+Real bugs the browser run found (unit tests could not):
+- **Focus after a scan did nothing.** The staggered reveal used `visibility: hidden`, and a hidden element cannot take focus. It now fades with `opacity`. Earlier QA used reduced motion, which skips the animation, so it never showed.
+- **The phone track stayed 140 px wide.** The 600 px rules sat above the base `.track` rule, so the base rule won. The block now comes last, and a test checks the order.
+- State strips were upper-casing the repo name in `SCANNING owner/name`. GitHub names are case-sensitive, so `text-transform: none` now applies.
+Each is covered by a test that fails when the bug is put back.
+
+Tests: 317 total, 317 pass, 0 fail, 0 cancelled, 0 skipped, 0 todo (279 before Phase C). New: `scan-state.test.js` (9), `export.test.js` (6), `navigate.test.js` (9), plus additions to `ui-state`, `web-copy` and `web-assets`. Shown failing: 48 deliberate breaks, one at a time, plus 3 for the bugs above. 47 turned red first time. The one that did not (a vacuous `indexOf` order check) was fixed and now fails.
+
+Browser check (Playwright, real CSP headers, `/api/scan` answered by mocks using the real live response, so no scan billed): 49 of 49 behaviors pass at 1200 px and 390 px.

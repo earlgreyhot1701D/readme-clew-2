@@ -1,7 +1,10 @@
-// Pure UI rules: tabs, accordion defaults, and the row limit. No DOM, so tests can pin every one of them.
+// Pure UI rules: tabs, accordion defaults, the row limit, chip-to-section mapping, and where to land after a scan.
+// No DOM, so tests can pin every one of them.
 export const TABS = ['scan', 'key', 'about'];
 export const DEFAULT_TAB = 'scan';
 export const ROW_LIMIT = 10; // rows drawn per open section before SHOW ALL
+export const BUCKET_ORDER = ['contradicted', 'missing', 'unverifiable', 'verified'];
+const PROBLEM_ORDER = ['contradicted', 'missing', 'unverifiable']; // where to land after a scan
 
 // Keyboard move between tabs (ARIA tabs pattern). Any other key leaves the tab where it is.
 export function nextTab(current, key) {
@@ -29,4 +32,33 @@ export function visibleRows(rows, showAll = false) {
 
 export function showAllLabel(total) {
   return `SHOW ALL ${total}`;
+}
+
+// The id of a bucket's body element. Its header button points at it with aria-controls, so a count chip finds
+// its section through this one function.
+export function sectionId(bucket) {
+  return BUCKET_ORDER.includes(bucket) ? `sec-${bucket}` : null;
+}
+
+// Screen reader name for a count chip: "Contradicted, 2, go to section".
+export function chipLabel(bucket, count) {
+  const name = String(bucket).charAt(0).toUpperCase() + String(bucket).slice(1);
+  return `${name}, ${count}, go to section`;
+}
+
+// After a scan, land on the first non-empty bucket among Contradicted, Missing, Unverifiable. null when all three
+// are empty (then the status strip gets the focus). Verified is never a landing spot: it is not a problem.
+export function firstProblemBucket(counts) {
+  return PROBLEM_ORDER.find((b) => (counts?.[b] ?? 0) > 0) ?? null;
+}
+
+// No smooth scrolling for people who asked for less motion.
+export function scrollBehavior(reducedMotion) {
+  return reducedMotion ? 'auto' : 'smooth';
+}
+
+// One line of Haiku text for a bucket, or null. Null means show nothing: never a placeholder.
+export function bucketNote(report, bucket) {
+  const note = report?.notes?.buckets?.[bucket];
+  return typeof note === 'string' && note.trim() ? note.trim() : null;
 }

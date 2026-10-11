@@ -1,10 +1,11 @@
 // Pure functions behind render.js. No DOM, no network. Every value comes from the report object (PRD 3b).
-import { defaultOpen } from './ui-state.js';
+import { defaultOpen, bucketNote } from './ui-state.js';
 
 export const BUCKETS = ['contradicted', 'missing', 'unverifiable', 'verified'];
 export const BUCKET_LABEL = { contradicted: 'CONTRADICTED', missing: 'MISSING', unverifiable: 'UNVERIFIABLE', verified: 'VERIFIED' };
 export const MOODS = ['calm', 'curious', 'worried', 'tangled'];
-export const DEMO_REPO = 'https://github.com/earlgreyhot1701D/readme-clew';
+export const DEMO_REPO = 'https://github.com/earlgreyhot1701D/readme-clew'; // pre-filled on load
+export const DEMO_SHORT = 'earlgreyhot1701D/readme-clew'; // what USE DEMO REPO types into the field
 
 // Status strip (STYLE 6). Restates the bucket result. Never shows a confidence number.
 export function statusStrip(mood, counts = {}) {
@@ -79,7 +80,7 @@ export function rowModel(f) {
 export function bucketSections(report) {
   return BUCKETS.map((b) => {
     const rows = (report.findings ?? []).filter((f) => f.bucket === b).map(rowModel);
-    return { bucket: b, label: BUCKET_LABEL[b], count: rows.length, rows, empty: rows.length === 0, open: defaultOpen(b, rows.length) };
+    return { bucket: b, label: BUCKET_LABEL[b], count: rows.length, rows, empty: rows.length === 0, open: defaultOpen(b, rows.length), note: bucketNote(report, b) };
   });
 }
 
