@@ -67,7 +67,8 @@ test('ABOUT: three steps, the limits, and the address', () => {
   assert.match(about, /3\. HAIKU EXPLAINS/);
   assert.match(about, /JS\/TS ONLY .*package\.json holds both the packages and the commands.*Other languages are planned, not built\./);
   assert.match(about, /MONOREPOS .*pnpm-workspace\.yaml.*workspaces.*dir\/\*.*exact dirs.*up to 30 workspaces/);
-  assert.match(about, /NOTHING STORED/);
+  assert.match(about, /SCANS NEVER STORED Public repos only\./);
+  assert.match(about, /ANALYTICS Anonymous page-view counts through Vercel Analytics\. No cookies\. Scans are never stored\./);
   assert.match(about, /HAIKU CAN BE DOWN .*the report still works/);
   assert.match(about, /Neither AI decides what's true\./);
 });

@@ -319,6 +319,16 @@ Oct 9, 2026, evening. Status: code and offline tests done (197 pass, 0 fail, 0 c
 4. The per-IP limiter is best effort (in memory, per instance). The Vercel firewall rule and the prepaid balances are the real ceilings (PRD 7.4).
 5. The token estimate is conservative and not calibrated against Jev's tokenizer, so some trimming may happen that was not strictly needed.
 
+## Phase D findings (2026-10-10)
+
+- **Analytics changes what "nothing is stored" means.** With Vercel Web Analytics, Vercel counts anonymous page views (no cookies). Scans are still never stored, so the input hint now says "SCANS ARE NEVER STORED" and ABOUT carries the exact line. The PRD's "no database, nothing stored" rule is about scans and repo content. If the PRD should name analytics too, that is for the PRD owner.
+- **The analytics script only exists once Analytics is enabled in the dashboard.** Until then `/_vercel/insights/script.js` returns 404 on Vercel, which shows as one failed resource in the browser console. It is harmless. The local dev server serves an empty stub so local checks stay clean. The CSP did not need to change: the script and its beacon are same-origin.
+- **Telling Haiku not to say "mood" is hard if the prompt says "mood".** The prompt cannot name the words it bans, and the request data used to carry `mood` and `lowConfidenceFindings` keys, which the model echoed ("The mood is worried, with 28 low-confidence findings"). Fix: the same data is sent with renamed keys, the prompt never names the words, and any reply that uses them is rejected in code. If Haiku writes them anyway, the page shows the fixed fallback line instead.
+- **Haiku ignores "one or two sentences" sometimes** (the live reply had three). The prompt still asks, and code keeps the first two sentences. The dropped sentence is the verified count, the lowest priority.
+- **Live wording check (1 scan, preview, demo repo):** the new summary leads with "No README claims were contradicted by the code", names the four missing packages, and puts the eight verified claims last. The Unverifiable count (140) appears only in the Unverifiable bucket note, as intended.
+- **404 page:** its asset links are root-absolute on purpose. Vercel serves it for any unknown path, including nested ones like `/a/b/c`, where relative links would break.
+- Not done: no per-path OG images, no search-console setup, and `sitemap.xml` has the home page only.
+
 ## Phase C findings (UI polish, 2026-10-10)
 
 - **A hidden element cannot be focused.** The strip reveal used `visibility: hidden` during its 60 ms stagger delay, so `focus()` right after a scan rendered silently did nothing and focus fell to the page. Unit tests with a fake DOM passed. Only a real browser with motion on caught it. Rule for later blocks: test focus and scroll behavior in a real browser, with `prefers-reduced-motion` both on and off.

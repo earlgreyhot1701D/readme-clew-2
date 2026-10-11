@@ -8,6 +8,11 @@ import { statusStrip, bubbleText, clewPose, bucketSections, countChips, recordFi
 
 function strip(cls) { return el('section', `strip ${cls ?? ''}`.trim()); }
 
+// A clew picture: square PNG shown at 120 px, with width and height set so the page does not shift when it loads.
+function clewImg(file, mood) {
+  return el('img', 'clew', null, { src: `mascot/${file}.png`, alt: `The clew, ${mood}`, width: '120', height: '120' });
+}
+
 export function renderRecord(report) {
   const s = strip('record');
   s.append(el('h2', 'strip-title', 'RECORD'));
@@ -39,9 +44,7 @@ export function renderStatus(report) {
   const s = strip('status');
   s.append(el('div', `status-fill m-${st.mood}`, st.text, { role: 'status' }));
   const row = el('div', 'clew-row');
-  // Square PNGs shown at 120 px. width and height are set, so the page does not shift when the picture loads.
-  const img = el('img', 'clew', null, { src: `mascot/${pose.file}.png`, alt: `The clew, ${st.mood}`, width: '120', height: '120' });
-  row.append(img, el('p', 'bubble', bubbleText(report)));
+  row.append(clewImg(pose.file, st.mood), el('p', 'bubble', bubbleText(report)));
   s.append(row);
   return s;
 }
@@ -73,6 +76,12 @@ export function renderState(root, text, kind, withCursor) {
   const s = strip(`state s-${kind}`);
   const p = el('p', 'state-text', text, { role: kind === 'error' ? 'alert' : 'status' });
   if (withCursor) p.append(el('span', 'cursor', '\u2588'));
-  s.append(p);
+  if (kind === 'idle') { // the first screen has the mascot beside the idle text
+    const row = el('div', 'idle-row');
+    row.append(clewImg('calm', 'calm'), p);
+    s.append(row);
+  } else {
+    s.append(p);
+  }
   root.append(s);
 }

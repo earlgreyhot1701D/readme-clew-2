@@ -62,6 +62,53 @@ test('a second start while a scan is running is ignored, so a double click sends
   assert.equal(again, loading); // the very same state object: nothing changed
   assert.equal(again.banner.text, 'SCANNING o/a ...');
 });
+// ---- CLEAR (Phase D) ----
+test('clear: a report on screen goes away and the page is back to the home screen', () => {
+  const s = run({ type: 'start', owner: 'o', name: 'a' }, { type: 'ok', report: reportA }, { type: 'clear' });
+  assert.deepEqual(s, initialState());
+  assert.equal(s.report, null);
+  assert.equal(canDownload(s), false);
+  assert.equal(s.banner.kind, 'idle');
+  assert.equal(s.canScan, true);
+});
+test('clear: an error strip over a report goes away too, and so does a first-scan error', () => {
+  const withErr = run({ type: 'start', owner: 'o', name: 'a' }, { type: 'ok', report: reportA }, { type: 'start', owner: 'o', name: 'b' }, { type: 'fail', text: STATES.failed }, { type: 'clear' });
+  assert.deepEqual(withErr, initialState());
+  const firstErr = run({ type: 'start', owner: 'o', name: 'a' }, { type: 'fail', text: STATES.notFound }, { type: 'clear' });
+  assert.deepEqual(firstErr, initialState());
+});
+test('clear is ignored while a scan is running: the report, the SCANNING strip, and the disabled SCAN stay', () => {
+  const loading = run({ type: 'start', owner: 'o', name: 'a' }, { type: 'ok', report: reportA }, { type: 'start', owner: 'o', name: 'b' });
+  const after = step(loading, { type: 'clear' });
+  assert.equal(after, loading); // the very same state object
+  assert.equal(after.report, reportA);
+  assert.equal(after.canScan, false);
+  assert.equal(after.banner.text, 'SCANNING o/b ...');
+});
+test('clear on a fresh page changes nothing important, and a scan works again afterwards', () => {
+  const s = step(initialState(), { type: 'clear' });
+  assert.deepEqual(s, initialState());
+  const again = run({ type: 'start', owner: 'o', name: 'a' }, { type: 'ok', report: reportA }, { type: 'clear' }, { type: 'start', owner: 'o', name: 'b' });
+  assert.equal(again.phase, 'loading');
+  assert.equal(again.banner.text, 'SCANNING o/b ...');
+});
+test('clear wiring: the button exists, is off while scanning, and the handler makes no request', async () => {
+  const { readFileSync } = await import('node:fs');
+  const html = readFileSync(new URL('../web/index.html', import.meta.url), 'utf8');
+  const app = readFileSync(new URL('../web/app.js', import.meta.url), 'utf8');
+  assert.match(html, /<button id="clear-btn" class="btn" type="button">CLEAR<\/button>/);
+  assert.ok(html.indexOf('id="scan-btn"') < html.indexOf('id="clear-btn"'), 'CLEAR sits next to SCAN, after it');
+  assert.match(app, /clearBtn\.disabled = !state\.canScan/);
+  const handler = app.slice(app.indexOf('clearBtn.addEventListener'), app.indexOf('// USE DEMO REPO'));
+  assert.ok(handler.length > 100);
+  assert.match(handler, /if \(!state\.canScan\) return;/);
+  assert.match(handler, /dispatch\(\{ type: 'clear' \}\)/);
+  assert.match(handler, /out\.replaceChildren\(\)/); // the report is removed
+  assert.match(handler, /input\.value = ''/); // the field is emptied
+  assert.match(handler, /history\.replaceState\(null, '', location\.pathname \+ withoutRepoParam\(location\.search\) \+ location\.hash\)/);
+  assert.match(handler, /input\.focus\(\)/); // focus goes back to the field
+  assert.doesNotMatch(handler.replace(/\/\/.*$/gm, ''), /fetch|XMLHttpRequest|scan\(|fetchReport|start/); // it never calls the API
+});
 test('unknown events and junk change nothing, and step never mutates the old state', () => {
   const s = run({ type: 'start', owner: 'o', name: 'a' }, { type: 'ok', report: reportA });
   const frozen = JSON.stringify(s);

@@ -94,6 +94,18 @@ test('bucketSections: Contradicted, Missing, Unverifiable, Verified in that orde
   assert.deepEqual(full.map((x) => x.open), [true, true, false, true]);
   assert.deepEqual(countChips({ verified: 1, contradicted: 2 }).map((c) => [c.bucket, c.count]), [['contradicted', 2], ['missing', 0], ['unverifiable', 0], ['verified', 1]]);
 });
+test('empty buckets show NONE FOUND only: the Haiku note is hidden when the count is 0, and kept when there are rows', () => {
+  const notes = { summary: 's', buckets: { contradicted: 'No claims were contradicted.', missing: 'Two imports are not mentioned.', unverifiable: 'No claims were unverifiable.', verified: 'One claim matches.' } };
+  const report = { ...load('missing-package'), notes }; // 1 missing, 1 verified, nothing else
+  const s = Object.fromEntries(bucketSections(report).map((x) => [x.bucket, x]));
+  assert.equal(s.contradicted.note, null); // empty, so no second line
+  assert.equal(s.unverifiable.note, null);
+  assert.equal(s.contradicted.empty, true);
+  assert.equal(s.missing.note, 'Two imports are not mentioned.'); // has a row, so its note stays
+  assert.equal(s.verified.note, 'One claim matches.');
+  // a null notes object still gives no notes anywhere
+  for (const x of bucketSections({ ...report, notes: null })) assert.equal(x.note, null, x.bucket);
+});
 test('recordFields and footerText: values come from the report, a null receipt shows a dash, and units are plural-correct', () => {
   const r = load('npm-start-drift');
   const f = Object.fromEntries(recordFields(r).map((x) => [x.label, x.value]));

@@ -15,10 +15,15 @@ test('index.html: no inline script, no inline style, no remote resource, every l
   assert.doesNotMatch(html, /<style[\s>]/i, 'style element');
   assert.doesNotMatch(html, /\son[a-z]+\s*=/i, 'inline event handler');
   // Resources the page loads (script, link, img, iframe, source) must be local. Plain <a> links may point anywhere.
-  const loaders = [...html.matchAll(/<(script|link|img|iframe|source|embed|object)\b[^>]*>/gi)].map((m) => m[0]);
+  // (<link rel="canonical"> only names the page's own address. It loads nothing.)
+  const loaders = [...html.matchAll(/<(script|link|img|iframe|source|embed|object)\b[^>]*>/gi)].map((m) => m[0]).filter((t) => !/rel="canonical"/.test(t));
   assert.ok(loaders.length >= 7, 'expected the script and the five stylesheets and the icon');
   for (const tag of loaders) assert.doesNotMatch(tag, /(?:src|href|data)\s*=\s*["']\s*(?:https?:)?\/\//i, `remote resource: ${tag}`);
-  const local = loaders.flatMap((t) => [...t.matchAll(/(?:src|href)\s*=\s*["']([^"'#]+)["']/gi)].map((m) => m[1]));
+  const all = loaders.flatMap((t) => [...t.matchAll(/(?:src|href)\s*=\s*["']([^"'#]+)["']/gi)].map((m) => m[1]));
+  // /_vercel/insights/script.js is the one path that is not a file here: Vercel serves it once Analytics is on, from the same origin.
+  const VERCEL_OWN = ['/_vercel/insights/script.js'];
+  assert.deepEqual(all.filter((f) => f.startsWith('/')), VERCEL_OWN, 'the only root-absolute resource is the Vercel Analytics script');
+  const local = all.filter((f) => !VERCEL_OWN.includes(f));
   assert.ok(local.length >= 7);
   for (const f of local) assert.ok(existsSync(new URL(`../web/${f}`, import.meta.url)), `${f} is missing`);
 });
@@ -42,9 +47,11 @@ test('the five clew PNGs exist, are square and sharp enough for 120 px, and no S
 });
 test('render.js shows the mascot as a 120 px PNG with width, height, and short mood alt text', () => {
   const src = read('web/render.js');
-  assert.match(src, /src: `mascot\/\$\{pose\.file\}\.png`/);
-  assert.match(src, /alt: `The clew, \$\{st\.mood\}`/);
+  assert.match(src, /src: `mascot\/\$\{file\}\.png`/); // one helper builds every clew picture
+  assert.match(src, /alt: `The clew, \$\{mood\}`/);
   assert.match(src, /width: '120', height: '120'/);
+  assert.match(src, /clewImg\(pose\.file, st\.mood\)/); // the status strip
+  assert.match(src, /clewImg\('calm', 'calm'\)/); // the home screen
   assert.doesNotMatch(src, /\.svg|rotate/);
   assert.doesNotMatch(read('web/layout.css'), /\.clew\.rotate/);
 });

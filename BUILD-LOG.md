@@ -198,3 +198,24 @@ Each is covered by a test that fails when the bug is put back.
 Tests: 317 total, 317 pass, 0 fail, 0 cancelled, 0 skipped, 0 todo (279 before Phase C). New: `scan-state.test.js` (9), `export.test.js` (6), `navigate.test.js` (9), plus additions to `ui-state`, `web-copy` and `web-assets`. Shown failing: 48 deliberate breaks, one at a time, plus 3 for the bugs above. 47 turned red first time. The one that did not (a vacuous `indexOf` order check) was fixed and now fails.
 
 Browser check (Playwright, real CSP headers, `/api/scan` answered by mocks using the real live response, so no scan billed): 49 of 49 behaviors pass at 1200 px and 390 px.
+
+Committed as `e864c8f`.
+
+## Block 5 Phase D: clear, home clew, site basics, analytics, summary wording (2026-10-10)
+
+1. **CLEAR** button next to SCAN. It empties the field, removes the report and any strip, drops `?repo=` (other parameters stay) with `history.replaceState`, resets SCANNED to a dash, and puts focus in the field. Off while a scan runs. It never calls the API. The rule lives in `scan-state.js` (`clear` event, ignored while scanning); `withoutRepoParam` is in `site.js`.
+2. **Home clew:** the idle state shows `calm.png` beside the idle text (one `clewImg` helper builds every clew picture).
+3. **Empty buckets** show NONE FOUND only. The Haiku note is hidden when the count is 0 (`bucketSections`).
+4. **Haiku summary (`lib/summarize.js`, prompt only):** plain English for a developer, lead with contradictions then missing, name a few missing packages, verified last and brief, the Unverifiable count only when nothing else exists, one or two sentences. Same structured data. Details:
+   - The prompt never contains "mood" or "low-confidence" (or any talk of confidence). The request is built by `promptInput`, which is the same information as `buildInput` with renamed keys (`mood` is `overall`, `lowConfidenceFindings` is `unsureLabels`, `lowConfidence` is `unsure`), so the model is never handed either word.
+   - A reply that uses either word anywhere is rejected, so the report falls back to the fixed line (fail-open, as before).
+   - The summary is cut to two sentences in code (`twoSentences`). The live reply had three.
+   - Live check on the demo repo (1 scan, preview): "No README claims were contradicted by the code. Four dependencies the code uses are missing from the README: esbuild-plugin-pino, orval, drizzle-kit, and pino-http. Eight claims were verified." No banned words, no Unverifiable count. Three sentences, which is why the two-sentence cap was added. The cap is covered by tests, not re-scanned.
+5. **Site basics in `web/`:** `robots.txt` (allow all, `Disallow: /api/`, Sitemap line), `sitemap.xml` (the one production URL), `404.html` (site style, the curious clew, a link home, root-absolute paths so it works at any depth), canonical link, description, `theme-color` `#0A1214`.
+6. **Vercel Web Analytics:** `<script defer src="/_vercel/insights/script.js">` (same origin, CSP unchanged). ABOUT has "Anonymous page-view counts through Vercel Analytics. No cookies. Scans are never stored." The input hint changed from "NOTHING IS STORED" to "SCANS ARE NEVER STORED", because page views are now counted.
+
+Dev server (`scripts/dev-server.mjs`) now serves `404.html` with status 404 for unknown paths, a stub for the Analytics script, and PNG, TXT and XML types.
+
+Tests: 340 total, 340 pass, 0 fail, 0 cancelled, 0 skipped, 0 todo (317 before). New: `site-basics.test.js` (8), CLEAR cases in `scan-state.test.js` (5), empty-bucket note in `web-view-model.test.js`, 11 in `summarize.test.js`. Shown failing: 42 deliberate breaks plus the two-sentence cap. All turned a test red. One slipped first time ("say how confident you are", because only "confidence" was banned); the test now also bans "confident".
+
+Browser check (Playwright, real CSP headers, mocked `/api/scan`): 48 of 48 pass at 1200 px and 390 px, including CLEAR, the home clew, hidden empty-bucket notes, the 404 page at a deep path, robots and sitemap, and the Analytics script with no CSP error.

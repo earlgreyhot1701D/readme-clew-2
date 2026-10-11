@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>README Clew 2 // Claim Ledger</title>
   <meta name="description" content="Checks whether a GitHub README matches its code. Rules decide what is true.">
+  <meta name="theme-color" content="#0A1214">
+  <link rel="canonical" href="https://readme-clew-2.vercel.app/">
   <meta property="og:type" content="website">
   <meta property="og:title" content="README Clew 2 // Claim Ledger">
   <meta property="og:description" content="Checks whether a GitHub README matches its code.">
@@ -22,6 +24,9 @@
   <link rel="stylesheet" href="chrome.css">
   <link rel="stylesheet" href="pages.css">
   <script type="module" src="app.js"></script>
+  <!-- Vercel Web Analytics: anonymous page views, no cookies. Same origin, so the CSP stays 'self'. The file is served by Vercel
+       once Analytics is enabled in the dashboard. Scans are never sent to it. -->
+  <script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body>
   <main class="terminal">
@@ -49,9 +54,10 @@
           <label class="prompt" for="repo-input">REPO &gt;</label>
           <input id="repo-input" name="repo" type="text" inputmode="url" autocomplete="off" spellcheck="false" maxlength="300" placeholder="owner/repo or https://github.com/owner/repo">
           <button id="scan-btn" class="btn" type="submit">SCAN</button>
+          <button id="clear-btn" class="btn" type="button">CLEAR</button>
         </form>
         <div class="hint-row">
-          <p class="hint">PUBLIC REPOS ONLY. NOTHING IS STORED.</p>
+          <p class="hint">PUBLIC REPOS ONLY. SCANS ARE NEVER STORED.</p>
           <button id="demo-btn" class="btn btn-small" type="button">USE DEMO REPO</button>
         </div>
       </section>
@@ -98,7 +104,8 @@
           <li><span class="label">JS/TS ONLY</span><span>package.json holds both the packages and the commands, so it gives the checks something solid to test against. Other languages are planned, not built.</span></li>
           <li><span class="label">MONOREPOS</span><span>Reads pnpm-workspace.yaml and the workspaces field in package.json. Supports dir/* and exact dirs, up to 30 workspaces.</span></li>
           <li><span class="label">SIZE</span><span>READMEs over 50 KB are cut, and only the first 20 source files are read.</span></li>
-          <li><span class="label">NOTHING STORED</span><span>Public repos only. Nothing is kept after a scan.</span></li>
+          <li><span class="label">SCANS NEVER STORED</span><span>Public repos only. Nothing about a scan is kept after it finishes.</span></li>
+          <li><span class="label">ANALYTICS</span><span>Anonymous page-view counts through Vercel Analytics. No cookies. Scans are never stored.</span></li>
           <li><span class="label">HAIKU CAN BE DOWN</span><span>If it is unavailable, the report still works and the clew speaks a fixed line.</span></li>
         </ul>
       </section>

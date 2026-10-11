@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { summarize, buildInput, parseNotes } from '../lib/summarize.js';
+import { summarize, buildInput, parseNotes, promptInput, twoSentences, SYSTEM } from '../lib/summarize.js';
 import { FIXTURES, runFixture } from './helpers.js';
 
 const GOOD = { summary: 'Mostly fine.', verified: 'Five checks passed.', unverifiable: 'None.', missing: 'None.', contradicted: 'None.' };
@@ -87,4 +87,87 @@ test('no key means skipped, with no request', async () => {
   let sent = 0;
   const r = await summarize(report, { fetchImpl: async () => { sent += 1; }, apiKey: '' });
   assert.deepEqual([r.notes, r.usage.status, sent], [null, 'skipped', 0]);
+});
+
+// ---- Phase D: plain English for a developer ----
+const BANNED_WORDS = /\bmood\b|low[\s-]*conf|confiden(?:ce|t)/i;
+
+test('prompt: it never contains the words "mood" or "low-confidence", nor talk of confidence at all', () => {
+  assert.doesNotMatch(SYSTEM, BANNED_WORDS);
+  assert.ok(SYSTEM.length > 200);
+});
+test('prompt: it leads with contradictions, then missing, and holds back the unverifiable count', () => {
+  const i = (re) => SYSTEM.search(re);
+  assert.ok(i(/Lead with what matters most/) > -1);
+  assert.ok(i(/claims the code contradicts first/) > -1);
+  assert.ok(i(/claims the code contradicts first/) < i(/then things the code does that the README never mentions/), 'contradicted before missing');
+  assert.match(SYSTEM, /Give the unverifiable count only when there are no contradicted, missing, or verified claims/);
+  assert.match(SYSTEM, /one or two plain sentences/);
+  assert.match(SYSTEM, /plain-English notes for a developer/);
+  assert.match(SYSTEM, /Never invent facts, names, or quotes/); // the old safety rules are still there
+});
+test('request: the whole request (prompt and data) holds neither banned word, for every fixture', async () => {
+  for (const name of FIXTURES) {
+    let seen;
+    await summarize(runFixture(name).report, opts(async (url, init) => { seen = init.body; return reply(JSON.stringify(GOOD)); }));
+    assert.doesNotMatch(seen, BANNED_WORDS, name);
+  }
+});
+test('request: it carries the same information as before, only with renamed keys', () => {
+  for (const name of FIXTURES) {
+    const r = runFixture(name).report;
+    const before = buildInput(r);
+    const sent = promptInput(r);
+    assert.deepEqual(sent.counts, before.counts, name);
+    assert.equal(sent.overall, before.mood, name);
+    assert.equal(sent.unsureLabels, before.lowConfidenceFindings, name);
+    assert.equal(sent.decidedByRule, before.decidedByRule, name);
+    assert.equal(sent.decidedByJev, before.decidedByJev, name);
+    assert.deepEqual(sent.findings.map((f) => f.unsure), before.findings.map((f) => f.lowConfidence), name);
+    assert.deepEqual(sent.findings.map(({ unsure, ...x }) => x), before.findings.map(({ lowConfidence, ...x }) => x), name);
+    assert.equal(sent.findings.length, before.findings.length, name);
+  }
+});
+test('request: the data still holds no README text, quotes, or evidence', () => {
+  for (const name of FIXTURES) {
+    const r = runFixture(name).report;
+    const json = JSON.stringify(promptInput(r));
+    for (const f of r.findings) {
+      if (f.quote) assert.ok(!json.includes(f.quote), `${name}: quote leaked`);
+      assert.ok(!json.includes(f.evidence.detail), `${name}: evidence leaked`);
+    }
+  }
+});
+test('output: a reply that uses "mood" or "low-confidence" anywhere is rejected, so the page falls back to the fixed line', async () => {
+  for (const bad of ['The mood is worried.', 'Found 28 low-confidence findings.', 'Several LOW CONFIDENCE labels.', 'Low-Confidence rows exist.']) {
+    for (const field of ['summary', 'verified', 'unverifiable', 'missing', 'contradicted']) {
+      assert.equal(parseNotes(JSON.stringify({ ...GOOD, [field]: bad })), null, `${field}: ${bad}`);
+    }
+  }
+  const r = await summarize(report, opts(async () => reply(JSON.stringify({ ...GOOD, summary: 'The mood is calm.' }))));
+  assert.equal(r.notes, null); // fail-open: the report is still complete
+  assert.equal(r.usage.status, 'error');
+});
+test('output: the summary is cut to two sentences (the live reply had three), and nothing else changes', () => {
+  const live = 'No README claims were contradicted by the code. Four dependencies the code uses are missing from the README: esbuild-plugin-pino, orval, drizzle-kit, and pino-http. Eight claims were verified.';
+  const n = parseNotes(JSON.stringify({ ...GOOD, summary: live }));
+  assert.equal(n.summary, 'No README claims were contradicted by the code. Four dependencies the code uses are missing from the README: esbuild-plugin-pino, orval, drizzle-kit, and pino-http.');
+  assert.equal(twoSentences('One only.'), 'One only.');
+  assert.equal(twoSentences('One. Two.'), 'One. Two.');
+  assert.equal(twoSentences('One! Two? Three. Four.'), 'One! Two?');
+  assert.equal(twoSentences('npm start is missing. next.js and v1.2 are fine. Third.'), 'npm start is missing. next.js and v1.2 are fine.'); // dots inside names do not split
+  assert.equal(twoSentences('No full stop at all'), 'No full stop at all');
+  // bucket notes are not cut: they are single lines already
+  const b = parseNotes(JSON.stringify({ ...GOOD, missing: 'First part. Second part. Third part.' }));
+  assert.equal(b.buckets.missing, 'First part. Second part. Third part.');
+});
+test('output: ordinary words that merely contain those letters are fine', () => {
+  const n = parseNotes(JSON.stringify({ ...GOOD, summary: 'Two commands are contradicted. A smoody tone is not a word we ban.', missing: 'Confident? No such word is banned here.' }));
+  assert.ok(n, 'plain replies still parse');
+});
+test('output: a plain developer-style reply parses, and the five fields are kept', () => {
+  const good = { summary: 'The README says to run npm start, but package.json has no start script. The code also uses orval, which the README never mentions.', verified: 'Eight claims match.', unverifiable: 'Most lines are prose.', missing: 'orval is imported but never mentioned.', contradicted: 'npm start has no matching script.' };
+  const n = parseNotes(JSON.stringify(good));
+  assert.equal(n.summary, good.summary);
+  assert.deepEqual(Object.keys(n.buckets), ['verified', 'unverifiable', 'missing', 'contradicted']);
 });

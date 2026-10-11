@@ -8,12 +8,13 @@ import { landAfterScan } from './navigate.js';
 import { fixtureName, loadFixture } from './fixture-mode.js';
 import { initTabs } from './tabs.js';
 import { bindDisclosure } from './disclosure.js';
-import { SITE_URL, deepLink } from './site.js';
+import { SITE_URL, deepLink, withoutRepoParam } from './site.js';
 
 const CLIENT_TIMEOUT_MS = 70000; // the function allows 60 s
 const form = document.getElementById('scan-form');
 const input = document.getElementById('repo-input');
 const button = document.getElementById('scan-btn');
+const clearBtn = document.getElementById('clear-btn');
 const stamp = document.getElementById('scan-time');
 const banner = document.getElementById('banner'); // idle, SCANNING, and error strips. The report stays below it.
 const out = document.getElementById('out');
@@ -29,6 +30,7 @@ function dispatch(event) {
   if (next === state) return;
   state = next;
   button.disabled = !state.canScan;
+  clearBtn.disabled = !state.canScan; // CLEAR is off while a scan runs
   button.textContent = state.canScan ? 'SCAN' : 'SCANNING';
   out.setAttribute('aria-busy', String(state.phase === 'loading'));
   if (state.banner) renderState(banner, state.banner.text, state.banner.kind, state.banner.kind === 'loading');
@@ -78,6 +80,19 @@ form.addEventListener('submit', async (e) => {
   } else {
     dispatch({ type: 'fail', text: result.error }); // the old report stays
   }
+});
+
+// CLEAR: empties the field, removes the report and any strip, drops ?repo= from the address bar, and puts focus back
+// in the field. It never calls the API, and does nothing while a scan is running.
+clearBtn.addEventListener('click', () => {
+  if (!state.canScan) return;
+  dispatch({ type: 'clear' });
+  out.replaceChildren();
+  stamp.textContent = '-';
+  input.value = '';
+  input.setAttribute('aria-invalid', 'false');
+  history.replaceState(null, '', location.pathname + withoutRepoParam(location.search) + location.hash);
+  input.focus();
 });
 
 // USE DEMO REPO fills the field and nothing else.

@@ -80,7 +80,7 @@ export function rowModel(f) {
 export function bucketSections(report) {
   return BUCKETS.map((b) => {
     const rows = (report.findings ?? []).filter((f) => f.bucket === b).map(rowModel);
-    return { bucket: b, label: BUCKET_LABEL[b], count: rows.length, rows, empty: rows.length === 0, open: defaultOpen(b, rows.length), note: bucketNote(report, b) };
+    return { bucket: b, label: BUCKET_LABEL[b], count: rows.length, rows, empty: rows.length === 0, open: defaultOpen(b, rows.length), note: rows.length ? bucketNote(report, b) : null }; // an empty bucket says NONE FOUND once, not twice
   });
 }
 
