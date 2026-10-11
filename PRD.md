@@ -1,7 +1,7 @@
 # README Clew 2 - PRD
 
-**Version:** 1.2 (Oct 8, 2026: Block 0 spike results applied)
-**Changelog:** v1.0 approved Oct 7. v1.1 Oct 7: owner added M21 (Praxi Clew-style receipt). Successor projects confirmed allowed. v1.2 Oct 8: spike results (LEDGER.md, Block 0). Glasser caps a call at 100 questions, so Jev runs in batches. Pinning the model does not guarantee identical labels. Gate threshold moves to Block 2 and applies only to verifier-bound labels. Vercel Hobby rate rule confirmed. Q4 resolved.
+**Version:** 1.3 (Oct 10, 2026: build-time decisions recorded)
+**Changelog:** v1.0 approved Oct 7. v1.1 Oct 7: owner added M21 (Praxi Clew-style receipt). Successor projects confirmed allowed. v1.2 Oct 8: spike results (LEDGER.md, Block 0). Glasser caps a call at 100 questions, so Jev runs in batches. Pinning the model does not guarantee identical labels. Gate threshold moves to Block 2 and applies only to verifier-bound labels. Vercel Hobby rate rule confirmed. Q4 resolved. v1.3 Oct 10: decisions made during the build, recorded here so the spec matches what shipped. Haiku is Claude Haiku 5.5 (`claude-haiku-5-5`). The social card is one static image, not a per-repo `/api/og` card. The badge (M19) is a STUB: with no storage, every badge view would re-scan and bill the owner. The demo video (M16) is dropped: the submission form does not require one, and screenshots replace it. The scan field starts blank; USE DEMO REPO fills the demo (M10). The clew mascot is raster art generated with ChatGPT by the owner, replacing hand-made SVG. Monorepo workspaces come from pnpm-workspace.yaml and package.json workspaces (Block 5a). Not-a-JS/TS repos are refused before any Jev call. Ship-by moved to Sun Oct 11, 6 PM PT.
 **Owner:** La Shara Cordero
 **Hackathon:** AdaL "What Would Jev Do?" (Oct 6-11, 2026)
 **Repo:** `readme-clew-2` (new repo, all code written this week)
@@ -44,7 +44,7 @@ Done is not:    Chrome Web Store listing        -> STUB
                 Firefox version                 -> STUB
                 Private repos                   -> NEVER in v1
 
-Ship by:        Sat Oct 10, 8 PM PT (deadline Sun Oct 11, 11:59 PM PT)
+Ship by:        Sun Oct 11, 6 PM PT (deadline Sun Oct 11, 11:59 PM PT). Moved from Sat 8 PM in v1.3
 ```
 
 When the done line is met, the build stops. Anything else goes to STUB.
@@ -92,17 +92,17 @@ README Clew 2 is a rebuild from scratch that fixes both by changing who decides 
 | M7 | Four buckets: Verified, Unverifiable, Missing, Contradicted. Each finding shows the README line, the code evidence, and confidence |
 | M8 | Haiku writes a summary line plus one note per bucket, from structured findings only. Fail-open |
 | M9 | Mascot (original yarn-ball clew) in popup and on the live page. Speech bubble, mood, head tilt (section 5) |
-| M10 | Live web page on Vercel with `?repo=` deep links and a pre-filled demo repo |
+| M10 | Live web page on Vercel with `?repo=` deep links and a USE DEMO REPO button (field starts blank, v1.3) |
 | M11 | Chrome extension (Manifest V3): popup scans the repo in the current tab |
 | M12 | Bookmarklet that opens the live page with the current repo filled in |
 | M13 | GitHub release with the extension ZIP and load-unpacked instructions |
 | M14 | One Vercel function holds all keys, validates input, rate-limits, times out |
 | M15 | Report output as specified in section 3b, including links to the exact README line on GitHub |
-| M16 | Demo video made with AdaL Video Producer, under 2 minutes |
+| M16 | ~~Demo video made with AdaL Video Producer~~ Dropped in v1.3: not required by the submission form; screenshots replace it |
 | M17 | "Try it" section in the README with judge install steps (section 6) |
 | M18 | JSON export: "Download JSON" button saves the report object (3b) as a file. Built in the browser, nothing stored |
-| M19 | Status badge: `/api/badge?repo=owner/name` returns an SVG with the four counts. Embeddable in any README (section 3d) |
-| M20 | Social card: `/api/og?repo=owner/name` returns a 1200x630 PNG with repo name, counts, and the clew's mood. The `?repo=` page links use it as their preview image (section 3d) |
+| M19 | STUB (v1.3). Status badge: `/api/badge?repo=owner/name`. Not built: with no storage, every view would re-scan and bill the owner's keys |
+| M20 | Social card: one static 1200x630 PNG (`web/social-card.png`) with og and twitter tags (v1.3, replaces the per-repo `/api/og` card) |
 | M21 | Scan receipt in every report, plus a build-week usage report of every real Jev and Haiku call (section 3e) |
 
 ### STUB (comment stubs with implementation notes, not built)
@@ -447,7 +447,7 @@ An original ball of thread with a loose end. Not based on any existing character
 | Mood: calm | Verifiers | Everything else |
 | Head tilt | Jev | Any low-confidence finding |
 
-Poses are hand-made SVG states. No generated art at runtime.
+Poses are raster images (v1.3): generated with ChatGPT by the owner, cut out by Claude. No generated art at runtime.
 
 ---
 
@@ -455,7 +455,7 @@ Poses are hand-made SVG states. No generated art at runtime.
 
 | Route | How | For |
 |---|---|---|
-| Live page | Vercel URL with a demo repo pre-filled | Judges with no install. Listed first everywhere |
+| Live page | Vercel URL with a USE DEMO REPO button | Judges with no install. Listed first everywhere |
 | Load unpacked | GitHub release ZIP, `chrome://extensions`, Developer mode, Load unpacked | Judges, devs |
 | Bookmarklet | Drag to bookmarks bar. Opens live page with `?repo=` | Everyone else, any browser |
 
@@ -674,7 +674,7 @@ Runs the whole pipeline on every fixture, twice:
 | Jev (pinned jev-1.13.0, via Glasser) | Line labels, name picks | Pinned so labels don't shift mid-week |
 | AdaL Video Producer | Demo video | Built into AdaL, loads on request |
 | Glasser | Paid access to Jev, $11 credit | `POST https://api.glasser.ai/v1/runs`, provider `typesafe`, endpoint `/v1/systemone`. Max 100 questions per call, 45 s deadline, failed runs charge $0. Also eligible for "Best use of Glasser" |
-| Claude Haiku 4.5 | Summary | Confirm model id is current before Block 4 |
+| Claude Haiku 5.5 (`claude-haiku-5-5`) | Summary | Confirmed with GET /v1/models in Block 4 |
 | Vercel (Hobby) | Live page + function | 300 s max duration, 2 GB memory |
 | Chrome MV3 | Extension | Current extension platform |
 | TypeSafe agent skill | Teaches AdaL Jev patterns | Try `@skills:gh:typesafe-ai/skills/skills/typesafe-ai`. Not in AdaL's docs, so fallback: copy SKILL.md into `.adal/skills/typesafe-ai/` |

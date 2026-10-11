@@ -262,3 +262,12 @@ Tests: 452 total, 452 pass, 0 fail. Real-Chrome QA (Chrome 155, unpacked, mocked
 - Submission ZIP built from git archive of main, not committed.
 
 Tests: 464 total, 464 pass, 0 fail.
+
+## Close (logged by Claude, architect)
+
+Oct 10, 2026, 10:26 PM PT
+
+1. AdaL mapped an HTTP 403 from /api/scan to the rate-limit message ("TOO MANY SCANS"), because the Vercel Hobby firewall can only Deny with 403. Commit a48ccf7, deployed to production. Extension ZIP on release v0.1.0 replaced; source ZIP rebuilt.
+2. Final suite: 465 tests, 465 pass, 0 fail.
+3. Self-scan of this repo through production: 0 Contradicted, 0 Missing.
+4. Build closed. Remaining work is docs and submission.
