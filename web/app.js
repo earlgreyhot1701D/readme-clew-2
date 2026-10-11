@@ -3,7 +3,7 @@
 // Rule: a scan only starts on a click (or Enter in the form). ?repo= and USE DEMO REPO fill the field and nothing more.
 import { renderReport, renderState } from './render.js';
 import { parseRepoInput, initialRepoValue, errorState, formatScanTime, STATES, DEMO_SHORT } from './view-model.js';
-import { initialState, step } from './scan-state.js';
+import { initialState, step, retryTarget, retryableError } from './scan-state.js';
 import { landAfterScan } from './navigate.js';
 import { fixtureName, loadFixture } from './fixture-mode.js';
 import { initTabs } from './tabs.js';
@@ -33,8 +33,11 @@ function dispatch(event) {
   clearBtn.disabled = !state.canScan; // CLEAR is off while a scan runs
   button.textContent = state.canScan ? 'SCAN' : 'SCANNING';
   out.setAttribute('aria-busy', String(state.phase === 'loading'));
-  if (state.banner) renderState(banner, state.banner.text, state.banner.kind, state.banner.kind === 'loading');
-  else banner.replaceChildren();
+  if (state.banner) {
+    // TRY AGAIN only appears on an error that another try could fix, and it re-sends the same repo, once, on a click.
+    const again = retryTarget(state) ? () => { const r = retryTarget(state); if (r) runScan(r); } : null;
+    renderState(banner, state.banner.text, state.banner.kind, state.banner.kind === 'loading', again);
+  } else banner.replaceChildren();
 }
 
 function showReport(report, { land }) {
@@ -55,13 +58,28 @@ async function fetchReport(url) {
     });
     let body = null;
     try { body = await res.json(); } catch { body = null; }
-    if (!res.ok) return { error: errorState(res.status, body?.error?.code) };
-    if (!looksLikeReport(body)) return { error: STATES.failed };
+    if (!res.ok) return { error: errorState(res.status, body?.error?.code), retryable: retryableError(res.status, body?.error?.code) };
+    if (!looksLikeReport(body)) return { error: STATES.failed, retryable: true };
     return { report: body };
   } catch {
-    return { error: STATES.failed }; // network failure or timeout
+    return { error: STATES.failed, retryable: true }; // network failure or timeout
   } finally {
     clearTimeout(timer);
+  }
+}
+
+// One scan for a repo that is already validated. The form and TRY AGAIN both come through here, and nothing else starts a scan.
+async function runScan(p) {
+  if (!state.canScan) return; // a scan is running: ignore
+  input.value = p.url;
+  dispatch({ type: 'start', owner: p.owner, name: p.name });
+  const result = await fetchReport(p.url);
+  if (result.report) {
+    dispatch({ type: 'ok', report: result.report });
+    showReport(result.report, { land: true });
+  } else {
+    // The old report stays. A retryable error carries the repo, so the strip can offer TRY AGAIN for exactly this repo.
+    dispatch({ type: 'fail', text: result.error, retry: result.retryable ? { owner: p.owner, name: p.name, url: p.url } : null });
   }
 }
 
@@ -70,16 +88,8 @@ form.addEventListener('submit', async (e) => {
   if (!state.canScan) return;
   const p = parseRepoInput(input.value);
   input.setAttribute('aria-invalid', String(!p.ok));
-  if (!p.ok) { dispatch({ type: 'fail', text: STATES.badInput }); input.focus(); return; } // the old report stays
-  input.value = p.url;
-  dispatch({ type: 'start', owner: p.owner, name: p.name });
-  const result = await fetchReport(p.url);
-  if (result.report) {
-    dispatch({ type: 'ok', report: result.report });
-    showReport(result.report, { land: true });
-  } else {
-    dispatch({ type: 'fail', text: result.error }); // the old report stays
-  }
+  if (!p.ok) { dispatch({ type: 'fail', text: STATES.badInput }); input.focus(); return; } // the old report stays, no TRY AGAIN
+  await runScan(p);
 });
 
 // CLEAR: empties the field, removes the report and any strip, drops ?repo= from the address bar, and puts focus back

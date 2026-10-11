@@ -29,7 +29,8 @@ function fakeFetch(handler) {
   f.seen = seen;
   return f;
 }
-const opts = (fetchImpl, extra = {}) => ({ fetchImpl, apiKey: KEY, ...extra });
+// wait and random are fixed, so a retry never sleeps for real in these tests.
+const opts = (fetchImpl, extra = {}) => ({ fetchImpl, apiKey: KEY, wait: async () => {}, random: () => 0, ...extra });
 
 test('request shape: URL, provider, endpoint, pinned model, auth, idempotency key', async () => {
   const f = fakeFetch((e) => respond(okRun(e.input)));
@@ -70,7 +71,7 @@ test('more than 100 questions in one callJev is refused before any request', asy
 test('cost is summed from Glasser charge_usd, exactly', async () => {
   const f = fakeFetch((e) => respond(okRun(e.input, '0.000828')));
   const r = await askAll([{ state: 's', questions: qs(250) }], opts(f));
-  assert.deepEqual(totalUsage(r.calls), { calls: 3, questions: 250, inputTokens: 300, outputTokens: 150, chargeUsd: '0.002484' });
+  assert.deepEqual(totalUsage(r.calls), { calls: 3, questions: 250, inputTokens: 300, outputTokens: 150, retriedCalls: 0, chargeUsd: '0.002484' });
 });
 
 test('a timeout becomes a JevError("timeout")', async () => {
@@ -90,18 +91,10 @@ test('HTTP errors map to codes: 401, 402, 400', async () => {
   }
 });
 
-test('429 is retried once with the same idempotency key, then succeeds', async () => {
-  const f = fakeFetch((e, n) => (n === 1 ? respond({ error: { code: 'rate_limited' } }, 429) : respond(okRun(e.input))));
-  const r = await callJev({ state: 's', questions: qs(1) }, opts(f));
-  assert.equal(f.seen.length, 2);
-  assert.equal(f.seen[0].init.headers['idempotency-key'], f.seen[1].init.headers['idempotency-key']);
-  assert.equal(r.call.attempts, 2);
-});
-
-test('429 twice gives up with rate_limited', async () => {
+test('429 is a 4xx and is never retried: one request, then rate_limited (the retry rules are in jev-retry.test.js)', async () => {
   const f = fakeFetch(() => respond({ error: { code: 'rate_limited' } }, 429));
   await assert.rejects(callJev({ state: 's', questions: qs(1) }, opts(f)), { code: 'rate_limited' });
-  assert.equal(f.seen.length, 2);
+  assert.equal(f.seen.length, 1);
 });
 
 test('bad responses are rejected: failed run, wrong model, answer outside the options, missing answer', async () => {

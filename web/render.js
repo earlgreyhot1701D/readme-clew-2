@@ -71,7 +71,8 @@ export function renderReport(report, root) {
 }
 
 // A one-line state strip (idle, loading, errors).
-export function renderState(root, text, kind, withCursor) {
+// onRetry (errors only): adds a TRY AGAIN button that calls it. The button is one click and never fires by itself.
+export function renderState(root, text, kind, withCursor, onRetry) {
   root.replaceChildren();
   const s = strip(`state s-${kind}`);
   const p = el('p', 'state-text', text, { role: kind === 'error' ? 'alert' : 'status' });
@@ -79,6 +80,12 @@ export function renderState(root, text, kind, withCursor) {
   if (kind === 'idle') { // the first screen has the mascot beside the idle text
     const row = el('div', 'idle-row');
     row.append(clewImg('calm', 'calm'), p);
+    s.append(row);
+  } else if (kind === 'error' && onRetry) {
+    const row = el('div', 'error-row');
+    const again = el('button', 'btn btn-small retry', 'TRY AGAIN', { type: 'button' });
+    again.addEventListener('click', onRetry);
+    row.append(p, again);
     s.append(row);
   } else {
     s.append(p);

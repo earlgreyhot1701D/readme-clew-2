@@ -231,3 +231,17 @@ On Unverifiable rows decided by Jev, the bare "JEV CONFIDENCE 0.95" bar is repla
 - a code type that was sure enough went to a code check, so it keeps the bar. Verified rows decided by Jev keep it too.
 
 The KEY line on confidence now describes all three. `rowModel` carries a `verdict` field, `renderRow` draws it as a paragraph, and the 0.8 bar and the code types are pinned to `lib/gate.js` by a test (no `lib/` change). On the real v1 report the 140 Jev-decided Unverifiable rows split 31 THOUGHT, 86 NOT A CHECKABLE CLAIM, and 23 with a bar. Tests: 351 total, 351 pass, 0 fail, 0 cancelled, 0 skipped, 0 todo (340 before). 20 deliberate breaks, all turned a test red. Browser check: 10 of 10 pass at 1200 px and 390 px.
+
+Committed as `c8dd621`. Production: `ad04a76` (blank scan field), live at https://readme-clew-2.vercel.app.
+
+## Hardening: Haiku reason codes, retries, per-field guard, TRY AGAIN (2026-10-11)
+
+Approved after one of two production demo scans fell back to the fixed clew line with no way to tell why. Files: `lib/summarize.js`, `lib/jev.js`, `lib/usage.js`, `lib/scan-repo.js`, `api/scan.js`, and in `web/` `scan-state.js`, `render.js`, `app.js`, `chrome.css`.
+
+1. **Haiku reason codes** `http_429`, `http_5xx`, `http_4xx`, `network`, `timeout`, `parse`, `banned`, `max_tokens`, in the receipt and the counts-only log line (`haiku`, `haikuRetried`, `jevRetried`). Codes and numbers only, never text.
+2. **Banned-word guard per field:** only the offending summary or bucket note is dropped, the rest of the reply stays.
+3. **Haiku: one retry** on 429, 5xx, or a network error, only if 3 s of the 9 s budget remain after a 200 to 600 ms jittered wait. Receipt: `retried: true`. Never on 4xx, timeout, parse, banned, or max_tokens.
+4. **Jev: one retry** on 5xx, a network error, or a timeout, with a new idempotency key, only if 8 s of the Jev budget remain (48 s of the 60 s function, kept clear of Haiku). Never on a 4xx. A Glasser 429 is no longer retried (it was before, with the same key).
+5. **TRY AGAIN** button on the error strip: re-sends the same repo, one click, never automatic, gone while scanning. Not offered for bad input, not found, or not JS/TS.
+
+Tests: 420 total, 420 pass, 0 fail, 0 cancelled, 0 skipped, 0 todo (353 before). New files: `haiku-retry.test.js` (24, with `summarize.test.js`), `jev-retry.test.js` (20), `retry-receipt.test.js` (13), `try-again.test.js` (13). The retry rules use a fake fetch and a fake clock, so no test waits or touches the network. Shown failing: 63 deliberate breaks, one at a time. 61 turned a test red the first time. Two did not ("timeout made retryable" and "the retry timer is not cut to the remaining budget"), because the existing tests could not tell them apart. Two tests were added and both breaks now go red. Real-browser check of TRY AGAIN: all 24 behaviors pass at 1200 px and 390 px.

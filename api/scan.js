@@ -31,8 +31,8 @@ export function makeHandler(deps = {}) {
     const t0 = now();
     const path = '/api/scan';
     const headers = { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store', ...corsHeaders(request) };
-    const reply = (status, body, extra = {}, counts) => {
-      log(logLine({ id, path, method: request.method, status, ms: now() - t0, errorCode: body?.error?.code, counts }));
+    const reply = (status, body, extra = {}, counts, more = {}) => {
+      log(logLine({ id, path, method: request.method, status, ms: now() - t0, errorCode: body?.error?.code, counts, ...more }));
       return new Response(JSON.stringify(body), { status, headers: { ...headers, ...extra } });
     };
     try {
@@ -44,8 +44,10 @@ export function makeHandler(deps = {}) {
       const declared = Number(request.headers.get('content-length') ?? 0);
       if (declared > MAX_BODY_BYTES) throw new ValidationError('body_too_large', 'Request body is too large', 413);
       const repo = validateBody(await request.text());
-      const { report } = await scan(repo);
-      return reply(200, report, {}, { ...report.counts, linesTotal: report.meta.linesTotal, linesToJev: report.meta.linesToJev });
+      const { report, usage } = await scan(repo);
+      // Codes and counts only: why Haiku fell back (if it did), and whether a retry was used. Never text.
+      const codes = { haiku: usage?.haiku?.reason ?? usage?.haiku?.status, haikuRetried: usage?.haiku?.retried ? 1 : 0, jevRetried: usage?.jev?.retriedCalls ?? 0 };
+      return reply(200, report, {}, { ...report.counts, linesTotal: report.meta.linesTotal, linesToJev: report.meta.linesToJev }, codes);
     } catch (e) {
       const m = mapError(e);
       return reply(m.status, { error: { code: m.code, message: m.message } });

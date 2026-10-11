@@ -38,6 +38,10 @@
 /* A link that looks like a button (the 404 page). */
 a.btn { display: inline-block; text-decoration: none; }
 
+/* An error strip with a TRY AGAIN button beside the text. */
+.error-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.error-row .state-text { flex: 1 1 260px; }
+
 /* Home screen: the calm clew beside the idle strip text. */
 .idle-row { display: flex; align-items: center; gap: 16px; }
 @media (max-width: 600px) { .idle-row { flex-direction: column; align-items: center; text-align: center; } }

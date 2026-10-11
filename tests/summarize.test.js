@@ -138,15 +138,19 @@ test('request: the data still holds no README text, quotes, or evidence', () => 
     }
   }
 });
-test('output: a reply that uses "mood" or "low-confidence" anywhere is rejected, so the page falls back to the fixed line', async () => {
+test('output: a field that uses "mood" or "low-confidence" is dropped on its own, and the rest of the reply stays', async () => {
   for (const bad of ['The mood is worried.', 'Found 28 low-confidence findings.', 'Several LOW CONFIDENCE labels.', 'Low-Confidence rows exist.']) {
     for (const field of ['summary', 'verified', 'unverifiable', 'missing', 'contradicted']) {
-      assert.equal(parseNotes(JSON.stringify({ ...GOOD, [field]: bad })), null, `${field}: ${bad}`);
+      const n = parseNotes(JSON.stringify({ ...GOOD, [field]: bad }));
+      assert.ok(n, `${field}: ${bad}: the other four fields survive`);
+      const got = field === 'summary' ? n.summary : n.buckets[field];
+      assert.equal(got, null, `${field}: ${bad}: the offending field is gone`);
     }
   }
   const r = await summarize(report, opts(async () => reply(JSON.stringify({ ...GOOD, summary: 'The mood is calm.' }))));
-  assert.equal(r.notes, null); // fail-open: the report is still complete
-  assert.equal(r.usage.status, 'error');
+  assert.equal(r.notes.summary, null); // the page then shows the fixed fallback line for the bubble
+  assert.equal(r.notes.buckets.verified, GOOD.verified); // the bucket notes are kept
+  assert.deepEqual([r.usage.status, r.usage.reason, r.usage.droppedFields], ['ok', 'banned', 1]);
 });
 test('output: the summary is cut to two sentences (the live reply had three), and nothing else changes', () => {
   const live = 'No README claims were contradicted by the code. Four dependencies the code uses are missing from the README: esbuild-plugin-pino, orval, drizzle-kit, and pino-http. Eight claims were verified.';

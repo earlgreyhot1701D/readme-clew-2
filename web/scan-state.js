@@ -21,10 +21,23 @@ export function step(state, event) {
     case 'ok':
       return { phase: 'done', report: event.report, banner: null, canScan: true };
     case 'fail':
-      return { ...state, phase: 'error', banner: { kind: 'error', text: event.text }, canScan: true };
+      // retry, when present, is the repo to send again (the TRY AGAIN button). It is only for errors a second try could fix.
+      return { ...state, phase: 'error', banner: { kind: 'error', text: event.text, ...(event.retry ? { retry: event.retry } : {}) }, canScan: true };
     default:
       return state;
   }
+}
+
+// Can another try help? Yes for a failed or slow scan and for a rate limit. No for a bad URL, a repo that is not there
+// or not public, or a repo that is not a JS/TS project: the answer would be the same.
+export function retryableError(httpStatus, code) {
+  if (httpStatus === 404 || httpStatus === 422) return false;
+  return !['bad_url', 'missing_repo', 'github_not_found', 'github_no_readme', 'not_js_repo'].includes(code);
+}
+
+// The repo TRY AGAIN would send, or null. Only while no scan is running.
+export function retryTarget(state) {
+  return state.canScan && state.banner?.kind === 'error' ? state.banner.retry ?? null : null;
 }
 
 // DOWNLOAD JSON needs a report in memory.

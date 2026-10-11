@@ -159,9 +159,10 @@ test('rescan wiring: the banner sits above the report, and a scan only ever redr
   assert.match(app, /out\.setAttribute\('aria-busy'/);
   assert.match(app, /if \(!state\.canScan\) return;/);
   // the old report is only replaced in the success branch
-  const submit = app.slice(app.indexOf("form.addEventListener('submit'"), app.indexOf('// USE DEMO REPO'));
+  const submit = app.slice(app.indexOf('async function runScan'), app.indexOf("form.addEventListener('submit'"));
   assert.equal((submit.match(/showReport\(/g) ?? []).length, 1);
   assert.ok(submit.indexOf('showReport(') > submit.indexOf('if (result.report)'));
+  assert.equal((app.match(/showReport\(result\.report/g) ?? []).length, 1, 'only runScan shows a scanned report');
 });
 test('count chips are buttons with a "go to section" name, wired to goToSection', () => {
   const render = src('render.js');
