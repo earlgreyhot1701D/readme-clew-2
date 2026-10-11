@@ -97,9 +97,22 @@ Oct 9, 2026, evening
 
 Outside `spike/`: `LICENSE`, `LEDGER.md`, `BUILD-LOG.md`. `.gitignore` was already correct.
 
-## Block 5 (in progress): live page
+## Block 5: live page (built, awaiting QA checkpoint, not committed)
 
-Done so far: `web/` (index.html, app.js, view-model.js, render.js, fixture-mode.js, tokens.css, layout.css, findings.css, mascot/ with 5 SVGs) and `scripts/dev-server.mjs` (local only, serves web/ plus fixtures/expected/). Fixture mode renders from `fixtures/expected/*.json` on localhost only. The API wiring is in `app.js` but untested against the live API. Screenshots are in `design/shots/` (gitignored). Still to do: view-model and DOM-safety tests, vercel.json (outputDirectory, CSP), preview deploy, QA checkpoint, commit with the `.gitignore` change.
+What exists:
+
+- `web/`: `index.html`, `app.js` (wiring), `view-model.js` (pure), `render.js` (DOM, `textContent` only), `fixture-mode.js` (localhost only, fixed allowlist of 13 names), `tokens.css`, `layout.css`, `findings.css`, and `mascot/` with 5 hand-made line-art SVGs (calm, curious, worried, tangled, tilt).
+- `scripts/dev-server.mjs`: local only (not under `web/`, so never published). Serves `web/` plus `fixtures/expected/`, and sends the same security headers as `vercel.json`.
+- `vercel.json`: `outputDirectory: web`, the scan function limit kept, and headers: CSP (`default-src 'self'`, `script-src 'self'`, `style-src 'self'`, `img-src 'self'`, `connect-src 'self'`, `object-src 'none'`, `base-uri 'none'`, `form-action 'self'`, `frame-ancestors 'none'`), `X-Content-Type-Options: nosniff`, `Referrer-Policy: no-referrer`.
+- Polish: "1 LINE" vs "LINES", scan time as `2026-10-11 02:16 UTC`, time in ms or s.
+- Download JSON is a disabled stub button with a comment (Block 6b).
+- `?repo=owner/name` fills the field and never scans. PRD says only that deep links exist (M10), not that they scan. The demo repo is `earlgreyhot1701D/readme-clew` (v1).
+
+Tests: 246 total, 246 pass, 0 fail, 0 cancelled, 0 skipped, 0 todo. New in this block: `tests/web-view-model.test.js` (17), `tests/no-unsafe-dom.test.js` (2), `tests/web-assets.test.js` (5). Each was shown failing: 38 deliberate breaks, one at a time, each restored. Failures found along the way: the no-unsafe-dom test caught the word "innerHTML" in my own comment in `render.js` (reworded), and a regex backtracking bug in my CSS test (fixed). A rule row with a stray confidence value was added to the tests after a break showed a gap.
+
+Checked on the preview (`vercel deploy`, not `--prod`; it sits behind Vercel login, so checks used `vercel curl`): `/` 200, `/app.js`, `/tokens.css`, `/mascot/tangled.svg` 200, `/api/scan` GET 405 (still works), `/fixtures/...`, `/lib/...`, `/scripts/...` 404 (not published), CSP and the other headers present. CSP console errors: none, checked in headless Chrome against the dev server with the same headers (page renders fully, including confidence bars set through CSSOM).
+
+Not done in this block: no live scan from the page (the Scan button path is written but was not run against the API, by the "no more live scans" decision), no real-device phone check, no commit yet.
 
 ## Block 5a: verifier fix for pnpm monorepos (2026-10-10, Working tier)
 

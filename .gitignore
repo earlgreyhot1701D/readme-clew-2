@@ -2,3 +2,9 @@ node_modules/
 .env
 .env.*
 .vercel/
+
+.vercel
+.env*
+
+# Local design references for the build agent (not published)
+design/

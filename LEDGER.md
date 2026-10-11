@@ -319,6 +319,15 @@ Oct 9, 2026, evening. Status: code and offline tests done (197 pass, 0 fail, 0 c
 4. The per-IP limiter is best effort (in memory, per instance). The Vercel firewall rule and the prepaid balances are the real ceilings (PRD 7.4).
 5. The token estimate is conservative and not calibrated against Jev's tokenizer, so some trimming may happen that was not strictly needed.
 
+## Block 5 findings (live page, 2026-10-10)
+
+- Vercel preview deployments are behind Vercel login by default. Anonymous requests get Vercel's own login page and CSP, which looks like a pass or fail of ours if you do not notice. Use `vercel curl <path> --deployment <url>` for checks.
+- Port 9222 on this machine is held by another app (LenovoVantage), and the browser tool could not load Playwright. Screenshots came from headless Chrome (`--screenshot`, `--force-prefers-reduced-motion` to skip the staggered reveal, which headless virtual time does not always advance).
+- The staggered strip reveal is `visibility` driven by a 0 s animation with a delay. It works in real time. In headless screenshots with a small virtual-time budget only the first strips appear. Not a product bug, but it is the first thing to check if a screenshot looks half empty.
+- Style choice: `style-src 'self'` forbids inline style attributes, so the confidence bar width is set through CSSOM (`el.style.width`), which CSP allows. Checked: no violations.
+- The 390 px phone layout was checked only in headless Chrome at about 754 px wide (it stacks correctly below 760 px). A real narrow-window or phone check is still open for the QA checkpoint.
+- The footer "HONEST LIMITATIONS" link points at a README anchor that does not exist until Block 7.
+
 ## Found in the demo: false positives on a pnpm monorepo (Block 5a, 2026-10-10)
 
 Scanning `earlgreyhot1701D/readme-clew` (v1, a Replit-style pnpm monorepo) for the live-page demo gave 3 Contradicted and 4 Missing. The owner checked v1: the 3 Contradicted were false, and the Missing evidence ("not listed in package.json") was false.
@@ -346,4 +355,5 @@ Other notes from this fix:
 
 - The Haiku summary was skipped in the local rescan (`receipt.calls` shows Anthropic `skipped`, `notes.summary` null). Not looked into; `lib/summarize.js` was not part of this block.
 - The coverage verifier also counts imports in `examples/` and `docs/` (known limit 1 above). It does not apply to v1, but it would on other repos.
+- **Haiku "skipped" was local config, not a bug (answered 2026-10-10, no live call).** `summarize()` returns `skipped` only when `ANTHROPIC_API_KEY` is falsy. The local `.env` has the variable present but empty (length 0), so a local run skips Haiku. The deployed function is fine: an earlier scan of v1 through the live API returned `notes` and an Anthropic receipt entry of `ok:1`, and Vercel has the key set for Production, Preview, and Development. No code change. One small weakness: `skipped` covers both "no key" and "caller chose to skip", so a missing key in production would look like a normal skip. Left as is.
 - Known gap left alone: `yarn workspaces foreach ...` is now Unverifiable (it used to be checked as a script named `workspaces`). Nothing else about foreach/`pnpm -r` filtering is modeled: `pnpm -r run x` still passes if any workspace has script `x`.

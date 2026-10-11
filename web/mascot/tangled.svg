@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120" fill="none" stroke="#4FE3D1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <title>The clew, tangled</title>
+  <circle cx="58" cy="52" r="32"/>
+  <path d="M26 56 C32 74 46 86 62 86"/>
+  <path d="M34 70 C48 84 72 84 86 68"/>
+  <path d="M88 40 C92 54 88 66 80 76"/>
+  <path d="M38 28 C48 20 70 20 80 28"/>
+  <path d="M42 46 l8 8 M50 46 l-8 8"/>
+  <path d="M64 46 l8 8 M72 46 l-8 8"/>
+  <path d="M48 66 l4 -4 l4 4 l4 -4 l4 4 l4 -4"/>
+  <path d="M82 80 C100 76 108 92 94 98 C80 102 74 88 88 86 C100 86 98 104 80 108 C62 112 50 104 56 96 C62 90 72 100 64 106"/>
+  <path d="M30 100 C22 94 28 84 38 90 C46 96 36 106 28 104"/>
+</svg>
