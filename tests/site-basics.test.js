@@ -78,3 +78,10 @@ test('withoutRepoParam: drops only ?repo=, keeps other parameters, and an empty 
   assert.equal(withoutRepoParam('?repo='), '');
   assert.equal(withoutRepoParam(null), ''); // junk in, nothing out
 });
+
+test('home: GET IT strip has the extension release, the source repo, and a button that opens ABOUT', () => {
+  const strip = html.slice(html.indexOf('class="strip get-it"'), html.indexOf('</section>', html.indexOf('class="strip get-it"')));
+  assert.ok(strip.includes('href="https://github.com/earlgreyhot1701D/readme-clew-2/releases/tag/v0.1.0"'));
+  assert.ok(strip.includes('href="https://github.com/earlgreyhot1701D/readme-clew-2"'));
+  assert.ok(strip.includes('data-goto-tab="about"'));
+});

@@ -271,3 +271,4 @@ Oct 10, 2026, 10:26 PM PT
 2. Final suite: 465 tests, 465 pass, 0 fail.
 3. Self-scan of this repo through production: 0 Contradicted, 0 Missing.
 4. Build closed. Remaining work is docs and submission.
+5. Home: GET IT strip (extension release, bookmarklet button to ABOUT, source) added to the SCAN panel. web/ only, one test.

@@ -28,6 +28,10 @@
 .link-list a { font-family: var(--head); font-weight: 700; letter-spacing: 0.04em; }
 .link-list span { color: var(--muted); }
 
+.get-it .link-list li { min-width: 0; }
+.get-it .link-list span, .get-it .link-list a { overflow-wrap: anywhere; }
+.get-it .btn { justify-self: start; }
+
 @media (max-width: 760px) {
   .key-item, .steps li, .limits li, .link-list li { grid-template-columns: 1fr; }
 }
