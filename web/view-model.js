@@ -30,11 +30,12 @@ export function bubbleText(report) {
   return typeof s === 'string' && s.trim() ? s : fallbackLine(report?.mood);
 }
 
-// Which SVG to show. Tilt has its own art for calm and curious. Other moods keep their pose and get a CSS rotation.
+// Which PNG to show (web/mascot/<file>.png). A head tilt means Jev was unsure somewhere. There is one tilt picture,
+// so it stands in for calm and curious. Worried and tangled keep their own picture, because a tilted calm clew
+// beside "DRIFT FOUND" would say the wrong thing. No CSS rotation: each pose is its own art.
 export function clewPose(mood, tilt) {
   const m = MOODS.includes(mood) ? mood : 'calm';
-  if (tilt && (m === 'calm' || m === 'curious')) return { file: 'tilt', rotate: false };
-  return { file: m, rotate: tilt === true };
+  return { file: tilt === true && (m === 'calm' || m === 'curious') ? 'tilt' : m };
 }
 
 // Only GitHub https links are ever put in an href.

@@ -28,13 +28,16 @@ test('fallbackLine and bubbleText: a fixed line per mood, and Haiku text only wh
     assert.equal(bubbleText({ mood: 'worried', notes }), fallbackLine('worried'));
   }
 });
-test('clewPose: tilt art for calm and curious, a rotated mood pose for worried and tangled, calm for junk', () => {
-  assert.deepEqual(clewPose('calm', true), { file: 'tilt', rotate: false });
-  assert.deepEqual(clewPose('curious', true), { file: 'tilt', rotate: false });
-  assert.deepEqual(clewPose('tangled', true), { file: 'tangled', rotate: true });
-  assert.deepEqual(clewPose('worried', true), { file: 'worried', rotate: true });
-  assert.deepEqual(clewPose('tangled', false), { file: 'tangled', rotate: false });
-  assert.deepEqual(clewPose('../evil', true), { file: 'tilt', rotate: false });
+test('clewPose: tilt.png for calm and curious, the mood picture for worried and tangled, never a CSS rotation, calm for junk', () => {
+  assert.deepEqual(clewPose('calm', true), { file: 'tilt' });
+  assert.deepEqual(clewPose('curious', true), { file: 'tilt' });
+  assert.deepEqual(clewPose('tangled', true), { file: 'tangled' });
+  assert.deepEqual(clewPose('worried', true), { file: 'worried' });
+  assert.deepEqual(clewPose('tangled', false), { file: 'tangled' });
+  assert.deepEqual(clewPose('calm', false), { file: 'calm' });
+  assert.deepEqual(clewPose('../evil', true), { file: 'tilt' });
+  assert.deepEqual(clewPose('../evil', false), { file: 'calm' });
+  assert.equal(clewPose('tangled', true).rotate, undefined);
 });
 test('rowModel: a rule row has no confidence bar and says DECIDED BY: RULE', () => {
   const r = rowModel(load('npm-start-drift').findings[0]);

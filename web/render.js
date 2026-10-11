@@ -34,7 +34,8 @@ export function renderStatus(report) {
   const s = strip('status');
   s.append(el('div', `status-fill m-${st.mood}`, st.text, { role: 'status' }));
   const row = el('div', 'clew-row');
-  const img = el('img', pose.rotate ? 'clew rotate' : 'clew', null, { src: `mascot/${pose.file}.svg`, alt: `The clew looks ${st.mood}`, width: '120', height: '120' });
+  // Square PNGs shown at 120 px. width and height are set, so the page does not shift when the picture loads.
+  const img = el('img', 'clew', null, { src: `mascot/${pose.file}.png`, alt: `The clew, ${st.mood}`, width: '120', height: '120' });
   row.append(img, el('p', 'bubble', bubbleText(report)));
   s.append(row);
   return s;

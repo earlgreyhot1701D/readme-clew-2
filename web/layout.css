@@ -79,8 +79,7 @@
 .status-fill.m-calm { background: var(--verified); }
 
 .clew-row { display: flex; gap: 16px; align-items: center; margin-top: 12px; }
-.clew { width: 120px; height: 120px; flex: none; filter: drop-shadow(0 0 3px rgba(79, 227, 209, 0.35)); }
-.clew.rotate { transform: rotate(-12deg); }
+.clew { width: 120px; height: 120px; flex: none; object-fit: contain; }
 .bubble {
   position: relative;
   margin: 0;

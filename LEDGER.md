@@ -319,6 +319,14 @@ Oct 9, 2026, evening. Status: code and offline tests done (197 pass, 0 fail, 0 c
 4. The per-IP limiter is best effort (in memory, per instance). The Vercel firewall rule and the prepaid balances are the real ceilings (PRD 7.4).
 5. The token estimate is conservative and not calibrated against Jev's tokenizer, so some trimming may happen that was not strictly needed.
 
+## Mascot art and social card (Block 5 Phase B, 2026-10-10)
+
+- **The clew art is AI-generated.** Shara made it with ChatGPT, and Claude cut the backgrounds out and cleaned the files (transparent PNGs). It replaces the PRD line "hand-made SVG poses" (PRD section 5: "Poses are hand-made SVG states. No generated art at runtime."). The art is still fixed files, made ahead of time, with nothing generated at runtime. Claude updates the PRD; this agent does not touch PRD.md.
+- The earlier hand-drawn faces and the two no-face SVG styles (A and B) are gone from `web/`. The A/B generator and previews stay in `design/` (gitignored).
+- Pose rule with PNGs (one picture per pose, no CSS rotation): `tilt.png` stands in for calm and curious when Jev was unsure. Worried and tangled keep their own picture, because a tilted calm clew next to "DRIFT FOUND" would say the wrong thing. This is one function (`clewPose`) with tests, so it is easy to change.
+- The social card is a static PNG in `web/social-card.png` (1200x630, 834 KB), replacing the per-repo `/api/og` card (PRD M20 already changed). **The draft shows example counts (2, 5, 3, 12).** They are an illustration, not a scan, so label them as an example or swap them for neutral art when Shara replaces the file. A test pins the size (1200x630, under 2 MB) so a wrong-sized replacement fails loudly.
+- Favicons: `favicon-16.png`, `favicon-32.png`, and `favicon-180.png` as the apple-touch-icon. No SVG favicon.
+
 ## Block 5 findings (live page, 2026-10-10)
 
 - Vercel preview deployments are behind Vercel login by default. Anonymous requests get Vercel's own login page and CSP, which looks like a pass or fail of ours if you do not notice. Use `vercel curl <path> --deployment <url>` for checks.
