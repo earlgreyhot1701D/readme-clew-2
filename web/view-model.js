@@ -5,8 +5,7 @@ import { jevVerdict } from './verdict.js';
 export const BUCKETS = ['contradicted', 'missing', 'unverifiable', 'verified'];
 export const BUCKET_LABEL = { contradicted: 'CONTRADICTED', missing: 'MISSING', unverifiable: 'UNVERIFIABLE', verified: 'VERIFIED' };
 export const MOODS = ['calm', 'curious', 'worried', 'tangled'];
-export const DEMO_REPO = 'https://github.com/earlgreyhot1701D/readme-clew'; // pre-filled on load
-export const DEMO_SHORT = 'earlgreyhot1701D/readme-clew'; // what USE DEMO REPO types into the field
+export const DEMO_SHORT = 'earlgreyhot1701D/readme-clew'; // what USE DEMO REPO types into the field. The only way the demo gets in.
 
 // Status strip (STYLE 6). Restates the bucket result. Never shows a confidence number.
 export function statusStrip(mood, counts = {}) {
@@ -159,6 +158,12 @@ export function deepLinkRepo(search) {
   try { v = new URLSearchParams(search).get('repo'); } catch { return null; }
   const p = v ? parseRepoInput(v) : { ok: false };
   return p.ok ? p.url : null;
+}
+
+// What the scan field holds when the page loads: a valid ?repo= value, otherwise nothing. There is no demo pre-fill.
+// USE DEMO REPO is the only way the demo repo gets into the field.
+export function initialRepoValue(search) {
+  return deepLinkRepo(search) ?? '';
 }
 
 // State strips (STYLE 11).

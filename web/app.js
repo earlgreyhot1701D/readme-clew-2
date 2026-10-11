@@ -2,7 +2,7 @@
 // ui-state.js and scan-state.js.
 // Rule: a scan only starts on a click (or Enter in the form). ?repo= and USE DEMO REPO fill the field and nothing more.
 import { renderReport, renderState } from './render.js';
-import { parseRepoInput, deepLinkRepo, errorState, formatScanTime, STATES, DEMO_REPO, DEMO_SHORT } from './view-model.js';
+import { parseRepoInput, initialRepoValue, errorState, formatScanTime, STATES, DEMO_SHORT } from './view-model.js';
 import { initialState, step } from './scan-state.js';
 import { landAfterScan } from './navigate.js';
 import { fixtureName, loadFixture } from './fixture-mode.js';
@@ -114,7 +114,7 @@ function initChrome() {
 
 async function init() {
   initChrome();
-  input.value = deepLinkRepo(location.search) ?? DEMO_REPO;
+  input.value = initialRepoValue(location.search); // blank unless ?repo= is present
   renderState(banner, state.banner.text, state.banner.kind);
   const fx = fixtureName(location.search, location.hostname);
   if (fx) {

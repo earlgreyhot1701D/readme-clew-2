@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { readdirSync, readFileSync } from 'node:fs';
 import {
   statusStrip, fallbackLine, bubbleText, clewPose, safeLink, rowModel, evidenceText, bucketSections, countChips,
-  recordFields, footerText, lines, formatScanTime, formatMs, parseRepoInput, deepLinkRepo, errorState, loadingText, STATES, MOODS, DEMO_REPO,
+  recordFields, footerText, lines, formatScanTime, formatMs, parseRepoInput, deepLinkRepo, initialRepoValue, errorState, loadingText, STATES, MOODS, DEMO_SHORT,
 } from '../web/view-model.js';
 import { FIXTURES, fixtureName, isDevHost, loadFixture } from '../web/fixture-mode.js';
 
@@ -136,12 +136,34 @@ test('parseRepoInput: GitHub URLs and owner/name are accepted; other hosts, sche
     'javascript:alert(1)', 'https://github.com/o', 'https://github.com/', 'o/', '/r', 'o/r/extra', 'https://github.com/-bad-owner-/r', 'https://github.com/o/..', '', null, 42, `https://github.com/o/${'x'.repeat(400)}`]) {
     assert.equal(parseRepoInput(bad).ok, false, String(bad).slice(0, 40));
   }
-  assert.equal(parseRepoInput(DEMO_REPO).ok, true);
+  assert.equal(parseRepoInput(DEMO_SHORT).ok, true);
 });
 test('deepLinkRepo: a valid ?repo= is returned as a full URL; everything else is null', () => {
   assert.equal(deepLinkRepo('?repo=lukeed/polka'), 'https://github.com/lukeed/polka');
   assert.equal(deepLinkRepo('?repo=https%3A%2F%2Fgithub.com%2Fo%2Fr'), 'https://github.com/o/r');
   for (const bad of ['', '?repo=', '?repo=javascript:alert(1)', '?repo=<script>', '?other=o/r', '?repo=o/r/x']) assert.equal(deepLinkRepo(bad), null, bad);
+});
+test('the scan field starts blank: a plain load, junk, and an invalid ?repo= all give an empty field', () => {
+  for (const search of ['', '?', '?x=1', '?fixture=npm-start-drift', '?repo=', '?repo=javascript:alert(1)', '?repo=<script>', '?repo=o/r/x', '?other=o/r', '?REPO=o/r', null, undefined]) {
+    assert.equal(initialRepoValue(search), '', `search=${String(search)}`);
+  }
+  // and only a valid ?repo= fills it
+  assert.equal(initialRepoValue('?repo=lukeed/polka'), 'https://github.com/lukeed/polka');
+  assert.equal(initialRepoValue('?x=1&repo=o%2Fr'), 'https://github.com/o/r');
+});
+test('the scan field starts blank on a plain load: app.js has no demo pre-fill, and the HTML input has no value', () => {
+  const app = readFileSync(new URL('../web/app.js', import.meta.url), 'utf8');
+  const html = readFileSync(new URL('../web/index.html', import.meta.url), 'utf8');
+  assert.match(app, /input\.value = initialRepoValue\(location\.search\);/);
+  assert.doesNotMatch(app, /DEMO_REPO|\?\? ['"`]https?:/); // nothing falls back to a repo URL
+  const loadLine = app.split('\n').find((l) => l.includes('input.value = initialRepoValue'));
+  assert.doesNotMatch(loadLine, /DEMO/);
+  // the only place the demo repo is typed into the field is the USE DEMO REPO click
+  assert.equal((app.match(/DEMO_SHORT/g) ?? []).length, 2, 'the import and the click handler, nothing else');
+  const handler = app.slice(app.indexOf("getElementById('demo-btn')"), app.indexOf('// Tabs, the HOW?'));
+  assert.match(handler, /input\.value = DEMO_SHORT/);
+  const input = html.match(/<input id="repo-input"[^>]*>/)[0];
+  assert.doesNotMatch(input, /\svalue\s*=/);
 });
 test('errorState: every failure maps to a STYLE 11 text, and unknown failures say the scan failed', () => {
   assert.equal(errorState(404, 'github_not_found'), STATES.notFound);

@@ -319,6 +319,12 @@ Oct 9, 2026, evening. Status: code and offline tests done (197 pass, 0 fail, 0 c
 4. The per-IP limiter is best effort (in memory, per instance). The Vercel firewall rule and the prepaid balances are the real ceilings (PRD 7.4).
 5. The token estimate is conservative and not calibrated against Jev's tokenizer, so some trimming may happen that was not strictly needed.
 
+## Blank scan field (2026-10-11)
+
+- **The field now starts empty** unless `?repo=` is present and valid. USE DEMO REPO (types `earlgreyhot1701D/readme-clew`, never scans) is the only way the demo gets in. Owner decision, made after the page was approved.
+- **This departs from the PRD.** PRD section 2 (M10: "a pre-filled demo repo") and section 6 ("a demo repo pre-filled", and the "Try it" steps: "A demo repo is already filled in. Click Scan.") describe the old behavior. The Block 7 README "Try it" text should say "Click USE DEMO REPO, then SCAN" instead. PRD.md and README.md were not touched by this agent; the PRD owner updates them.
+- The rule is one pure function, `initialRepoValue(search)`, with a test that fails if a plain load, junk, or an invalid `?repo=` gives a non-empty field, and a static test that fails if `app.js` falls back to a repo URL or the HTML input gets a `value`.
+
 ## Phase D findings (2026-10-10)
 
 - **Jev verdict lines on Unverifiable rows.** The old "JEV CONFIDENCE 0.95" bar on a row Jev kept away from a code check suggested Jev was confident the claim was true. It now says what Jev decided. Things worth knowing from the real v1 report: 86 of the 140 Jev-decided Unverifiable rows are "NOT A CHECKABLE CLAIM", and some of those carry a low "SURE" number (for example 0.42 and 0.51). That is Jev's top label (unverifiable) winning with low probability. The gate does not apply to that label by design, because wavering between not-a-claim and unverifiable cannot produce Contradicted (see `lib/gate.js`). The page shows the number as it is, with no invented rounding up.
