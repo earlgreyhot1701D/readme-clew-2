@@ -141,14 +141,33 @@ Drag the bookmarklet from the **ABOUT** tab to your bookmarks bar. On a GitHub r
 - **No badge.** A live README badge would re-run a scan, and bill the owner, every time someone viewed it. Without storage there's no safe way to cache it, so it's not built.
 - **The summary can be unavailable.** If Haiku times out or fails, the report shows a fixed line instead. Everything else still works.
 
-## Privacy and security
+## Privacy: no database, nothing about you
 
-- **Scans are never stored.** No database. The report lives in your browser until you leave or press CLEAR. DOWNLOAD JSON saves it as a file on your machine.
-- Page views are counted anonymously through Vercel Analytics, with no cookies.
-- Public repos only. Private or missing repos get "repo not found or not public."
-- API keys live only in server-side environment variables: `GLASSER_API_KEY`, `ANTHROPIC_API_KEY` and `GITHUB_TOKEN`. Never in the page, the extension or the repo.
-- All repo text is rendered with `textContent`. The README text is never sent to Haiku, so a README can't talk to the summary model.
-- Input is validated in the page and again on the server. The scan API is rate-limited.
+README Clew 2 is built so there is nothing about you or your scan to lose.
+
+- **Scans are never stored.** There is no database and no account. The report exists in your browser tab until you leave or press CLEAR.
+- **No cookies, no tracking of what you scan.** Page views are counted anonymously through Vercel Analytics. Which repos people scan is never recorded.
+- **Logs hold counts and timing only.** Never README text, code, or model output.
+- **The models see as little as possible.** Jev gets the README so it can label each line. Those calls run through Glasser, which keeps a record of each run under the project owner's account, as API providers do. Public README text only, never anything about you. Claude Haiku gets only counts, claim types and names, never the README lines themselves, so a README can't talk to the summary model.
+- **Public repos only.** Private or missing repos get "repo not found or not public."
+- **Keys stay on the server.** `GLASSER_API_KEY`, `ANTHROPIC_API_KEY` and `GITHUB_TOKEN` live only in server-side environment variables. Never in the page, the extension or this repo.
+- **Defensive by default.** All repo text is rendered with `textContent`, input is validated in the page and again on the server, and the scan API is rate-limited.
+
+## Your report, your file: DOWNLOAD JSON
+
+Since nothing is stored, the report is yours to keep. **DOWNLOAD JSON** (on the page and in the extension) saves the full report to your machine as a file named after the repo and commit. It's built in your browser. Nothing is sent anywhere.
+
+The file holds every finding with its README line, code evidence, bucket, who decided and Jev's confidence, plus a **scan receipt**:
+
+| Receipt field | What it lets you do |
+|---|---|
+| Repo and commit | Know exactly which version of the code was checked |
+| README fingerprint (SHA-256) | Prove which README text was checked, without storing the text |
+| Report fingerprint (SHA-256) | Check later that the report wasn't edited |
+| Lines decided by rules vs by Jev | See how much was deterministic |
+| Calls and step timing | See how many model calls the scan made and how long each step took |
+
+No model writes any part of the receipt. Ways to use the file: attach it to a pull request before a release, keep it as a before-and-after record when you fix your README, or hand it to a reviewer as evidence.
 
 ## How it was built
 
