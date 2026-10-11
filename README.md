@@ -10,6 +10,8 @@ Paste a public JavaScript or TypeScript repo, press SCAN, and get a claim ledger
 
 Built for the AdaL "What Would Jev Do?" hackathon, October 6 to 11, 2026.
 
+**Why "clew"?** A clew (said like "clue") is a ball of thread. In the Greek myth, Ariadne gave Theseus a clew so he could follow it back out of the Labyrinth, and it's where the word "clue" comes from. README Clew follows the thread from each README line back to the code. It's also the name of the author's suite of civic tech tools.
+
 ---
 
 ## What it does
