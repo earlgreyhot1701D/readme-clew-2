@@ -6,7 +6,7 @@ const dir = (p) => new URL(`../fixtures/${p}`, import.meta.url);
 
 export const FIXTURES = ['clean-minimal', 'npm-start-drift', 'frontend-vite', 'envvar-unread', 'missing-package',
   'marketing-claims', 'empty', 'no-claims', 'monorepo', 'injection', 'jev-confident-mislabel', 'name-pick',
-  'pnpm-monorepo', 'readme-clew-v1-regression'];
+  'pnpm-monorepo', 'readme-clew-v1-regression', 'polka-examples'];
 
 export function loadFixture(name) {
   const read = (p) => readFileSync(dir(p), 'utf8');

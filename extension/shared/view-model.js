@@ -169,7 +169,7 @@ export function initialRepoValue(search) {
 // State strips (STYLE 11).
 export const STATES = {
   idle: 'ENTER A PUBLIC GITHUB REPO AND PRESS SCAN',
-  badInput: 'NOT A GITHUB REPO URL // USE https://github.com/owner/repo',
+  badInput: 'NOT A GITHUB REPO // USE owner/repo OR https://github.com/owner/repo',
   notFound: 'REPO NOT FOUND OR NOT PUBLIC',
   rateLimited: 'TOO MANY SCANS // TRY AGAIN IN A MINUTE',
   notJs: 'NOT A JS/TS REPO // THIS TOOL CHECKS package.json PROJECTS',

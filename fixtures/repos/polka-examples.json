@@ -1,0 +1,20 @@
+{
+  "pkg": { "name": "polka-root", "private": true, "dependencies": { "@polka/url": "^1.0.0" } },
+  "workspaces": [],
+  "files": [
+    "package.json", "README.md", "index.js", "test/index.js",
+    "examples/with-body-parser/package.json", "examples/with-body-parser/index.js",
+    "examples/with-apollo/package.json", "examples/with-apollo/index.js",
+    "examples/with-firebase-admin/client/package.json", "examples/with-firebase-admin/client/index.js",
+    "tools/helper/package.json", "tools/helper/index.js"
+  ],
+  "sources": {
+    "index.js": "import parse from '@polka/url';\nimport { Trouter } from 'trouter';\n",
+    "test/index.js": "import { test } from 'uvu';\n",
+    "examples/with-body-parser/index.js": "const bodyParser = require('body-parser');\n",
+    "examples/with-apollo/index.js": "import { ApolloServer } from 'apollo-server';\n",
+    "examples/with-firebase-admin/client/index.js": "import riot from 'riot';\n",
+    "tools/helper/index.js": "import chalk from 'chalk';\n"
+  }
+}
+

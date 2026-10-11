@@ -117,7 +117,7 @@ test('state strips keep the repo name as typed: .state-text sets text-transform 
   assert.match(layout, /\.state-text\s*\{[^}]*text-transform:\s*none/);
   // every state text is already capitals, so nothing relies on the transform
   const states = readFileSync(new URL('../web/view-model.js', import.meta.url), 'utf8').match(/export const STATES = \{[\s\S]*?\n\};/)[0];
-  for (const m of states.matchAll(/:\s*'([^']+)'/g)) assert.equal(m[1], m[1].toUpperCase().replace('HTTPS://GITHUB.COM/OWNER/REPO', 'https://github.com/owner/repo').replace('PACKAGE.JSON', 'package.json'), m[1]);
+  for (const m of states.matchAll(/:\s*'([^']+)'/g)) assert.equal(m[1], m[1].toUpperCase().replace('HTTPS://GITHUB.COM/OWNER/REPO', 'https://github.com/owner/repo').replace('PACKAGE.JSON', 'package.json').replace('USE OWNER/REPO', 'USE owner/repo'), m[1]);
 });
 test('the staggered reveal hides strips with opacity, never visibility, so focus can land on them after a scan', () => {
   const css = read('web/layout.css');
