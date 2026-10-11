@@ -45,6 +45,26 @@ Every row shows the exact README line (with a link to that line on GitHub), the 
 
 Anyone who maintains or evaluates a JS/TS repo: open source maintainers before a release, hackathon judges reading a submission, and new contributors who want to know which parts of a README they can trust.
 
+## From README Clew to README Clew 2
+
+[README Clew](https://github.com/earlgreyhot1701D/readme-clew) (May 2026, Replit Buildathon) proved the idea. Its own README listed two honest limits:
+
+1. Claude was *asked* to quote the README word for word. That was a prompt rule, not a code check.
+2. Prose labels like "Frontend (Vite)" sometimes got pulled out as package names, which produced false Contradicted findings.
+
+README Clew 2 is a rebuild from scratch, all new code, that fixes both by changing who decides what:
+
+| Job | README Clew (v1) | README Clew 2 |
+|---|---|---|
+| Find claims in the README | Claude extracts and quotes | Code splits the README into lines and Jev labels them. The quote *is* the line, so word for word is guaranteed by code |
+| Pick the real package, script or path name | Claude | Code finds candidates, Jev picks one, with confidence |
+| Decide Verified or Contradicted | Five deterministic verifiers | Same five checks, rewritten. Still fully deterministic |
+| Low certainty | Not reported | Goes to Unverifiable, never Contradicted |
+| Summary | Claude Sonnet | Claude Haiku, from structured results only |
+| Where it runs | Web page | Web page, Chrome extension and bookmarklet |
+
+The demo repo is v1 itself, so the new version audits the old one. Its first scan of v1 was wrong in exactly the way v2 promises not to be, which is how the monorepo fix in "How it was built" happened.
+
 ## How it decides (and who doesn't)
 
 The design rule: **models never decide what's true.**
@@ -75,6 +95,18 @@ The sample is small, so this supports "safe enough to ship," not a measured erro
 Cost per scan is about a penny: roughly $0.009 for Jev and $0.0005 for Haiku. Glasser's own run and balance history for the build is in [evaluation/usage_report.md](evaluation/usage_report.md).
 
 ## Try it
+
+### Why a website, an extension and a bookmarklet?
+
+Same scan, same results, three ways to reach it, because people check a README from different places:
+
+| Use | Best when | Why it exists |
+|---|---|---|
+| **Live page** | You want the full ledger, or you're on a phone | No install. Shareable links with the repo filled in. Shows every bucket, the KEY and the ABOUT tab |
+| **Chrome extension** | You're already looking at the repo on GitHub | One click from the page you're on, no copy and paste. Shows the counts and the top problems, with a link to the full ledger |
+| **Bookmarklet** | You can't or won't install an extension (another browser, or a work computer that blocks extensions) | Nothing to install. It only opens the live page with the repo filled in |
+
+All three call the same scan API and share the same display code, so a repo gets the same answer wherever you check it.
 
 ### Live page (no install)
 
@@ -121,7 +153,12 @@ Drag the bookmarklet from the **ABOUT** tab to your bookmarks bar. On a GitHub r
 
 Built in five days in the [AdaL](https://adalagent.ai) desktop app, block by block, with propose-first prompts and an `AGENTS.md` it read every turn. Claude wrote the PRD, the architecture and the docs, and reviewed AdaL's work at each checkpoint.
 
-- **AdaL** wrote the code and tests, ran the Jev evaluation, found the 100-question-per-call limit, deployed to Vercel, and drove a real browser for QA. It turns capabilities on by itself when a task needs them: it switched on its browser tool to screenshot and time the UI without being asked.
+- **AdaL** wrote the code and tests, ran the Jev evaluation, deployed to Vercel, and drove a real browser for QA. What stood out:
+  - **Fast.** In plan mode it proposed and confirmed plans so quickly that a prompt was often done before I got back to my desk.
+  - **It followed the rules it was given.** Propose first, one block at a time, no edits outside the named files, a QA checkpoint at the end of every block.
+  - **It found real bugs, not just the ones it was told about.** Glasser's 100-question limit per call (only the live API says so), a timer that let tests quietly cancel instead of fail, a state trimmer that measured the wrong text, and two layout bugs that only a real browser showed.
+  - **It turns capabilities on by itself when a task needs them.** It switched on its browser tool to screenshot and time the UI without being asked.
+  - **The team behind it showed up.** They fixed the Glasser connector the same day I reported it, and granted a credit when I hit the Pro plan's weekly limit.
 - **Glasser** is how Jev is called: plain Glasser runs (`POST /v1/runs`), one run per batch of up to 100 questions. Failed runs cost nothing, and every run reports its exact charge. The build's usage report is generated from Glasser's run and balance history.
 - **Workflows and Sandboxes:** not used.
 
