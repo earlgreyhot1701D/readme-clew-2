@@ -114,6 +114,43 @@ Checked on the preview (`vercel deploy`, not `--prod`; it sits behind Vercel log
 
 Not done in this block: no live scan from the page (the Scan button path is written but was not run against the API, by the "no more live scans" decision), no real-device phone check, no commit yet.
 
+Committed as `84aab98` ("Block 5: live page, fixture render, scan wiring").
+
+## Block 5 Phase A: header, tabs, KEY, ABOUT, accordions, not-JS/TS check (2026-10-10, not committed)
+
+What I did:
+
+1. **Not-a-JS/TS repo (item 8).** `lib/js-repo.js` (new): `isJsProject(snapshot)` and `NotJsRepoError`. `lib/scan-repo.js` throws it right after the GitHub fetch, before any Jev call. `api/scan.js` maps it to HTTP 422, code `not_js_repo`. The page shows `NOT A JS/TS REPO // THIS TOOL CHECKS package.json PROJECTS`.
+2. **Header and intro.** Intro line under the title, a HOW? disclosure button (`aria-expanded`, `aria-controls`, real button, no hover tooltip).
+3. **Tabs.** SCAN / KEY / ABOUT as real buttons with `role="tab"` and `aria-selected`, arrow, Home and End keys, SCAN by default. `tabs.js` imports only `ui-state.js`, so switching a tab cannot start a scan (a test proves it).
+4. **KEY and ABOUT** are static HTML in `index.html` (no JS, no `innerHTML`). ABOUT has the three steps, the limits, the address, and six links, all `rel="noopener noreferrer"`. I added two limits the brief did not list, because they are true and in the LEDGER: READMEs over 50 KB are cut and only 20 source files are read. TypeSafe points at https://typesafe.ai (it resolved; docs.typesafe.ai only redirects). I checked all six links returned 200 before building.
+5. **Site footer** on every tab, with the exact text.
+6. **Accordions.** Each bucket is a disclosure (`aria-expanded`, `aria-controls`). Defaults: Contradicted and Missing open, Unverifiable and Verified closed, and an empty bucket opens so NONE FOUND shows. First 10 rows, then SHOW ALL N. Rows are built only when a section is first opened.
+7. **The report footer "HONEST LIMITATIONS"** now opens the ABOUT tab (`data-goto-tab`), so it no longer points at a README anchor that did not exist yet.
+8. **Public address.** `web/site.js` has `SITE_URL = https://readme-clew-2.vercel.app` and `deepLink()`. A test fails if any hashed preview URL appears in `web/`.
+9. **Files split to stay under 200 lines:** `dom.js`, `disclosure.js`, `ui-state.js`, `tabs.js`, `site.js`, `render-sections.js`, `chrome.css`, `pages.css`.
+
+Freeze, measured with the saved 152-row v1 report in real Chrome (Playwright in TEMP):
+
+| | Before | After |
+|---|---|---|
+| Rows drawn at first | 152 | 4 |
+| DOM elements | 2,039 | 222 |
+| Accessibility snapshot | 56,028 chars | 871 chars |
+| Layout | 63 ms | 18 ms |
+| Full-page screenshot | 574 ms | 72 ms |
+| Layout at 6x slower CPU | 783 ms | 258 ms |
+
+The page itself never froze for me: it renders 152 rows in about 60 ms. Turning off the scanline overlay and the stagger changed nothing. The likely cause was the browser tool choking on a 56 KB accessibility tree and a very tall page. Fewer nodes fix that.
+
+Tests: 276 total, 276 pass, 0 fail, 0 cancelled, 0 skipped, 0 todo (246 before this block). New files: `js-repo.test.js` (5), `ui-state.test.js` (7), `tabs-no-scan.test.js` (6), `web-copy.test.js` (11), plus changes to `web-view-model.test.js` and `web-assets.test.js`. Shown failing: 42 deliberate breaks, one at a time, each restored. 41 turned a test red. The one that did not (`rows.length <= 10` changed to `< 10`) is an equivalent change, since 10 rows give the same output either way.
+
+Real browser check (Playwright, real CSP headers, 1200 px and 390 px): 54 of 54 behaviors pass, including defaults, SHOW ALL (140 rows in about 40 ms), keyboard tabs, HOW?, footer link, no horizontal scroll, no console errors, and zero requests to `/api/` while switching tabs.
+
+Preview deploy (not `--prod`), checked with `vercel curl`: all new files 200, `GET /api/scan` 405. One live scan of v1 on the preview: HTTP 200 in 3.8 s, `notes.summary` present, Anthropic `ok` (1 call), Jev $0.006041. The page puts that exact summary in the bubble (checked by rendering the live response, not the fallback). A scan of a Python repo (`hung-jury`) returned 422 `not_js_repo` with no Jev or Haiku call.
+
+Mascot (item 6): `design/mascot/build.mjs` writes two styles (A thin single stroke, B heavier double-line wraps) into `design/mascot/a/` and `/b/`, and `design/mascot-preview.html` shows both next to the current art and at 64, 32 and 16 px. Stopped here for Shara's pick. `web/mascot/` is unchanged.
+
 ## Block 5a: verifier fix for pnpm monorepos (2026-10-10, Working tier)
 
 Why: the demo repo (`earlgreyhot1701D/readme-clew`) showed 7 false positives. Details in LEDGER ("Found in the demo").

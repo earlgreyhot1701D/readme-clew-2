@@ -1,4 +1,6 @@
 // Pure functions behind render.js. No DOM, no network. Every value comes from the report object (PRD 3b).
+import { defaultOpen } from './ui-state.js';
+
 export const BUCKETS = ['contradicted', 'missing', 'unverifiable', 'verified'];
 export const BUCKET_LABEL = { contradicted: 'CONTRADICTED', missing: 'MISSING', unverifiable: 'UNVERIFIABLE', verified: 'VERIFIED' };
 export const MOODS = ['calm', 'curious', 'worried', 'tangled'];
@@ -76,7 +78,7 @@ export function rowModel(f) {
 export function bucketSections(report) {
   return BUCKETS.map((b) => {
     const rows = (report.findings ?? []).filter((f) => f.bucket === b).map(rowModel);
-    return { bucket: b, label: BUCKET_LABEL[b], count: rows.length, rows, empty: rows.length === 0, collapsed: b === 'verified' };
+    return { bucket: b, label: BUCKET_LABEL[b], count: rows.length, rows, empty: rows.length === 0, open: defaultOpen(b, rows.length) };
   });
 }
 
@@ -160,12 +162,14 @@ export const STATES = {
   badInput: 'NOT A GITHUB REPO URL // USE https://github.com/owner/repo',
   notFound: 'REPO NOT FOUND OR NOT PUBLIC',
   rateLimited: 'TOO MANY SCANS // TRY AGAIN IN A MINUTE',
+  notJs: 'NOT A JS/TS REPO // THIS TOOL CHECKS package.json PROJECTS',
   failed: 'SCAN FAILED // NOTHING WAS STORED // TRY AGAIN',
 };
 export function loadingText(owner, name) { return `SCANNING ${owner}/${name} ...`; }
 
 export function errorState(httpStatus, code) {
   if (httpStatus === 404 || code === 'github_not_found' || code === 'github_no_readme') return STATES.notFound;
+  if (code === 'not_js_repo') return STATES.notJs;
   if (httpStatus === 429 || code === 'rate_limited') return STATES.rateLimited;
   if (httpStatus === 400 && (code === 'bad_url' || code === 'missing_repo')) return STATES.badInput;
   return STATES.failed;

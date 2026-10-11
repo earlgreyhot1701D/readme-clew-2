@@ -14,11 +14,9 @@
 }
 .strip.title { border-top: 0; }
 
-.title { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
 .scan-time { margin: 0; display: flex; gap: 8px; align-items: baseline; }
 
 .strip-title { display: block; margin: 0 0 8px; color: var(--text); background: none; border: 0; padding: 0; font-size: 16px; text-align: left; }
-.toggle { cursor: pointer; width: 100%; }
 
 /* Input strip */
 #scan-form { display: flex; gap: 10px; align-items: stretch; }

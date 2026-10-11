@@ -81,12 +81,14 @@ test('evidenceText: skips a null file, and skips the file when the detail alread
   assert.equal(evidenceText({ file: 'src/index.js', detail: 'src/index.js imports lodash' }), 'src/index.js imports lodash');
   assert.equal(evidenceText(null), '');
 });
-test('bucketSections: Contradicted, Missing, Unverifiable, Verified in that order; empty buckets say NONE FOUND; only Verified collapses', () => {
+test('bucketSections: Contradicted, Missing, Unverifiable, Verified in that order; empty buckets are open and say NONE FOUND', () => {
   const s = bucketSections(load('npm-start-drift'));
   assert.deepEqual(s.map((x) => x.bucket), ['contradicted', 'missing', 'unverifiable', 'verified']);
   assert.deepEqual(s.map((x) => x.count), [1, 0, 0, 1]);
   assert.deepEqual(s.map((x) => x.empty), [false, true, true, false]);
-  assert.deepEqual(s.map((x) => x.collapsed), [false, false, false, true]);
+  assert.deepEqual(s.map((x) => x.open), [true, true, true, false]); // empty buckets open, a non-empty Verified starts closed
+  const full = bucketSections(load('jev-confident-mislabel')); // 2 Unverifiable rows, nothing else
+  assert.deepEqual(full.map((x) => x.open), [true, true, false, true]);
   assert.deepEqual(countChips({ verified: 1, contradicted: 2 }).map((c) => [c.bucket, c.count]), [['contradicted', 2], ['missing', 0], ['unverifiable', 0], ['verified', 1]]);
 });
 test('recordFields and footerText: values come from the report, a null receipt shows a dash, and units are plural-correct', () => {
@@ -125,6 +127,8 @@ test('deepLinkRepo: a valid ?repo= is returned as a full URL; everything else is
 test('errorState: every failure maps to a STYLE 11 text, and unknown failures say the scan failed', () => {
   assert.equal(errorState(404, 'github_not_found'), STATES.notFound);
   assert.equal(errorState(404, 'github_no_readme'), STATES.notFound);
+  assert.equal(errorState(422, 'not_js_repo'), STATES.notJs);
+  assert.equal(STATES.notJs, 'NOT A JS/TS REPO // THIS TOOL CHECKS package.json PROJECTS');
   assert.equal(errorState(429, 'rate_limited'), STATES.rateLimited);
   assert.equal(errorState(400, 'bad_url'), STATES.badInput);
   for (const [s, c] of [[500, 'internal'], [504, 'jev_timeout'], [502, 'github_unavailable'], [0, undefined], [422, 'jev_too_large']]) assert.equal(errorState(s, c), STATES.failed, `${s} ${c}`);

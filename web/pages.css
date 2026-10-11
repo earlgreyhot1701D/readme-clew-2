@@ -1,0 +1,33 @@
+/* KEY and ABOUT tabs. */
+.key-list, .steps, .limits, .link-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+
+.key-item, .steps li, .limits li {
+  display: grid;
+  grid-template-columns: 190px 1fr;
+  gap: 4px 16px;
+  align-items: baseline;
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--muted);
+  background: var(--bg);
+  padding: 8px 12px;
+}
+.key-item.b-contradicted { border-left-color: var(--contradicted); }
+.key-item.b-missing { border-left-color: var(--missing); }
+.key-item.b-unverifiable { border-left-color: var(--unverifiable); }
+.key-item.b-verified { border-left-color: var(--verified); }
+.key-item.b-contradicted .label { color: var(--contradicted); }
+.key-item.b-missing .label { color: var(--missing); }
+.key-item.b-unverifiable .label { color: var(--unverifiable); }
+.key-item.b-verified .label { color: var(--verified); }
+.key-item .label, .steps .label, .limits .label { font-size: 13px; }
+
+.prose { margin: 0; max-width: 76ch; overflow-wrap: anywhere; }
+.mono { font-family: var(--mono); overflow-wrap: anywhere; }
+
+.link-list li { display: grid; grid-template-columns: 190px 1fr; gap: 4px 16px; align-items: baseline; padding: 4px 0; border-bottom: 1px solid var(--rule); }
+.link-list a { font-family: var(--head); font-weight: 700; letter-spacing: 0.04em; }
+.link-list span { color: var(--muted); }
+
+@media (max-width: 760px) {
+  .key-item, .steps li, .limits li, .link-list li { grid-template-columns: 1fr; }
+}

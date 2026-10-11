@@ -4,31 +4,111 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>README Clew 2 // Claim Ledger</title>
-  <meta name="description" content="Checks whether a public GitHub repo's README matches its code. Rules decide what is true.">
-  <!-- Block 6b: og:image tags (/api/og) go here. -->
+  <meta name="description" content="Checks whether a GitHub README matches its code. Rules decide what is true.">
+  <!-- Phase B: og:title, og:description, og:image, twitter:card, and the favicon links go here. -->
   <link rel="icon" href="mascot/calm.svg" type="image/svg+xml">
   <link rel="stylesheet" href="tokens.css">
   <link rel="stylesheet" href="layout.css">
   <link rel="stylesheet" href="findings.css">
+  <link rel="stylesheet" href="chrome.css">
+  <link rel="stylesheet" href="pages.css">
   <script type="module" src="app.js"></script>
 </head>
 <body>
   <main class="terminal">
     <header class="strip title">
-      <h1>README CLEW 2 // CLAIM LEDGER</h1>
-      <p class="scan-time"><span class="label">SCANNED</span> <span id="scan-time" class="value">-</span></p>
+      <div class="title-row">
+        <h1>README CLEW 2 // CLAIM LEDGER</h1>
+        <p class="scan-time"><span class="label">SCANNED</span> <span id="scan-time" class="value">-</span></p>
+      </div>
+      <div class="intro-row">
+        <p class="tagline">Checks whether a GitHub README matches its code.</p>
+        <button id="how-btn" class="btn btn-small" type="button" aria-expanded="false" aria-controls="how-panel">HOW?</button>
+      </div>
+      <p id="how-panel" class="how" hidden>We read the README line by line. Code checks test each claim against the repo's package.json, scripts, files and env vars. Jev, an AI that only picks labels, sorts the lines rules can't. Claude Haiku writes the summary from the results. Neither AI decides what's true.</p>
     </header>
 
-    <section class="strip input">
-      <form id="scan-form" novalidate>
-        <label class="prompt" for="repo-input">REPO &gt;</label>
-        <input id="repo-input" name="repo" type="text" inputmode="url" autocomplete="off" spellcheck="false" maxlength="300" placeholder="https://github.com/owner/repo">
-        <button id="scan-btn" class="btn" type="submit">SCAN</button>
-      </form>
-      <p class="hint">PUBLIC REPOS ONLY. NOTHING IS STORED.</p>
-    </section>
+    <div class="strip tabs" role="tablist" aria-label="Sections">
+      <button id="tab-scan" class="tab" type="button" role="tab" aria-selected="true" aria-controls="panel-scan">SCAN</button>
+      <button id="tab-key" class="tab" type="button" role="tab" aria-selected="false" aria-controls="panel-key" tabindex="-1">KEY</button>
+      <button id="tab-about" class="tab" type="button" role="tab" aria-selected="false" aria-controls="panel-about" tabindex="-1">ABOUT</button>
+    </div>
 
-    <div id="out" aria-live="polite"></div>
+    <div id="panel-scan" role="tabpanel" aria-labelledby="tab-scan">
+      <section class="strip input">
+        <form id="scan-form" novalidate>
+          <label class="prompt" for="repo-input">REPO &gt;</label>
+          <input id="repo-input" name="repo" type="text" inputmode="url" autocomplete="off" spellcheck="false" maxlength="300" placeholder="https://github.com/owner/repo">
+          <button id="scan-btn" class="btn" type="submit">SCAN</button>
+        </form>
+        <p class="hint">PUBLIC REPOS ONLY. NOTHING IS STORED.</p>
+      </section>
+      <div id="out" aria-live="polite"></div>
+    </div>
+
+    <div id="panel-key" role="tabpanel" aria-labelledby="tab-key" hidden>
+      <section class="strip">
+        <h2 class="strip-title">THE FOUR BUCKETS</h2>
+        <ul class="key-list">
+          <li class="key-item b-contradicted"><span class="label">CONTRADICTED</span><span>The README says it, the code disagrees.</span></li>
+          <li class="key-item b-missing"><span class="label">MISSING</span><span>The code does it, the README never mentions it.</span></li>
+          <li class="key-item b-unverifiable"><span class="label">UNVERIFIABLE</span><span>Can't be checked from code, or Jev wasn't sure.</span></li>
+          <li class="key-item b-verified"><span class="label">VERIFIED</span><span>The README and the code agree.</span></li>
+        </ul>
+      </section>
+      <section class="strip">
+        <h2 class="strip-title">WHO DECIDED</h2>
+        <ul class="key-list">
+          <li class="key-item"><span class="label">DECIDED BY: RULE</span><span>A fixed check read the line and tested it against the repo. Same input, same answer.</span></li>
+          <li class="key-item"><span class="label">DECIDED BY: JEV</span><span>No rule could tell what kind of line it was, so Jev picked a label. Code still runs any check. Jev never decides what's true.</span></li>
+          <li class="key-item"><span class="label">JEV CONFIDENCE</span><span>How sure Jev is about what kind of line it is, not whether the claim is true. A 0.99 on an Unverifiable row is normal.</span></li>
+        </ul>
+      </section>
+      <section class="strip">
+        <h2 class="strip-title">LINKS TO THE README</h2>
+        <p class="prose">Click L42 &#8599; on any row to open that exact README line on GitHub. CODE ONLY rows have no README line, because the code does it and the README never mentions it.</p>
+      </section>
+    </div>
+
+    <div id="panel-about" role="tabpanel" aria-labelledby="tab-about" hidden>
+      <section class="strip">
+        <h2 class="strip-title">HOW IT WORKS</h2>
+        <ol class="steps">
+          <li><span class="label">1. RULES</span><span>Code reads the README line by line and tests each claim against the repo: package.json, scripts, files and env vars.</span></li>
+          <li><span class="label">2. JEV LABELS</span><span>Jev, an AI that only picks labels, sorts the lines rules can't. It never decides what's true.</span></li>
+          <li><span class="label">3. HAIKU EXPLAINS</span><span>Claude Haiku writes the summary from the results. Neither AI decides what's true.</span></li>
+        </ol>
+      </section>
+      <section class="strip">
+        <h2 class="strip-title">LIMITS</h2>
+        <ul class="limits">
+          <li><span class="label">JS/TS ONLY</span><span>package.json holds both the packages and the commands, so it gives the checks something solid to test against. Other languages are planned, not built.</span></li>
+          <li><span class="label">MONOREPOS</span><span>Reads pnpm-workspace.yaml and the workspaces field in package.json. Supports dir/* and exact dirs, up to 30 workspaces.</span></li>
+          <li><span class="label">SIZE</span><span>READMEs over 50 KB are cut, and only the first 20 source files are read.</span></li>
+          <li><span class="label">NOTHING STORED</span><span>Public repos only. Nothing is kept after a scan.</span></li>
+          <li><span class="label">HAIKU CAN BE DOWN</span><span>If it is unavailable, the report still works and the clew speaks a fixed line.</span></li>
+        </ul>
+      </section>
+      <section class="strip">
+        <h2 class="strip-title">ADDRESS</h2>
+        <p class="prose">Live at <a id="live-url" href="https://readme-clew-2.vercel.app" target="_blank" rel="noopener noreferrer">https://readme-clew-2.vercel.app</a>. Share a repo with <span id="deep-example" class="mono">https://readme-clew-2.vercel.app/?repo=owner/name</span>. The link fills the field and waits for you to press SCAN.</p>
+      </section>
+      <section class="strip">
+        <h2 class="strip-title">LINKS</h2>
+        <ul class="link-list">
+          <li><a href="https://clewlabs.org" target="_blank" rel="noopener noreferrer">clewlabs.org</a><span>Clew Labs, the lab that built this tool.</span></li>
+          <li><a href="https://github.com/earlgreyhot1701D/readme-clew-2" target="_blank" rel="noopener noreferrer">GitHub repo</a><span>Source code for this tool.</span></li>
+          <li><a href="https://adalagent.ai" target="_blank" rel="noopener noreferrer">AdaL</a><span>The coding agent this was built with.</span></li>
+          <li><a href="https://glasser.ai" target="_blank" rel="noopener noreferrer">Glasser</a><span>Runs Jev for this tool.</span></li>
+          <li><a href="https://typesafe.ai" target="_blank" rel="noopener noreferrer">TypeSafe</a><span>Makes Jev.</span></li>
+          <li><a href="https://www.anthropic.com" target="_blank" rel="noopener noreferrer">Anthropic</a><span>Makes Claude Haiku, which writes the summary.</span></li>
+        </ul>
+      </section>
+    </div>
+
+    <footer class="strip site-footer">
+      <p>Built with AdaL // Jev by TypeSafe via Glasser // Summary by Claude Haiku // AI assisted. Human approved. Powered by NLP.</p>
+    </footer>
   </main>
   <noscript><p class="noscript">THIS PAGE NEEDS JAVASCRIPT TO SCAN A REPO.</p></noscript>
 </body>

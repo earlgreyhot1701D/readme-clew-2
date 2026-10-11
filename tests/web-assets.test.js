@@ -14,9 +14,12 @@ test('index.html: no inline script, no inline style, no remote resource, every l
   assert.doesNotMatch(html, /\sstyle\s*=/i, 'inline style attribute');
   assert.doesNotMatch(html, /<style[\s>]/i, 'style element');
   assert.doesNotMatch(html, /\son[a-z]+\s*=/i, 'inline event handler');
-  assert.doesNotMatch(html, /(?:src|href)\s*=\s*["']\s*(?:https?:)?\/\//i, 'remote src or href');
-  const local = [...html.matchAll(/(?:src|href)\s*=\s*["']([^"'#]+)["']/gi)].map((m) => m[1]);
-  assert.ok(local.length >= 5);
+  // Resources the page loads (script, link, img, iframe, source) must be local. Plain <a> links may point anywhere.
+  const loaders = [...html.matchAll(/<(script|link|img|iframe|source|embed|object)\b[^>]*>/gi)].map((m) => m[0]);
+  assert.ok(loaders.length >= 7, 'expected the script and the five stylesheets and the icon');
+  for (const tag of loaders) assert.doesNotMatch(tag, /(?:src|href|data)\s*=\s*["']\s*(?:https?:)?\/\//i, `remote resource: ${tag}`);
+  const local = loaders.flatMap((t) => [...t.matchAll(/(?:src|href)\s*=\s*["']([^"'#]+)["']/gi)].map((m) => m[1]));
+  assert.ok(local.length >= 7);
   for (const f of local) assert.ok(existsSync(new URL(`../web/${f}`, import.meta.url)), `${f} is missing`);
 });
 test('the five clew SVGs exist, are line art with no fill, and contain no script, link, image, or event handler', () => {
@@ -30,7 +33,7 @@ test('the five clew SVGs exist, are line art with no fill, and contain no script
   }
 });
 test('the CSS follows the style guide: tokens defined, zero border-radius, no gradients except the scanline overlay, no remote url()', () => {
-  const css = ['tokens', 'layout', 'findings'].map((n) => read(`web/${n}.css`)).join('\n');
+  const css = ['tokens', 'layout', 'findings', 'chrome', 'pages'].map((n) => read(`web/${n}.css`)).join('\n');
   for (const t of ['--bg: #0A1214', '--panel: #0E1C1F', '--rule: #3CA89C', '--text: #4FE3D1', '--label: #79C7C5', '--muted: #9BB0AD', '--contradicted: #FF7A6B', '--missing: #F2C14E']) {
     assert.ok(css.includes(t), `${t} missing`);
   }
@@ -52,7 +55,7 @@ test('vercel.json: web/ is the site root, the scan function keeps its limit, and
   assert.doesNotMatch(csp, /unsafe-inline|unsafe-eval|\*|https?:/);
 });
 test('nothing the page publishes holds a key, and web/ holds no fixture mode data path outside localhost', () => {
-  const js = ['app', 'render', 'view-model', 'fixture-mode'].map((n) => read(`web/${n}.js`)).join('\n');
+  const js = ['app', 'render', 'render-sections', 'view-model', 'fixture-mode', 'ui-state', 'tabs', 'disclosure', 'dom', 'site'].map((n) => read(`web/${n}.js`)).join('\n');
   assert.doesNotMatch(js, /GLASSER|ANTHROPIC|GITHUB_TOKEN|process\.env|sk-ant|api[_-]?key/i);
   assert.match(read('web/fixture-mode.js'), /isDevHost\(hostname\)/);
 });

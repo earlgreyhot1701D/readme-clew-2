@@ -10,6 +10,7 @@ const JEV_STATUS = { timeout: 504, rate_limited: 503, too_large: 422 };
 
 function mapError(e) {
   if (e instanceof ValidationError || e?.name === 'ValidationError') return { status: e.status, code: e.code, message: e.message };
+  if (e?.name === 'NotJsRepoError') return { status: 422, code: 'not_js_repo', message: e.message };
   if (e?.name === 'GithubError') return { status: GITHUB_STATUS[e.code] ?? 502, code: `github_${e.code}`, message: e.message };
   if (e?.name === 'JevError') return { status: JEV_STATUS[e.code] ?? 502, code: `jev_${e.code}`, message: e.code === 'too_large' ? e.message : 'The line-labeling service could not finish this scan. Try again in a moment.' };
   return { status: 500, code: 'internal', message: 'Something went wrong on our side.' };

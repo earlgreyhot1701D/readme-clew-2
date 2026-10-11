@@ -3,6 +3,9 @@
 import { renderReport, renderState } from './render.js';
 import { parseRepoInput, deepLinkRepo, errorState, loadingText, formatScanTime, STATES, DEMO_REPO } from './view-model.js';
 import { fixtureName, loadFixture } from './fixture-mode.js';
+import { initTabs } from './tabs.js';
+import { bindDisclosure } from './disclosure.js';
+import { SITE_URL, deepLink } from './site.js';
 
 const CLIENT_TIMEOUT_MS = 70000; // the function allows 60 s
 const form = document.getElementById('scan-form');
@@ -62,7 +65,18 @@ form.addEventListener('submit', async (e) => {
   setBusy(false);
 });
 
+// Tabs, the HOW? toggle, and the clean public address in the ABOUT tab. None of these starts a scan.
+function initChrome() {
+  initTabs();
+  bindDisclosure(document.getElementById('how-btn'), document.getElementById('how-panel'), { open: false });
+  const live = document.getElementById('live-url');
+  live.href = SITE_URL;
+  live.textContent = SITE_URL;
+  document.getElementById('deep-example').textContent = deepLink('owner/name');
+}
+
 async function init() {
+  initChrome();
   input.value = deepLinkRepo(location.search) ?? DEMO_REPO;
   const fx = fixtureName(location.search, location.hostname);
   if (fx) {
