@@ -88,7 +88,8 @@ Measured on a held-out set of 32 README lines, frozen configuration, run twice:
 | Wrong routes passing the 0.8 gate | 0 | 0 |
 | False Contradicted (end-to-end scan) | 0 | 0 |
 | Real drift found | 3 of 3 | 3 of 3 |
-| Lines whose label changed between runs | 0 of 32 | |
+
+Comparing the two runs, 0 of the 32 lines changed label.
 
 The sample is small, so this supports "safe enough to ship," not a measured error rate. Full numbers and caveats are in [LEDGER.md](LEDGER.md).
 
