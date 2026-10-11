@@ -173,7 +173,7 @@ No model writes any part of the receipt. Ways to use the file: attach it to a pu
 
 ## Testing
 
-**473 tests, all offline.** `npm test` runs them with Node's built-in test runner. No network and no keys: Jev's answers come from recorded fixtures, so the suite gives the same result every time.
+**474 tests, all offline.** `npm test` runs them with Node's built-in test runner. No network and no keys: Jev's answers come from recorded fixtures, so the suite gives the same result every time.
 
 The tests that matter most guard the promise that a correct README is never called wrong:
 
@@ -198,7 +198,7 @@ The tests that matter most guard the promise that a correct README is never call
 - **Live scans** of real repos, which is how both monorepo bugs were found.
 - **The self-scan:** README Clew 2 scanned its own README before submission. 0 Contradicted.
 
-Honest note: 473 is more than a five-day build needed. Many tests re-prove page wiring that the browser checks already cover. The guards in the table above are the ones worth keeping.
+Honest note: 474 is more than a five-day build needed. Many tests re-prove page wiring that the browser checks already cover. The guards in the table above are the ones worth keeping.
 
 ## How it was built
 
@@ -218,7 +218,7 @@ Things that went wrong, kept on the record:
 - The first real test, scanning README Clew v1, falsely called three lines Contradicted. v1 is a pnpm monorepo in folders the workspace finder didn't know, and pnpm's filter option was read as a script name. Fixed and saved as a regression test.
 - A second live test found 14 Missing packages that all came from an examples folder with its own package file. Fixed the same way.
 - Reading the verifier code one last time before submitting turned up two more ways to accuse a correct README: env vars read in files the scan never opened, and build output that is never committed. Both now come back Unverifiable.
-- The test suite grew to 473 tests in five days, more than it needed. See "Testing" for which ones matter.
+- The test suite grew to 474 tests in five days, more than it needed. See "Testing" for which ones matter.
 
 The decision log is [LEDGER.md](LEDGER.md). The block-by-block log is [BUILD-LOG.md](BUILD-LOG.md). The spec is [PRD.md](PRD.md).
 
