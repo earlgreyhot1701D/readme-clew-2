@@ -104,7 +104,9 @@ test('envvars: Verified when .env.example lists it', () => {
   assert.equal(verifyEnvVar('FROM_EXAMPLE', repo).bucket, 'verified');
 });
 test('envvars: Contradicted when nothing reads it', () => {
-  assert.equal(verifyEnvVar('DATABASE_URL', repo).bucket, 'contradicted');
+  // every source file in the tree was read (tools/run.js too), so absence is proof
+  const allRead = { ...repo, sources: { ...repo.sources, 'tools/run.js': 'run();' } };
+  assert.equal(verifyEnvVar('DATABASE_URL', allRead).bucket, 'contradicted');
 });
 test('envvars: Unverifiable with no usable name', () => {
   assert.equal(verifyEnvVar(null, repo).bucket, 'unverifiable');
