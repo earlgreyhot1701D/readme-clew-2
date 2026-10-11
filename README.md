@@ -137,6 +137,8 @@ Drag the bookmarklet from the **ABOUT** tab to your bookmarks bar. On a GitHub r
 - **Monorepos:** reads the pnpm workspace file and the workspaces field in `package.json`, with simple folder patterns only (one level of wildcard, or an exact folder), up to 30 workspaces. Beyond that, Missing turns into Unverifiable. A recursive pnpm command counts as verified if any one workspace has that script.
 - **Example, demo, test, fixture and docs folders** are skipped when looking for Missing packages, because they usually have their own `package.json`.
 - **Size:** READMEs over 50 KB are cut, and at most 20 source files are read per scan.
+- **Env vars are only called Contradicted when the whole repo was read.** If a scan hit the 20-file limit, or the repo has config files whose text wasn't fetched (database schemas, CI and Docker files), a missing env var comes back Unverifiable instead. `PORT`, `NODE_ENV`, `CI` and `HOST` are always Unverifiable, because platforms set them.
+- **Build output isn't checked.** A README that points at `dist/`, `build/`, `out/` or similar gets Unverifiable, because those files are created by the build and aren't committed.
 - **Labels can drift by a line.** The same README scanned twice can move one borderline line between buckets. The 0.8 gate keeps that drift away from Contradicted.
 - **No badge.** A live README badge would re-run a scan, and bill the owner, every time someone viewed it. Without storage there's no safe way to cache it, so it's not built.
 - **The summary can be unavailable.** If Haiku times out or fails, the report shows a fixed line instead. Everything else still works.
@@ -171,7 +173,7 @@ No model writes any part of the receipt. Ways to use the file: attach it to a pu
 
 ## Testing
 
-**465 tests, all offline.** `npm test` runs them with Node's built-in test runner. No network and no keys: Jev's answers come from recorded fixtures, so the suite gives the same result every time.
+**473 tests, all offline.** `npm test` runs them with Node's built-in test runner. No network and no keys: Jev's answers come from recorded fixtures, so the suite gives the same result every time.
 
 The tests that matter most guard the promise that a correct README is never called wrong:
 
@@ -181,6 +183,7 @@ The tests that matter most guard the promise that a correct README is never call
 | The 0.8 gate | Lines Jev isn't sure about go to Unverifiable, never to a verifier |
 | The prose guard | A name that only appears in prose can never be marked Contradicted, however confident Jev is |
 | A confidently wrong Jev | A fixture where Jev mislabels a line with high confidence still produces no false Contradicted |
+| No false accusations from what wasn't read | An env var read in a file past the 20-file limit, and a command pointing at build output, both come back Unverifiable, not Contradicted |
 | Monorepo regressions | The real layouts of README Clew v1 and polka, the two cases that fooled earlier versions, stay fixed |
 | Not a JS/TS repo | The scan stops before Jev is ever called |
 | Prompt injection | A README with planted instructions: the text becomes the quoted line but never reaches the summary model |
@@ -195,7 +198,7 @@ The tests that matter most guard the promise that a correct README is never call
 - **Live scans** of real repos, which is how both monorepo bugs were found.
 - **The self-scan:** README Clew 2 scanned its own README before submission. 0 Contradicted.
 
-Honest note: 465 is more than a five-day build needed. Many tests re-prove page wiring that the browser checks already cover. The guards in the table above are the ones worth keeping.
+Honest note: 473 is more than a five-day build needed. Many tests re-prove page wiring that the browser checks already cover. The guards in the table above are the ones worth keeping.
 
 ## How it was built
 
@@ -214,7 +217,8 @@ Things that went wrong, kept on the record:
 
 - The first real test, scanning README Clew v1, falsely called three lines Contradicted. v1 is a pnpm monorepo in folders the workspace finder didn't know, and pnpm's filter option was read as a script name. Fixed and saved as a regression test.
 - A second live test found 14 Missing packages that all came from an examples folder with its own package file. Fixed the same way.
-- The test suite grew to 465 tests in five days, more than it needed. See "Testing" for which ones matter.
+- Reading the verifier code one last time before submitting turned up two more ways to accuse a correct README: env vars read in files the scan never opened, and build output that is never committed. Both now come back Unverifiable.
+- The test suite grew to 473 tests in five days, more than it needed. See "Testing" for which ones matter.
 
 The decision log is [LEDGER.md](LEDGER.md). The block-by-block log is [BUILD-LOG.md](BUILD-LOG.md). The spec is [PRD.md](PRD.md).
 
