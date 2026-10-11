@@ -1,5 +1,6 @@
 // Pure functions behind render.js. No DOM, no network. Every value comes from the report object (PRD 3b).
 import { defaultOpen, bucketNote } from './ui-state.js';
+import { jevVerdict } from './verdict.js';
 
 export const BUCKETS = ['contradicted', 'missing', 'unverifiable', 'verified'];
 export const BUCKET_LABEL = { contradicted: 'CONTRADICTED', missing: 'MISSING', unverifiable: 'UNVERIFIABLE', verified: 'VERIFIED' };
@@ -57,7 +58,8 @@ export function evidenceText(ev) {
 // One finding row (STYLE 7). quote is passed through untouched. Missing findings have no quote, so the code name is the headline.
 export function rowModel(f) {
   const isJev = f.decidedBy === 'jev';
-  const hasConf = isJev && typeof f.confidence === 'number';
+  const verdict = jevVerdict(f); // words for rows Jev kept away from a code check
+  const hasConf = isJev && typeof f.confidence === 'number' && !verdict; // the bar is only for rows that went to a code check
   const pct = hasConf ? Math.round(Math.max(0, Math.min(1, f.confidence)) * 100) : null;
   return {
     id: f.id,
@@ -69,6 +71,7 @@ export function rowModel(f) {
     headline: typeof f.quote === 'string' ? f.quote : String(f.name ?? ''),
     isQuote: typeof f.quote === 'string',
     evidence: evidenceText(f.evidence),
+    verdict,
     showConfidence: hasConf,
     confidence: hasConf ? f.confidence.toFixed(2) : null,
     confidencePct: pct,

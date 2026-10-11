@@ -58,6 +58,7 @@
 .track { display: inline-block; width: 140px; height: 10px; border: 1px solid var(--rule); background: var(--bg); }
 .fill { display: block; height: 100%; background: var(--text); }
 
+.verdict { margin: 6px 0 0; font-family: var(--head); font-weight: 700; font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--label); overflow-wrap: anywhere; }
 .unsure { margin: 6px 0 0; font-size: 12px; color: var(--muted); }
 .none { margin: 0; color: var(--muted); font-size: 14px; }
 

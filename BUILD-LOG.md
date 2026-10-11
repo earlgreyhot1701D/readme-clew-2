@@ -219,3 +219,15 @@ Dev server (`scripts/dev-server.mjs`) now serves `404.html` with status 404 for 
 Tests: 340 total, 340 pass, 0 fail, 0 cancelled, 0 skipped, 0 todo (317 before). New: `site-basics.test.js` (8), CLEAR cases in `scan-state.test.js` (5), empty-bucket note in `web-view-model.test.js`, 11 in `summarize.test.js`. Shown failing: 42 deliberate breaks plus the two-sentence cap. All turned a test red. One slipped first time ("say how confident you are", because only "confidence" was banned); the test now also bans "confident".
 
 Browser check (Playwright, real CSP headers, mocked `/api/scan`): 48 of 48 pass at 1200 px and 390 px, including CLEAR, the home clew, hidden empty-bucket notes, the 404 page at a deep path, robots and sitemap, and the Analytics script with no CSP error.
+
+Committed as `5e5e507`.
+
+### Phase D addition: say what Jev decided on Unverifiable rows (web/ only)
+
+On Unverifiable rows decided by Jev, the bare "JEV CONFIDENCE 0.95" bar is replaced with words, as plain text with no bar (`web/verdict.js`, new, pure):
+
+- a code type (dependency, command, env_var, file_or_url) with `lowConfidence` true: `JEV THOUGHT: COMMAND (0.62), BELOW THE 0.8 BAR` (`env_var` shows as `ENV VAR`, `file_or_url` as `FILE OR URL`)
+- any other type: `JEV: NOT A CHECKABLE CLAIM (0.95 SURE)`
+- a code type that was sure enough went to a code check, so it keeps the bar. Verified rows decided by Jev keep it too.
+
+The KEY line on confidence now describes all three. `rowModel` carries a `verdict` field, `renderRow` draws it as a paragraph, and the 0.8 bar and the code types are pinned to `lib/gate.js` by a test (no `lib/` change). On the real v1 report the 140 Jev-decided Unverifiable rows split 31 THOUGHT, 86 NOT A CHECKABLE CLAIM, and 23 with a bar. Tests: 351 total, 351 pass, 0 fail, 0 cancelled, 0 skipped, 0 todo (340 before). 20 deliberate breaks, all turned a test red. Browser check: 10 of 10 pass at 1200 px and 390 px.

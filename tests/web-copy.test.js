@@ -56,7 +56,9 @@ test('KEY: the four buckets with their meanings, RULE vs JEV, the confidence not
   for (const b of ['contradicted', 'missing', 'unverifiable', 'verified']) assert.match(panel('panel-key'), new RegExp(`key-item b-${b}`));
   assert.match(key, /DECIDED BY: RULE/);
   assert.match(key, /DECIDED BY: JEV/);
-  assert.match(key, /JEV CONFIDENCE How sure Jev is about what kind of line it is, not whether the claim is true\. A 0\.99 on an Unverifiable row is normal\./);
+  assert.match(key, /JEV CONFIDENCE On rows that went to a code check, the bar shows how sure Jev is about what kind of line it is, not whether the claim is true\./);
+  assert.match(key, /NOT A CHECKABLE CLAIM, with how sure Jev is of that, or THOUGHT, with the type Jev guessed and a number under the 0\.8 bar\./);
+  assert.doesNotMatch(key, /0\.99 on an Unverifiable row is normal/); // the old line no longer matches what the rows say
   assert.match(key, /Click L42 \u2197 on any row to open that exact README line on GitHub\./);
   assert.match(key, /CODE ONLY rows have no README line/);
 });

@@ -16,6 +16,7 @@ export function renderRow(r) {
     ev.append(el('span', 'label', 'EVIDENCE'), el('span', 'value', ` ${r.evidence}`));
     row.append(ev);
   }
+  if (r.verdict) row.append(el('p', 'verdict', r.verdict)); // plain text: what Jev decided, with no bar
   if (r.showConfidence) {
     const conf = el('div', 'conf');
     const track = el('span', 'track', null, { role: 'img', 'aria-label': `Jev confidence ${r.confidence}` });

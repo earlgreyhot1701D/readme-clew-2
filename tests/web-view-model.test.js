@@ -50,15 +50,19 @@ test('rowModel: a rule row has no confidence bar and says DECIDED BY: RULE', () 
   // even a stray confidence value on a rule row never draws a bar
   assert.equal(rowModel({ ...load('npm-start-drift').findings[0], confidence: 0.9 }).showConfidence, false);
 });
-test('rowModel: a Jev row shows its confidence, and a low-confidence row is tagged', () => {
-  const f = { id: 'x', bucket: 'unverifiable', claimType: 'dependency', line: 3, quote: 'q', evidence: { file: null, detail: 'd' }, decidedBy: 'jev', confidence: 0.746, lowConfidence: true, link: 'https://github.com/a/b/blob/HEAD/README.md?plain=1#L3' };
-  const r = rowModel(f);
+test('rowModel: a Jev row that went to a code check shows its confidence bar, and a low-confidence row is tagged and gets words instead', () => {
+  const f = { id: 'x', bucket: 'unverifiable', claimType: 'dependency', line: 3, quote: 'q', evidence: { file: null, detail: 'd' }, decidedBy: 'jev', confidence: 0.746, lowConfidence: false, link: 'https://github.com/a/b/blob/HEAD/README.md?plain=1#L3' };
+  const r = rowModel(f); // a code type, sure enough: it went to a code check, so the bar stays
   assert.equal(r.decidedLabel, 'DECIDED BY: JEV');
   assert.equal(r.showConfidence, true);
+  assert.equal(r.verdict, null);
   assert.equal(r.confidence, '0.75');
   assert.equal(r.confidencePct, 75);
-  assert.equal(r.unsure, true);
-  assert.equal(rowModel({ ...f, lowConfidence: false }).unsure, false);
+  assert.equal(r.unsure, false);
+  const low = rowModel({ ...f, lowConfidence: true }); // under the bar: kept away from the check
+  assert.equal(low.unsure, true);
+  assert.equal(low.showConfidence, false);
+  assert.equal(low.verdict, 'JEV THOUGHT: DEPENDENCY (0.75), BELOW THE 0.8 BAR');
   assert.equal(rowModel({ ...f, confidence: 7 }).confidencePct, 100); // clamped
 });
 test('rowModel: a Missing row says CODE ONLY, has no link, and shows the code name', () => {
