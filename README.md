@@ -1,5 +1,7 @@
 # README Clew 2
 
+![README Clew 2: checks whether your README matches your code](web/social-card.png)
+
 Checks whether a GitHub README matches its code.
 
 **Live:** https://readme-clew-2.vercel.app
@@ -22,6 +24,20 @@ READMEs drift. A command gets renamed, an env var gets dropped, a package gets s
 | **Verified** | The README and the code agree |
 
 Every row shows the exact README line (with a link to that line on GitHub), the code evidence, and **who decided: a rule or Jev.**
+
+## Screenshots
+
+**A real scan of README Clew v1** (this project's predecessor). No contradictions, four packages the code uses that the README never mentions:
+
+![Report for earlgreyhot1701D/readme-clew](assets/screenshots/report.png)
+
+| Home | Key | Phone |
+|---|---|---|
+| ![Home page before a scan](assets/screenshots/home.png) | ![The KEY tab](assets/screenshots/key.png) | ![A report at phone width](assets/screenshots/phone.png) |
+
+**The Chrome extension popup,** shown with a sample report from the test fixtures (a README that says to run a start script the code doesn't have):
+
+![Extension popup with one Contradicted row](assets/screenshots/extension-popup.png)
 
 ## Who it's for
 
@@ -160,6 +176,10 @@ DigitalOcean, ["Jev: an AI model that can't write a sentence"](https://dev.to/di
 ### Art
 
 The clew mascot and the social card were generated with ChatGPT by the author, then cut out and sized by Claude.
+
+### Thanks
+
+To the AdaL team, who answered fast every time: they fixed the Glasser connector the same day I reported it, and granted a credit when I hit the Pro plan's weekly limit mid-build so I could finish.
 
 ### Built with
 
