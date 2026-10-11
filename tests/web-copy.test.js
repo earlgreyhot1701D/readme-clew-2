@@ -86,7 +86,7 @@ test('ABOUT links: all six, exact URLs, each opens safely with rel noopener', ()
   };
   const got = Object.fromEntries(links.map((m) => [m[2], m[1]]));
   for (const [name, url] of Object.entries(want)) assert.equal(got[name], url, name);
-  for (const m of links) {
+  for (const m of links.filter((x) => !x[0].includes('id="bookmarklet"'))) { // the bookmarklet is a drag target, not an outbound link
     assert.match(m[0], /rel="noopener noreferrer"/, m[1]);
     assert.match(m[0], /target="_blank"/, m[1]);
   }

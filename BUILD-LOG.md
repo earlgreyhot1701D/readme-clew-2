@@ -251,3 +251,14 @@ Tests: 420 total, 420 pass, 0 fail, 0 cancelled, 0 skipped, 0 todo (353 before).
 Built in the last session, finished and checked here. Popup 400 px wide, activeTab plus one API host permission, click to scan (opening the popup never scans). Shows the top 3 Contradicted, else the top 3 Missing. OPEN FULL REPORT (opens the site with ?repo=) with the note, and DOWNLOAD JSON from the report in hand. No input, HOW? or KEY. Shared files are copied from web/ by scripts/sync-extension.mjs; a drift test fails if they differ. content.js is a stub (STRETCH X1), not in the manifest.
 
 Tests: 452 total, 452 pass, 0 fail. Real-Chrome QA (Chrome 155, unpacked, mocked API): not a repo page, idle, scanning, error with TRY AGAIN, report. Shots in design/shots/ext-*.png. Production already served 3d4f4bc (TRY AGAIN live).
+
+## Block 7: bookmarklet, usage report, ZIPs
+
+- Coverage verifier scope fix and bad-input text (see LEDGER). Rescan of lukeed/polka: 0 Missing (was 14).
+- Bookmarklet: bookmarklet/bookmarklet.js (navigates only), built into web/bookmarklet-href.js by scripts/build-bookmarklet.mjs, drag link on the ABOUT tab. Test runs the real source in a sandbox with no network.
+- M19 badge left as a stub (LEDGER).
+- tools/usage-report.js writes evaluation/usage_report.md from Glasser's run and balance history (counts and money only).
+- Extension ZIP built. GitHub release v0.1.0 NOT created: waits for Shara to say the README is in.
+- Submission ZIP built from git archive of main, not committed.
+
+Tests: 464 total, 464 pass, 0 fail.

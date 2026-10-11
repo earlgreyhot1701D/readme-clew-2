@@ -10,6 +10,7 @@ import { fixtureName, loadFixture } from './fixture-mode.js';
 import { initTabs } from './tabs.js';
 import { bindDisclosure } from './disclosure.js';
 import { SITE_URL, deepLink, withoutRepoParam } from './site.js';
+import './bookmarklet-link.js';
 
 const form = document.getElementById('scan-form');
 const input = document.getElementById('repo-input');
