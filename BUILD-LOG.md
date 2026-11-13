@@ -272,3 +272,11 @@ Oct 10, 2026, 10:26 PM PT
 3. Self-scan of this repo through production: 0 Contradicted, 0 Missing.
 4. Build closed. Remaining work is docs and submission.
 5. Home: GET IT strip (extension release, bookmarklet button to ABOUT, source) added to the SCAN panel. web/ only, one test.
+
+## Maintenance: PR #2 sync, expired GitHub token fallback, Anthropic key rotation (2026-11-13)
+
+1. Pulled merged PR #2 (`86d50b6`, ManSio: match package names as whole tokens in `lib/verifiers/coverage.js` and `lib/verifiers/dependencies.js`, plus 3 tests in `tests/mentions-word.test.js`).
+2. Updated `lib/github.js`: when `api.github.com` returns HTTP 401 on a request that sent `Authorization`, drop the header and retry unauthenticated so an expired `GITHUB_TOKEN` does not fail public repo scans.
+3. Added 1 test in `tests/github.test.js` (shown failing first, then green). Suite: 478 pass, 0 fail, 0 cancelled.
+4. Updated `README.md` with the PR #2 contributor note and 478 test count.
+5. Owner rotated `ANTHROPIC_API_KEY`.

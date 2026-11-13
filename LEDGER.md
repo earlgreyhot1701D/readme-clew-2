@@ -419,3 +419,10 @@ Other notes from this fix:
 - Known gap left alone: `yarn workspaces foreach ...` is now Unverifiable (it used to be checked as a script named `workspaces`). Nothing else about foreach/`pnpm -r` filtering is modeled: `pnpm -r run x` still passes if any workspace has script `x`.
 
 - **M19 status badge is a STUB (decided 2026-10-10, owner).** Reason: we store nothing, so every badge view would re-run a scan and bill Shara's Glasser and Anthropic keys, and badge views are set by strangers and GitHub's image proxy. Left as a comment stub in api/badge.js, which returns 404 text. It was not built, and no README badge points at it.
+
+## Maintenance: expired GitHub token and key rotation (2026-11-13)
+
+- **Cause of scan failures (`HTTP 502 github_forbidden`):** the 30-day `GITHUB_TOKEN` from October expired (`HTTP 401 Bad credentials`). Even though all scanned repos are public, `lib/github.js` sent `Authorization: Bearer <token>` whenever `GITHUB_TOKEN` was set, and treated `401` as a fatal error.
+- **Fix (`lib/github.js`):** on `HTTP 401` with `headers.authorization` present, delete `headers.authorization` from the shared headers object and retry once without it. The first metadata call drops the bad token, and the remaining three calls run unauthenticated (60 REST API calls per hour per IP, 4 calls per scan = 15 scans per hour without a token).
+- **Anthropic key (`HTTP 401 invalid x-api-key`):** rotated by the owner in `.env` and Vercel. Verified with `GET /v1/models` (`HTTP 200`).
+- **PR #2 (ManSio, `86d50b6`):** `mentionsWord()` in `lib/verifiers/dependencies.js` and `lib/verifiers/coverage.js` prevents short package names like `ava` from matching inside longer words like `javascript`. 3 new tests in `tests/mentions-word.test.js`, plus 1 new test in `tests/github.test.js` (478 total).

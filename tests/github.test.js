@@ -73,6 +73,20 @@ test('the token is sent to the API only, never to raw reads', async () => {
   assert.ok(seen.filter(([u]) => u.includes('api.github.com')).every(([, a]) => a === 'Bearer SECRET'));
   assert.ok(seen.filter(([u]) => u.includes('raw.githubusercontent.com')).every(([, a]) => a === undefined));
 });
+test('an expired token (401) is dropped so public reads still succeed without it', async () => {
+  const authSeen = [];
+  const fx = fakeGithub({ files: base });
+  const rejectToken = async (url, init) => {
+    authSeen.push(init.headers?.authorization);
+    if (init.headers?.authorization) return json({ message: 'Bad credentials' }, 401);
+    return fx(url, init);
+  };
+  const r = await fetchRepo({ owner: 'o', name: 'r' }, { fetchImpl: rejectToken, token: 'EXPIRED' });
+  assert.equal(r.commit, SHA);
+  assert.equal(r.readme, '# Hi\n');
+  assert.equal(authSeen[0], 'Bearer EXPIRED');
+  assert.ok(authSeen.slice(1).every((a) => a === undefined));
+});
 test('source picking: at most 20, skips tests, build output, and typings, shallow first', () => {
   const paths = ['src/a.js', 'src/a.test.js', 'node_modules/x/i.js', 'dist/o.js', 'types/t.d.ts', 'index.ts', 'tests/x.js', 'README.md',
     ...Array.from({ length: 30 }, (_, i) => `lib/deep/f${i}.js`)];

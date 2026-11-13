@@ -173,7 +173,7 @@ No model writes any part of the receipt. Ways to use the file: attach it to a pu
 
 ## Testing
 
-**474 tests, all offline.** `npm test` runs them with Node's built-in test runner. No network and no keys: Jev's answers come from recorded fixtures, so the suite gives the same result every time.
+**478 tests, all offline.** `npm test` runs them with Node's built-in test runner. No network and no keys: Jev's answers come from recorded fixtures, so the suite gives the same result every time.
 
 The tests that matter most guard the promise that a correct README is never called wrong:
 
@@ -198,7 +198,7 @@ The tests that matter most guard the promise that a correct README is never call
 - **Live scans** of real repos, which is how both monorepo bugs were found.
 - **The self-scan:** README Clew 2 scanned its own README before submission. 0 Contradicted.
 
-Honest note: 474 is more than a five-day build needed. Many tests re-prove page wiring that the browser checks already cover. The guards in the table above are the ones worth keeping.
+Honest note: 474 (the count at submission) was more than a five-day build needed. Many tests re-prove page wiring that the browser checks already cover. The guards in the table above are the ones worth keeping.
 
 ## How it was built
 
@@ -271,6 +271,10 @@ The clew mascot and the social card were generated with ChatGPT by the author, t
 ### Thanks
 
 To the AdaL team, who answered fast every time: they fixed the Glasser connector the same day I reported it, and granted a credit when I hit the Pro plan's weekly limit mid-build so I could finish.
+
+### Contributors
+
+[ManSio](https://github.com/ManSio) found that package names were matched as pieces of words (so the name "ava" matched inside the word "javascript") and fixed both checks to match whole names, with 3 new tests ([#2](https://github.com/earlgreyhot1701D/readme-clew-2/pull/2)).
 
 ### Built with
 
