@@ -280,3 +280,10 @@ Oct 10, 2026, 10:26 PM PT
 3. Added 1 test in `tests/github.test.js` (shown failing first, then green). Suite: 478 pass, 0 fail, 0 cancelled.
 4. Updated `README.md` with the PR #2 contributor note and 478 test count.
 5. Owner rotated `ANTHROPIC_API_KEY`.
+
+## Maintenance: PRs #4, #5, #3 by ManSio (2026-11-13)
+
+1. Merged PR #4 (`68c97a3`, ManSio: read `sentAuthorization` before awaiting in `lib/github.js` so parallel requests in `Promise.all` each retry their own 401 when a token is rejected mid-scan, plus 2 tests in `tests/github.test.js`).
+2. Merged PR #5 (`c11d820`, ManSio: guard `withoutRepoParam(null)` in `web/site.js` and `extension/shared/site.js`; per ManSio's PR notes, Node 24.19+ changed `new URLSearchParams(null)` to produce `'null='`).
+3. Merged PR #3 (`788f912`, ManSio: add `.gitattributes` with `* text=auto eol=lf` so Windows checkouts keep LF line endings and byte-comparison tests stay green).
+4. Suite: 480 pass, 0 fail, 0 cancelled.
