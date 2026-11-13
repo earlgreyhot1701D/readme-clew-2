@@ -1,0 +1,2 @@
+# Keep every text file LF in the working copy on every platform: the tests compare committed bytes (extension/ vs web/, bookmarklet build), so a CRLF checkout makes two of them red before anything is touched.
+* text=auto eol=lf
