@@ -274,7 +274,7 @@ To the AdaL team, who answered fast every time: they fixed the Glasser connector
 
 ### Contributors
 
-[ManSio](https://github.com/ManSio) found that package names were matched as pieces of words (so the name "ava" matched inside the word "javascript") and fixed both checks to match whole names, with 3 new tests ([#2](https://github.com/earlgreyhot1701D/readme-clew-2/pull/2)).
+[ManSio](https://github.com/ManSio) ([@mansio on DEV](https://dev.to/mansio)) found that package names were matched as pieces of words (so the name "ava" matched inside the word "javascript") and fixed both checks to match whole names, with 3 new tests ([#2](https://github.com/earlgreyhot1701D/readme-clew-2/pull/2)).
 
 ### Built with
 
