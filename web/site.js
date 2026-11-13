@@ -8,6 +8,7 @@ export function deepLink(repo) {
 
 // A query string with ?repo= removed and everything else kept (for example ?fixture= in dev). "" when nothing is left.
 export function withoutRepoParam(search) {
+  if (search === null || search === undefined) return ''; // no search. Node 24.19+ turns null into the string "null=" (older versions gave an empty set).
   let params;
   try { params = new URLSearchParams(search); } catch { return ''; }
   params.delete('repo');
