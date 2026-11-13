@@ -87,6 +87,34 @@ test('an expired token (401) is dropped so public reads still succeed without it
   assert.equal(authSeen[0], 'Bearer EXPIRED');
   assert.ok(authSeen.slice(1).every((a) => a === undefined));
 });
+test('a token rejected only on the parallel readme+tree pair is still retried for both', async () => {
+  // The token is accepted for the two awaited calls, then revoked, so /readme and /git/trees/:sha
+  // both go out with it at once. One 401 clears the shared header; the other request still has to retry.
+  const fx = fakeGithub({ files: base });
+  const rejectPair = async (url, init) => {
+    const u = new URL(url);
+    const parallel = u.pathname.endsWith('/readme') || u.pathname.includes('/git/trees/');
+    if (parallel && init.headers?.authorization) return json({ message: 'Bad credentials' }, 401);
+    return fx(url, init);
+  };
+  const r = await fetchRepo({ owner: 'o', name: 'r' }, { fetchImpl: rejectPair, token: 'REVOKED' });
+  assert.equal(r.commit, SHA);
+  assert.equal(r.readme, '# Hi\n');
+  // The tree is the other half of the pair: it must arrive, not just "not throw".
+  assert.ok(r.snapshot.files.includes('README.md'));
+  assert.deepEqual(r.snapshot.pkg, { name: 'x', scripts: { start: 'x' } });
+});
+test('a token that is rejected even without it is not retried in a loop', async () => {
+  const seen = [];
+  const always401 = async (url, init) => {
+    seen.push(Boolean(init.headers?.authorization));
+    if (seen.length > 5) throw new TypeError('retry loop'); // a loop would otherwise hang this test
+    return json({ message: 'Bad credentials' }, 401);
+  };
+  await assert.rejects(fetchRepo({ owner: 'o', name: 'r' }, { fetchImpl: always401, token: 'BAD' }),
+    { name: 'GithubError', code: 'forbidden', status: 401 });
+  assert.equal(seen.length, 2); // the first request, then one retry without the token
+});
 test('source picking: at most 20, skips tests, build output, and typings, shallow first', () => {
   const paths = ['src/a.js', 'src/a.test.js', 'node_modules/x/i.js', 'dist/o.js', 'types/t.d.ts', 'index.ts', 'tests/x.js', 'README.md',
     ...Array.from({ length: 30 }, (_, i) => `lib/deep/f${i}.js`)];
