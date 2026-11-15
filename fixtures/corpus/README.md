@@ -29,7 +29,7 @@ as it stands today, with nothing to measure until there is an adapter.
 | verdict | count | what it is |
 |---|---:|---|
 | `false` | 2 | chalk imports `#ansi-styles` and `#supports-color`. Both are package subpath imports, declared under `"imports"` in chalk's own `package.json`. The finding says they are not listed, which is wrong |
-| `no_action` | 27 | every hoppscotch Missing comes from a build or test entry point (`vite.config.ts`, `eslint.config.mjs`, `tsup.config.ts`, `prisma.config.ts`, `tailwind.config.ts`, …), not from a file the published packages import at runtime |
+| `no_action` | 27 | every hoppscotch Missing comes from a build or test entry point (`vite.config.ts`, `eslint.config.mjs`, `tsup.config.ts`, `prisma.config.ts`, `tailwind.config.ts`, …), not from a file the published packages import at runtime. 25 of the 27 are `devDependencies`; the other two, `dotenv` and `prisma`, are runtime dependencies imported only by `prisma.config.ts` |
 | `correct` | 3 | chalk: the install command, and two env vars that stay Unverifiable because not all source files were read |
 
 One class is measured but not frozen, because its snapshot is 340 KB: `sindresorhus/got` reports 4 Missing,
