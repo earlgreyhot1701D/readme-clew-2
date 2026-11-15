@@ -82,7 +82,7 @@ test('OPTIONS preflight answers 204', async () => {
   assert.equal(res.headers.get('access-control-allow-origin'), 'https://site.example');
 });
 
-test('rate limited: 503 carries retry-after so the page can say how long', async () => {
+test('rate limited: 503 carries retry-after so a client can read how long', async () => {
   const { h } = mk(async () => {
     const e = new GithubError('rate_limited', 'GitHub rate limit reached, try again later', 403);
     e.retryAfter = 30;

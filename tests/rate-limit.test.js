@@ -66,3 +66,10 @@ test('a junk retry-after is ignored in favour of the one-minute rule', async () 
   ));
   assert.equal(r.retryAfter, 60);
 });
+
+test('retry-after as an HTTP-date is understood too', async () => {
+  const when = new Date(Date.now() + 45_000).toUTCString();
+  const r = await classify(reply(403, { 'x-ratelimit-remaining': '50', 'retry-after': when }));
+  assert.equal(r.code, 'rate_limited');
+  assert.ok(r.retryAfter >= 40 && r.retryAfter <= 46, `retryAfter=${r.retryAfter}`);
+});
