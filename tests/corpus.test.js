@@ -60,18 +60,14 @@ test('every finding has an audit verdict, and no verdict is left without a findi
   }
 });
 
-// Ratchet: these two are wrong, and the follow-up fix removes them. The count may go down, never up.
-test('chalk: the only false findings are the #-prefixed subpath imports', () => {
+// The fix this corpus asked for: a subpath import is declared in the package's own "imports" map,
+// so it must not be reported as a package the project forgot.
+test('chalk: package subpath imports are not reported as Missing', () => {
   const { input, report } = measure('chalk-chalk');
-  const audit = read('audit/chalk-chalk.json');
-  const wrongKeys = audit.entries.filter((e) => e.verdict === 'false').map((e) => e.key);
-  const wrong = report.findings.filter((f) => wrongKeys.includes(keyOf(f))).map((f) => f.name).sort();
-  assert.deepEqual(wrong, ['#ansi-styles', '#supports-color']);
   const imports = Object.keys(input.snapshot.pkg.imports ?? {});
-  for (const name of wrong) {
-    assert.ok(imports.includes(name), `${name} is declared under package.json imports`);
-    assert.equal(report.findings.find((f) => f.name === name).bucket, 'missing');
-  }
+  assert.deepEqual(imports.sort(), ['#ansi-styles', '#supports-color']);
+  assert.equal(report.findings.filter((f) => (f.name ?? '').startsWith('#')).length, 0);
+  assert.equal(report.counts.missing, 0);
 });
 
 // The strongest claim this corpus can make today: on a real monorepo every Missing comes from a
