@@ -33,3 +33,10 @@ test('polka regression: only the real root import is Missing', () => {
 test('bad input wording', () => {
   assert.equal(STATES.badInput, 'NOT A GITHUB REPO // USE owner/repo OR https://github.com/owner/repo');
 });
+
+test('coverage: type tests are not source', () => {
+  for (const file of ['@types/index.test-d.ts', 'src/index.test-d.ts', 'types/x.test-d.ts']) {
+    assert.deepEqual(names(repo({ [file]: "import a from 'tsd';" })), [], file);
+  }
+  assert.deepEqual(names(repo({ 'src/index.ts': "import a from 'tsd';" })), ['tsd']);
+});

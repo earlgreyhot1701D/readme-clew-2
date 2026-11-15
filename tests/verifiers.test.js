@@ -220,3 +220,12 @@ test('importedPackages: an import written inside a comment is not an import', ()
   });
   assert.deepEqual([...found.keys()], ['real']);
 });
+
+test('importedPackages: the word from inside a string is not an import keyword', () => {
+  const multi = importedPackages({
+    'index.js': "const pick = (w) => w ? 'to' : 'from';\n\nexport const f = (v) => { if (typeof v === 'x') return 1; };\n",
+  });
+  assert.deepEqual([...multi.keys()], []);
+  const single = importedPackages({ 'index.js': "const pick = (w) => w ? 'to' : 'from'; const y = foo('bar');\n" });
+  assert.deepEqual([...single.keys()], []);
+});
