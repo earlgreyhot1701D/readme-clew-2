@@ -81,3 +81,23 @@ test('OPTIONS preflight answers 204', async () => {
   assert.equal(res.status, 204);
   assert.equal(res.headers.get('access-control-allow-origin'), 'https://site.example');
 });
+
+test('rate limited: 503 carries retry-after so a client can read how long', async () => {
+  const { h } = mk(async () => {
+    const e = new GithubError('rate_limited', 'GitHub rate limit reached, try again later', 403);
+    e.retryAfter = 30;
+    throw e;
+  });
+  const res = await h(req(good));
+  assert.equal(res.status, 503);
+  assert.equal(res.headers.get('retry-after'), '30');
+  assert.equal((await res.json()).error.code, 'github_rate_limited');
+});
+test('a permanent forbidden does not advertise a retry-after', async () => {
+  const { h } = mk(async () => {
+    throw new GithubError('forbidden', 'GitHub returned HTTP 403', 403);
+  });
+  const res = await h(req(good));
+  assert.equal(res.status, 502);
+  assert.equal(res.headers.get('retry-after'), null);
+});
