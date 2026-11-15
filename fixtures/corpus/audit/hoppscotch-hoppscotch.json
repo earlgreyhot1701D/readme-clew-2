@@ -1,0 +1,147 @@
+{
+  "fixture": "hoppscotch-hoppscotch",
+  "commit": "55908a76a1d0555c9bbb5d74244c14173df95b06",
+  "measured": {
+    "verified": 0,
+    "unverifiable": 0,
+    "missing": 27,
+    "contradicted": 0
+  },
+  "entries": [
+    {
+      "key": "missing/dependency/@hoppscotch/ui#repo",
+      "verdict": "no_action",
+      "why": "tailwind.config.ts is tooling config; @hoppscotch/ui is a devDependency, so a README is not missing it"
+    },
+    {
+      "key": "missing/dependency/@rollup/plugin-typescript#repo",
+      "verdict": "no_action",
+      "why": "packages/codemirror-lang-graphql/rollup.config.js is tooling config; @rollup/plugin-typescript is a devDependency, so a README is not missing it"
+    },
+    {
+      "key": "missing/dependency/@lezer/generator#repo",
+      "verdict": "no_action",
+      "why": "packages/codemirror-lang-graphql/rollup.config.js is tooling config; @lezer/generator is a devDependency, so a README is not missing it"
+    },
+    {
+      "key": "missing/dependency/eslint-plugin-vue#repo",
+      "verdict": "no_action",
+      "why": "packages/hoppscotch-agent/eslint.config.mjs is tooling config; eslint-plugin-vue is a devDependency, so a README is not missing it"
+    },
+    {
+      "key": "missing/dependency/@vue/eslint-config-typescript#repo",
+      "verdict": "no_action",
+      "why": "packages/hoppscotch-agent/eslint.config.mjs is tooling config; @vue/eslint-config-typescript is a devDependency, so a README is not missing it"
+    },
+    {
+      "key": "missing/dependency/eslint-plugin-prettier#repo",
+      "verdict": "no_action",
+      "why": "packages/hoppscotch-agent/eslint.config.mjs is tooling config; eslint-plugin-prettier is a devDependency, so a README is not missing it"
+    },
+    {
+      "key": "missing/dependency/globals#repo",
+      "verdict": "no_action",
+      "why": "packages/hoppscotch-agent/eslint.config.mjs is tooling config; globals is a devDependency, so a README is not missing it"
+    },
+    {
+      "key": "missing/dependency/vite#repo",
+      "verdict": "no_action",
+      "why": "packages/hoppscotch-agent/vite.config.ts is tooling config; vite is a devDependency, so a README is not missing it"
+    },
+    {
+      "key": "missing/dependency/@vitejs/plugin-vue#repo",
+      "verdict": "no_action",
+      "why": "packages/hoppscotch-agent/vite.config.ts is tooling config; @vitejs/plugin-vue is a devDependency, so a README is not missing it"
+    },
+    {
+      "key": "missing/dependency/tailwindcss#repo",
+      "verdict": "no_action",
+      "why": "packages/hoppscotch-agent/vite.config.ts is tooling config; tailwindcss is a devDependency, so a README is not missing it"
+    },
+    {
+      "key": "missing/dependency/autoprefixer#repo",
+      "verdict": "no_action",
+      "why": "packages/hoppscotch-agent/vite.config.ts is tooling config; autoprefixer is a devDependency, so a README is not missing it"
+    },
+    {
+      "key": "missing/dependency/unplugin-icons#repo",
+      "verdict": "no_action",
+      "why": "packages/hoppscotch-agent/vite.config.ts is tooling config; unplugin-icons is a devDependency, so a README is not missing it"
+    },
+    {
+      "key": "missing/dependency/unplugin-vue-components#repo",
+      "verdict": "no_action",
+      "why": "packages/hoppscotch-agent/vite.config.ts is tooling config; unplugin-vue-components is a devDependency, so a README is not missing it"
+    },
+    {
+      "key": "missing/dependency/eslint#repo",
+      "verdict": "no_action",
+      "why": "packages/hoppscotch-backend/eslint.config.js is tooling config; eslint is a devDependency, so a README is not missing it"
+    },
+    {
+      "key": "missing/dependency/@typescript-eslint/parser#repo",
+      "verdict": "no_action",
+      "why": "packages/hoppscotch-backend/eslint.config.js is tooling config; @typescript-eslint/parser is a devDependency, so a README is not missing it"
+    },
+    {
+      "key": "missing/dependency/@typescript-eslint/eslint-plugin#repo",
+      "verdict": "no_action",
+      "why": "packages/hoppscotch-backend/eslint.config.js is tooling config; @typescript-eslint/eslint-plugin is a devDependency, so a README is not missing it"
+    },
+    {
+      "key": "missing/dependency/@eslint/js#repo",
+      "verdict": "no_action",
+      "why": "packages/hoppscotch-backend/eslint.config.js is tooling config; @eslint/js is a devDependency, so a README is not missing it"
+    },
+    {
+      "key": "missing/dependency/@eslint/eslintrc#repo",
+      "verdict": "no_action",
+      "why": "packages/hoppscotch-backend/eslint.config.js is tooling config; @eslint/eslintrc is a devDependency, so a README is not missing it"
+    },
+    {
+      "key": "missing/dependency/@relmify/jest-fp-ts#repo",
+      "verdict": "no_action",
+      "why": "packages/hoppscotch-backend/jest.setup.js is tooling config; @relmify/jest-fp-ts is a devDependency, so a README is not missing it"
+    },
+    {
+      "key": "missing/dependency/dotenv#repo",
+      "verdict": "no_action",
+      "why": "packages/hoppscotch-backend/prisma.config.ts is build config; dotenv is imported there only, which a README is not missing"
+    },
+    {
+      "key": "missing/dependency/prisma#repo",
+      "verdict": "no_action",
+      "why": "packages/hoppscotch-backend/prisma.config.ts is build config; prisma is imported there only, which a README is not missing"
+    },
+    {
+      "key": "missing/dependency/vitest#repo",
+      "verdict": "no_action",
+      "why": "packages/hoppscotch-cli/setupFiles.ts is tooling config; vitest is a devDependency, so a README is not missing it"
+    },
+    {
+      "key": "missing/dependency/tsup#repo",
+      "verdict": "no_action",
+      "why": "packages/hoppscotch-cli/tsup.config.ts is tooling config; tsup is a devDependency, so a README is not missing it"
+    },
+    {
+      "key": "missing/dependency/vite-plugin-html-config#repo",
+      "verdict": "no_action",
+      "why": "packages/hoppscotch-common/meta.ts is tooling config; vite-plugin-html-config is a devDependency, so a README is not missing it"
+    },
+    {
+      "key": "missing/dependency/glob#repo",
+      "verdict": "no_action",
+      "why": "packages/hoppscotch-common/type-check.mjs is tooling config; glob is a devDependency, so a README is not missing it"
+    },
+    {
+      "key": "missing/dependency/typescript#repo",
+      "verdict": "no_action",
+      "why": "packages/hoppscotch-common/type-check.mjs is tooling config; typescript is a devDependency, so a README is not missing it"
+    },
+    {
+      "key": "missing/dependency/vue-tsc#repo",
+      "verdict": "no_action",
+      "why": "packages/hoppscotch-common/type-check.mjs is tooling config; vue-tsc is a devDependency, so a README is not missing it"
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "fixture": "chalk-chalk",
+  "commit": "72110019e147683f60e13fa0ff5c14a0c27cd9fe",
+  "measured": {
+    "verified": 1,
+    "unverifiable": 2,
+    "missing": 2,
+    "contradicted": 0
+  },
+  "entries": [
+    {
+      "key": "missing/dependency/#ansi-styles#repo",
+      "verdict": "false",
+      "why": "#ansi-styles is a package subpath import, declared under \"imports\" in package.json (true); the evidence says it is not listed"
+    },
+    {
+      "key": "missing/dependency/#supports-color#repo",
+      "verdict": "false",
+      "why": "#supports-color is a package subpath import, declared under \"imports\" in package.json (true); the evidence says it is not listed"
+    },
+    {
+      "key": "unverifiable/env_var/FORCE_COLOR#149",
+      "verdict": "correct",
+      "why": "Not found in the 5 source files read"
+    },
+    {
+      "key": "unverifiable/env_var/FORCE_COLOR#151",
+      "verdict": "correct",
+      "why": "Not found in the 5 source files read"
+    },
+    {
+      "key": "verified/command/npm install chalk#39",
+      "verdict": "correct",
+      "why": "npm install is a built-in command"
+    }
+  ]
+}

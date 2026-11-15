@@ -1,0 +1,111 @@
+{
+  "repo": {
+    "owner": "chalk",
+    "name": "chalk",
+    "readmePath": "readme.md"
+  },
+  "counts": {
+    "verified": 1,
+    "unverifiable": 2,
+    "missing": 2,
+    "contradicted": 0
+  },
+  "findings": [
+    {
+      "id": "f-01",
+      "bucket": "missing",
+      "claimType": "dependency",
+      "line": null,
+      "quote": null,
+      "name": "#ansi-styles",
+      "evidence": {
+        "file": "source/index.js",
+        "detail": "source/index.js imports #ansi-styles (not listed in package.json); the README never mentions it"
+      },
+      "decidedBy": "rule",
+      "confidence": null,
+      "lowConfidence": false,
+      "verifier": "coverage",
+      "link": null
+    },
+    {
+      "id": "f-02",
+      "bucket": "missing",
+      "claimType": "dependency",
+      "line": null,
+      "quote": null,
+      "name": "#supports-color",
+      "evidence": {
+        "file": "source/index.js",
+        "detail": "source/index.js imports #supports-color (not listed in package.json); the README never mentions it"
+      },
+      "decidedBy": "rule",
+      "confidence": null,
+      "lowConfidence": false,
+      "verifier": "coverage",
+      "link": null
+    },
+    {
+      "id": "f-03",
+      "bucket": "unverifiable",
+      "claimType": "env_var",
+      "line": 149,
+      "quote": "Can be overridden by the user with the flags `--color` and `--no-color`. For situations where using `--color` is not possible, use the environment variable `FORCE_COLOR=1` (level 1), `FORCE_COLOR=2` (level 2), or `FORCE_COLOR=3` (level 3) to forcefully enable color, or `FORCE_COLOR=0` to forcefully disable. A numeric `FORCE_COLOR` overrides the detected color support and sets the level directly, meaning the terminal cannot raise it to a higher level. Use `FORCE_COLOR=true` to instead only enable color and let the level be detected.",
+      "name": "FORCE_COLOR",
+      "evidence": {
+        "file": null,
+        "detail": "Not found in the 5 source files read"
+      },
+      "decidedBy": "rule",
+      "confidence": null,
+      "lowConfidence": false,
+      "verifier": "envvars",
+      "link": "https://github.com/chalk/chalk/blob/HEAD/readme.md?plain=1#L149"
+    },
+    {
+      "id": "f-04",
+      "bucket": "unverifiable",
+      "claimType": "env_var",
+      "line": 151,
+      "quote": "Explicit 256/Truecolor mode can be enabled using the `--color=256` and `--color=16m` flags, respectively. These take precedence over a non-zero numeric `FORCE_COLOR`.",
+      "name": "FORCE_COLOR",
+      "evidence": {
+        "file": null,
+        "detail": "Not found in the 5 source files read"
+      },
+      "decidedBy": "rule",
+      "confidence": null,
+      "lowConfidence": false,
+      "verifier": "envvars",
+      "link": "https://github.com/chalk/chalk/blob/HEAD/readme.md?plain=1#L151"
+    },
+    {
+      "id": "f-05",
+      "bucket": "verified",
+      "claimType": "command",
+      "line": 39,
+      "quote": "npm install chalk",
+      "name": "npm install chalk",
+      "evidence": {
+        "file": null,
+        "detail": "npm install is a built-in command"
+      },
+      "decidedBy": "rule",
+      "confidence": null,
+      "lowConfidence": false,
+      "verifier": "commands",
+      "link": "https://github.com/chalk/chalk/blob/HEAD/readme.md?plain=1#L39"
+    }
+  ],
+  "notes": null,
+  "mood": "worried",
+  "tilt": false,
+  "meta": {
+    "jevModel": "jev-1.13.0",
+    "readmeTruncated": false,
+    "linesTotal": 331,
+    "linesToJev": 191,
+    "ms": 0
+  },
+  "receipt": null
+}
