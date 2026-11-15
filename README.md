@@ -173,7 +173,7 @@ No model writes any part of the receipt. Ways to use the file: attach it to a pu
 
 ## Testing
 
-**478 tests, all offline.** `npm test` runs them with Node's built-in test runner. No network and no keys: Jev's answers come from recorded fixtures, so the suite gives the same result every time.
+**489 tests, all offline.** `npm test` runs them with Node's built-in test runner. No network and no keys: Jev's answers come from recorded fixtures, so the suite gives the same result every time.
 
 The tests that matter most guard the promise that a correct README is never called wrong:
 
@@ -274,7 +274,7 @@ To the AdaL team, who answered fast every time: they fixed the Glasser connector
 
 ### Contributors
 
-[ManSio](https://github.com/ManSio) ([@mansio on DEV](https://dev.to/mansio)) found that package names were matched as pieces of words (so the name "ava" matched inside the word "javascript") and fixed both checks to match whole names, with 3 new tests ([#2](https://github.com/earlgreyhot1701D/readme-clew-2/pull/2)).
+[ManSio](https://github.com/ManSio) ([@mansio on DEV](https://dev.to/mansio)) found that package names were matched as pieces of words (so the name "ava" matched inside the word "javascript") and fixed both checks to match whole names, with 3 new tests ([#2](https://github.com/earlgreyhot1701D/readme-clew-2/pull/2)). He has since kept text files consistent across Windows and Mac ([#3](https://github.com/earlgreyhot1701D/readme-clew-2/pull/3)), made scans keep working when the GitHub token expires ([#4](https://github.com/earlgreyhot1701D/readme-clew-2/pull/4)), handled a change in how newer Node versions read web addresses ([#5](https://github.com/earlgreyhot1701D/readme-clew-2/pull/5)), and taught the app to tell a short GitHub slow-down from a real block ([#7](https://github.com/earlgreyhot1701D/readme-clew-2/pull/7)).
 
 ### Built with
 
