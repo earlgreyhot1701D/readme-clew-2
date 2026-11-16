@@ -9,7 +9,7 @@ const repo = (sources, files = [], workspaces = []) => ({ pkg: { name: 'p' }, wo
 const names = (r) => verifyCoverage('nothing', r).map((m) => m.name);
 
 test('coverage: imports under example/test/docs style folders are ignored, at any depth', () => {
-  for (const dir of ['examples', 'example', 'demo', 'demos', 'test', 'tests', '__tests__', 'fixtures', 'docs', 'benchmark', 'benchmarks', 'packages/a/examples']) {
+  for (const dir of ['examples', 'example', 'demo', 'demos', 'test', 'tests', '__tests__', 'fixtures', 'docs', 'benchmark', 'benchmarks', 'bench', 'benches', 'packages/a/examples']) {
     assert.deepEqual(names(repo({ [`${dir}/x.js`]: "import a from 'zed';" })), [], dir);
   }
   assert.deepEqual(names(repo({ 'src/x.js': "import a from 'zed';" })), ['zed']);
