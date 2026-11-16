@@ -152,6 +152,18 @@ test('source picking: shipped code comes first, so a 20-file budget is not spent
   assert.ok(!picked.some((p) => /^(?:benchmarks|docs|scripts)\//.test(p) || p === 'vite.config.ts' || p === 'bin/cli.js'));
 });
 
+test('source picking: a large SFC tree gets no reserved slots (measured: the quota lost runtime findings)', () => {
+  const js = Array.from({ length: 30 }, (_, i) => `src/f${i}.js`);
+  const vue = Array.from({ length: 25 }, (_, i) => `packages/app/src/c${i}.vue`);
+  const picked = pickSources([...js, ...vue]);
+  assert.equal(picked.length, MAX_SOURCES);
+  // components are ranked like any other file: 30 src/ files fill the budget first
+  assert.equal(picked.filter((p) => p.endsWith('.vue')).length, 0);
+  const mixed = pickSources([...js.slice(0, 5), ...vue]);
+  assert.equal(mixed.length, MAX_SOURCES);
+  assert.ok(mixed.some((p) => p.endsWith('.vue')), 'components still take part when there is room');
+});
+
 test('source picking: at most 20, skips tests, build output, and typings, shallow first', () => {
   const paths = ['src/a.js', 'src/a.test.js', 'node_modules/x/i.js', 'dist/o.js', 'types/t.d.ts', 'index.ts', 'tests/x.js', 'README.md',
     ...Array.from({ length: 30 }, (_, i) => `lib/deep/f${i}.js`)];
