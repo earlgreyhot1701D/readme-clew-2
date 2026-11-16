@@ -134,6 +134,24 @@ test('a token that is rejected even without it is not retried in a loop', async 
     { name: 'GithubError', code: 'forbidden', status: 401 });
   assert.equal(seen.length, 2); // the first request, then one retry without the token
 });
+test('source picking: shipped code comes first, so a 20-file budget is not spent on tooling', () => {
+  const paths = [
+    ...[0, 1, 2].map((i) => `benchmarks/b${i}.js`),
+    ...[0, 1, 2].map((i) => `docs/d${i}.js`),
+    'scripts/publish.js',
+    'vite.config.ts',
+    'bin/cli.js',
+    ...Array.from({ length: 30 }, (_, i) => `lib/deep/f${i}.js`),
+    'index.js',
+  ];
+  const picked = pickSources(paths);
+  assert.equal(picked.length, MAX_SOURCES);
+  // shipped code fills the budget: index first, then lib/*
+  assert.equal(picked[0], 'index.js');
+  assert.ok(picked.slice(1).every((p) => p.startsWith('lib/deep/')), picked.join(','));
+  assert.ok(!picked.some((p) => /^(?:benchmarks|docs|scripts)\//.test(p) || p === 'vite.config.ts' || p === 'bin/cli.js'));
+});
+
 test('source picking: at most 20, skips tests, build output, and typings, shallow first', () => {
   const paths = ['src/a.js', 'src/a.test.js', 'node_modules/x/i.js', 'dist/o.js', 'types/t.d.ts', 'index.ts', 'tests/x.js', 'README.md',
     ...Array.from({ length: 30 }, (_, i) => `lib/deep/f${i}.js`)];
