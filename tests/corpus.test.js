@@ -57,6 +57,11 @@ test('every finding has an audit verdict, and no verdict is left without a findi
     const judged = audit.entries.map((e) => e.key).sort();
     assert.deepEqual(judged, seen, fixture);
     for (const e of audit.entries) assert.ok(['correct', 'false', 'no_action'].includes(e.verdict), `${fixture} ${e.key}`);
+    // Ratchet at zero: the corpus asked for two false findings (chalk's subpath imports) and they are
+    // fixed. The count may go down, never up, so a verdict flipped to "false" breaks this test and
+    // scripts/mutation-corpus.mjs keeps biting on the audit file.
+    const falseKeys = audit.entries.filter((e) => e.verdict === 'false').map((e) => e.key);
+    assert.deepEqual(falseKeys, [], `${fixture} has a false verdict again`);
   }
 });
 
