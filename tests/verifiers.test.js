@@ -221,6 +221,16 @@ test('importedPackages: an import written inside a comment is not an import', ()
   assert.deepEqual([...found.keys()], ['real']);
 });
 
+// A regex literal that contains a quote must not open a string and swallow the rest of the file.
+test('importedPackages: a regex with a quote does not hide the import after it', () => {
+  const found = importedPackages({ 'index.js': "const q = /'/g;\nimport a from 'after-regex';\n" });
+  assert.deepEqual([...found.keys()], ['after-regex']);
+  const division = importedPackages({ 'index.js': 'const half = total / count;\nimport b from "after-division";\n' });
+  assert.deepEqual([...division.keys()], ['after-division']);
+  const withClass = importedPackages({ 'index.js': "const re = /[\"']/gu;\nimport c from 'after-class';\n" });
+  assert.deepEqual([...withClass.keys()], ['after-class']);
+});
+
 // A generated-test template can contain import statements as text. Found on trpc/trpc, where three
 // of five Missing findings came from a template literal, not from code.
 test('importedPackages: an import written inside a template literal is not an import', () => {
