@@ -221,6 +221,13 @@ test('importedPackages: an import written inside a comment is not an import', ()
   assert.deepEqual([...found.keys()], ['real']);
 });
 
+test('importedPackages: a specifier that cannot be an npm name is not a package', () => {
+  const found = importedPackages({
+    'index.js': "import a from '_private';\nimport b from 'pkg.';\nimport c from 'under_score';\nimport d from '123numeric';\nimport e from '.hidden';\n",
+  });
+  assert.deepEqual([...found.keys()], ['under_score', '123numeric']);
+});
+
 // A regex literal that contains a quote must not open a string and swallow the rest of the file.
 test('importedPackages: a regex with a quote does not hide the import after it', () => {
   const found = importedPackages({ 'index.js': "const q = /'/g;\nimport a from 'after-regex';\n" });
