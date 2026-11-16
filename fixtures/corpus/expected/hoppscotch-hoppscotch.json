@@ -1,0 +1,485 @@
+{
+  "repo": {
+    "owner": "hoppscotch",
+    "name": "hoppscotch",
+    "readmePath": "README.md"
+  },
+  "counts": {
+    "verified": 0,
+    "unverifiable": 0,
+    "missing": 27,
+    "contradicted": 0
+  },
+  "findings": [
+    {
+      "id": "f-01",
+      "bucket": "missing",
+      "claimType": "dependency",
+      "line": null,
+      "quote": null,
+      "name": "@hoppscotch/ui",
+      "evidence": {
+        "file": "tailwind.config.ts",
+        "detail": "tailwind.config.ts imports @hoppscotch/ui (devDependencies has it); the README never mentions it"
+      },
+      "decidedBy": "rule",
+      "confidence": null,
+      "lowConfidence": false,
+      "verifier": "coverage",
+      "link": null
+    },
+    {
+      "id": "f-02",
+      "bucket": "missing",
+      "claimType": "dependency",
+      "line": null,
+      "quote": null,
+      "name": "@rollup/plugin-typescript",
+      "evidence": {
+        "file": "packages/codemirror-lang-graphql/rollup.config.js",
+        "detail": "packages/codemirror-lang-graphql/rollup.config.js imports @rollup/plugin-typescript (devDependencies has it); the README never mentions it"
+      },
+      "decidedBy": "rule",
+      "confidence": null,
+      "lowConfidence": false,
+      "verifier": "coverage",
+      "link": null
+    },
+    {
+      "id": "f-03",
+      "bucket": "missing",
+      "claimType": "dependency",
+      "line": null,
+      "quote": null,
+      "name": "@lezer/generator",
+      "evidence": {
+        "file": "packages/codemirror-lang-graphql/rollup.config.js",
+        "detail": "packages/codemirror-lang-graphql/rollup.config.js imports @lezer/generator (devDependencies has it); the README never mentions it"
+      },
+      "decidedBy": "rule",
+      "confidence": null,
+      "lowConfidence": false,
+      "verifier": "coverage",
+      "link": null
+    },
+    {
+      "id": "f-04",
+      "bucket": "missing",
+      "claimType": "dependency",
+      "line": null,
+      "quote": null,
+      "name": "eslint-plugin-vue",
+      "evidence": {
+        "file": "packages/hoppscotch-agent/eslint.config.mjs",
+        "detail": "packages/hoppscotch-agent/eslint.config.mjs imports eslint-plugin-vue (devDependencies has it); the README never mentions it"
+      },
+      "decidedBy": "rule",
+      "confidence": null,
+      "lowConfidence": false,
+      "verifier": "coverage",
+      "link": null
+    },
+    {
+      "id": "f-05",
+      "bucket": "missing",
+      "claimType": "dependency",
+      "line": null,
+      "quote": null,
+      "name": "@vue/eslint-config-typescript",
+      "evidence": {
+        "file": "packages/hoppscotch-agent/eslint.config.mjs",
+        "detail": "packages/hoppscotch-agent/eslint.config.mjs imports @vue/eslint-config-typescript (devDependencies has it); the README never mentions it"
+      },
+      "decidedBy": "rule",
+      "confidence": null,
+      "lowConfidence": false,
+      "verifier": "coverage",
+      "link": null
+    },
+    {
+      "id": "f-06",
+      "bucket": "missing",
+      "claimType": "dependency",
+      "line": null,
+      "quote": null,
+      "name": "eslint-plugin-prettier",
+      "evidence": {
+        "file": "packages/hoppscotch-agent/eslint.config.mjs",
+        "detail": "packages/hoppscotch-agent/eslint.config.mjs imports eslint-plugin-prettier (devDependencies has it); the README never mentions it"
+      },
+      "decidedBy": "rule",
+      "confidence": null,
+      "lowConfidence": false,
+      "verifier": "coverage",
+      "link": null
+    },
+    {
+      "id": "f-07",
+      "bucket": "missing",
+      "claimType": "dependency",
+      "line": null,
+      "quote": null,
+      "name": "globals",
+      "evidence": {
+        "file": "packages/hoppscotch-agent/eslint.config.mjs",
+        "detail": "packages/hoppscotch-agent/eslint.config.mjs imports globals (devDependencies has it); the README never mentions it"
+      },
+      "decidedBy": "rule",
+      "confidence": null,
+      "lowConfidence": false,
+      "verifier": "coverage",
+      "link": null
+    },
+    {
+      "id": "f-08",
+      "bucket": "missing",
+      "claimType": "dependency",
+      "line": null,
+      "quote": null,
+      "name": "vite",
+      "evidence": {
+        "file": "packages/hoppscotch-agent/vite.config.ts",
+        "detail": "packages/hoppscotch-agent/vite.config.ts imports vite (devDependencies has it); the README never mentions it"
+      },
+      "decidedBy": "rule",
+      "confidence": null,
+      "lowConfidence": false,
+      "verifier": "coverage",
+      "link": null
+    },
+    {
+      "id": "f-09",
+      "bucket": "missing",
+      "claimType": "dependency",
+      "line": null,
+      "quote": null,
+      "name": "@vitejs/plugin-vue",
+      "evidence": {
+        "file": "packages/hoppscotch-agent/vite.config.ts",
+        "detail": "packages/hoppscotch-agent/vite.config.ts imports @vitejs/plugin-vue (devDependencies has it); the README never mentions it"
+      },
+      "decidedBy": "rule",
+      "confidence": null,
+      "lowConfidence": false,
+      "verifier": "coverage",
+      "link": null
+    },
+    {
+      "id": "f-10",
+      "bucket": "missing",
+      "claimType": "dependency",
+      "line": null,
+      "quote": null,
+      "name": "tailwindcss",
+      "evidence": {
+        "file": "packages/hoppscotch-agent/vite.config.ts",
+        "detail": "packages/hoppscotch-agent/vite.config.ts imports tailwindcss (devDependencies has it); the README never mentions it"
+      },
+      "decidedBy": "rule",
+      "confidence": null,
+      "lowConfidence": false,
+      "verifier": "coverage",
+      "link": null
+    },
+    {
+      "id": "f-11",
+      "bucket": "missing",
+      "claimType": "dependency",
+      "line": null,
+      "quote": null,
+      "name": "autoprefixer",
+      "evidence": {
+        "file": "packages/hoppscotch-agent/vite.config.ts",
+        "detail": "packages/hoppscotch-agent/vite.config.ts imports autoprefixer (devDependencies has it); the README never mentions it"
+      },
+      "decidedBy": "rule",
+      "confidence": null,
+      "lowConfidence": false,
+      "verifier": "coverage",
+      "link": null
+    },
+    {
+      "id": "f-12",
+      "bucket": "missing",
+      "claimType": "dependency",
+      "line": null,
+      "quote": null,
+      "name": "unplugin-icons",
+      "evidence": {
+        "file": "packages/hoppscotch-agent/vite.config.ts",
+        "detail": "packages/hoppscotch-agent/vite.config.ts imports unplugin-icons (devDependencies has it); the README never mentions it"
+      },
+      "decidedBy": "rule",
+      "confidence": null,
+      "lowConfidence": false,
+      "verifier": "coverage",
+      "link": null
+    },
+    {
+      "id": "f-13",
+      "bucket": "missing",
+      "claimType": "dependency",
+      "line": null,
+      "quote": null,
+      "name": "unplugin-vue-components",
+      "evidence": {
+        "file": "packages/hoppscotch-agent/vite.config.ts",
+        "detail": "packages/hoppscotch-agent/vite.config.ts imports unplugin-vue-components (devDependencies has it); the README never mentions it"
+      },
+      "decidedBy": "rule",
+      "confidence": null,
+      "lowConfidence": false,
+      "verifier": "coverage",
+      "link": null
+    },
+    {
+      "id": "f-14",
+      "bucket": "missing",
+      "claimType": "dependency",
+      "line": null,
+      "quote": null,
+      "name": "eslint",
+      "evidence": {
+        "file": "packages/hoppscotch-backend/eslint.config.js",
+        "detail": "packages/hoppscotch-backend/eslint.config.js imports eslint (devDependencies has it); the README never mentions it"
+      },
+      "decidedBy": "rule",
+      "confidence": null,
+      "lowConfidence": false,
+      "verifier": "coverage",
+      "link": null
+    },
+    {
+      "id": "f-15",
+      "bucket": "missing",
+      "claimType": "dependency",
+      "line": null,
+      "quote": null,
+      "name": "@typescript-eslint/parser",
+      "evidence": {
+        "file": "packages/hoppscotch-backend/eslint.config.js",
+        "detail": "packages/hoppscotch-backend/eslint.config.js imports @typescript-eslint/parser (devDependencies has it); the README never mentions it"
+      },
+      "decidedBy": "rule",
+      "confidence": null,
+      "lowConfidence": false,
+      "verifier": "coverage",
+      "link": null
+    },
+    {
+      "id": "f-16",
+      "bucket": "missing",
+      "claimType": "dependency",
+      "line": null,
+      "quote": null,
+      "name": "@typescript-eslint/eslint-plugin",
+      "evidence": {
+        "file": "packages/hoppscotch-backend/eslint.config.js",
+        "detail": "packages/hoppscotch-backend/eslint.config.js imports @typescript-eslint/eslint-plugin (devDependencies has it); the README never mentions it"
+      },
+      "decidedBy": "rule",
+      "confidence": null,
+      "lowConfidence": false,
+      "verifier": "coverage",
+      "link": null
+    },
+    {
+      "id": "f-17",
+      "bucket": "missing",
+      "claimType": "dependency",
+      "line": null,
+      "quote": null,
+      "name": "@eslint/js",
+      "evidence": {
+        "file": "packages/hoppscotch-backend/eslint.config.js",
+        "detail": "packages/hoppscotch-backend/eslint.config.js imports @eslint/js (devDependencies has it); the README never mentions it"
+      },
+      "decidedBy": "rule",
+      "confidence": null,
+      "lowConfidence": false,
+      "verifier": "coverage",
+      "link": null
+    },
+    {
+      "id": "f-18",
+      "bucket": "missing",
+      "claimType": "dependency",
+      "line": null,
+      "quote": null,
+      "name": "@eslint/eslintrc",
+      "evidence": {
+        "file": "packages/hoppscotch-backend/eslint.config.js",
+        "detail": "packages/hoppscotch-backend/eslint.config.js imports @eslint/eslintrc (devDependencies has it); the README never mentions it"
+      },
+      "decidedBy": "rule",
+      "confidence": null,
+      "lowConfidence": false,
+      "verifier": "coverage",
+      "link": null
+    },
+    {
+      "id": "f-19",
+      "bucket": "missing",
+      "claimType": "dependency",
+      "line": null,
+      "quote": null,
+      "name": "@relmify/jest-fp-ts",
+      "evidence": {
+        "file": "packages/hoppscotch-backend/jest.setup.js",
+        "detail": "packages/hoppscotch-backend/jest.setup.js imports @relmify/jest-fp-ts (devDependencies has it); the README never mentions it"
+      },
+      "decidedBy": "rule",
+      "confidence": null,
+      "lowConfidence": false,
+      "verifier": "coverage",
+      "link": null
+    },
+    {
+      "id": "f-20",
+      "bucket": "missing",
+      "claimType": "dependency",
+      "line": null,
+      "quote": null,
+      "name": "dotenv",
+      "evidence": {
+        "file": "packages/hoppscotch-backend/prisma.config.ts",
+        "detail": "packages/hoppscotch-backend/prisma.config.ts imports dotenv (dependencies has it); the README never mentions it"
+      },
+      "decidedBy": "rule",
+      "confidence": null,
+      "lowConfidence": false,
+      "verifier": "coverage",
+      "link": null
+    },
+    {
+      "id": "f-21",
+      "bucket": "missing",
+      "claimType": "dependency",
+      "line": null,
+      "quote": null,
+      "name": "prisma",
+      "evidence": {
+        "file": "packages/hoppscotch-backend/prisma.config.ts",
+        "detail": "packages/hoppscotch-backend/prisma.config.ts imports prisma (dependencies has it); the README never mentions it"
+      },
+      "decidedBy": "rule",
+      "confidence": null,
+      "lowConfidence": false,
+      "verifier": "coverage",
+      "link": null
+    },
+    {
+      "id": "f-22",
+      "bucket": "missing",
+      "claimType": "dependency",
+      "line": null,
+      "quote": null,
+      "name": "vitest",
+      "evidence": {
+        "file": "packages/hoppscotch-cli/setupFiles.ts",
+        "detail": "packages/hoppscotch-cli/setupFiles.ts imports vitest (devDependencies has it); the README never mentions it"
+      },
+      "decidedBy": "rule",
+      "confidence": null,
+      "lowConfidence": false,
+      "verifier": "coverage",
+      "link": null
+    },
+    {
+      "id": "f-23",
+      "bucket": "missing",
+      "claimType": "dependency",
+      "line": null,
+      "quote": null,
+      "name": "tsup",
+      "evidence": {
+        "file": "packages/hoppscotch-cli/tsup.config.ts",
+        "detail": "packages/hoppscotch-cli/tsup.config.ts imports tsup (devDependencies has it); the README never mentions it"
+      },
+      "decidedBy": "rule",
+      "confidence": null,
+      "lowConfidence": false,
+      "verifier": "coverage",
+      "link": null
+    },
+    {
+      "id": "f-24",
+      "bucket": "missing",
+      "claimType": "dependency",
+      "line": null,
+      "quote": null,
+      "name": "vite-plugin-html-config",
+      "evidence": {
+        "file": "packages/hoppscotch-common/meta.ts",
+        "detail": "packages/hoppscotch-common/meta.ts imports vite-plugin-html-config (devDependencies has it); the README never mentions it"
+      },
+      "decidedBy": "rule",
+      "confidence": null,
+      "lowConfidence": false,
+      "verifier": "coverage",
+      "link": null
+    },
+    {
+      "id": "f-25",
+      "bucket": "missing",
+      "claimType": "dependency",
+      "line": null,
+      "quote": null,
+      "name": "glob",
+      "evidence": {
+        "file": "packages/hoppscotch-common/type-check.mjs",
+        "detail": "packages/hoppscotch-common/type-check.mjs imports glob (devDependencies has it); the README never mentions it"
+      },
+      "decidedBy": "rule",
+      "confidence": null,
+      "lowConfidence": false,
+      "verifier": "coverage",
+      "link": null
+    },
+    {
+      "id": "f-26",
+      "bucket": "missing",
+      "claimType": "dependency",
+      "line": null,
+      "quote": null,
+      "name": "typescript",
+      "evidence": {
+        "file": "packages/hoppscotch-common/type-check.mjs",
+        "detail": "packages/hoppscotch-common/type-check.mjs imports typescript (devDependencies has it); the README never mentions it"
+      },
+      "decidedBy": "rule",
+      "confidence": null,
+      "lowConfidence": false,
+      "verifier": "coverage",
+      "link": null
+    },
+    {
+      "id": "f-27",
+      "bucket": "missing",
+      "claimType": "dependency",
+      "line": null,
+      "quote": null,
+      "name": "vue-tsc",
+      "evidence": {
+        "file": "packages/hoppscotch-common/type-check.mjs",
+        "detail": "packages/hoppscotch-common/type-check.mjs imports vue-tsc (devDependencies has it); the README never mentions it"
+      },
+      "decidedBy": "rule",
+      "confidence": null,
+      "lowConfidence": false,
+      "verifier": "coverage",
+      "link": null
+    }
+  ],
+  "notes": null,
+  "mood": "worried",
+  "tilt": false,
+  "meta": {
+    "jevModel": "jev-1.13.0",
+    "readmeTruncated": false,
+    "linesTotal": 299,
+    "linesToJev": 192,
+    "ms": 0
+  },
+  "receipt": null
+}
