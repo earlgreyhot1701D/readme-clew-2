@@ -221,6 +221,17 @@ test('importedPackages: an import written inside a comment is not an import', ()
   assert.deepEqual([...found.keys()], ['real']);
 });
 
+// A generated-test template can contain import statements as text. Found on trpc/trpc, where three
+// of five Missing findings came from a template literal, not from code.
+test('importedPackages: an import written inside a template literal is not an import', () => {
+  const found = importedPackages({
+    'index.js': "const ASSERTIONS = `\nimport a from 'inside-template';\n`;\nimport b from 'real-pkg';\n",
+  });
+  assert.deepEqual([...found.keys()], ['real-pkg']);
+  const escapes = importedPackages({ 'index.js': "const s = `a \\` import x from 'nope'; \\``;\nimport y from 'yes';\n" });
+  assert.deepEqual([...escapes.keys()], ['yes']);
+});
+
 test('importedPackages: the word from inside a string is not an import keyword', () => {
   const multi = importedPackages({
     'index.js': "const pick = (w) => w ? 'to' : 'from';\n\nexport const f = (v) => { if (typeof v === 'x') return 1; };\n",
