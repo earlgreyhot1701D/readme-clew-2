@@ -64,6 +64,20 @@ test('receipt: records what shaped the scan, and the hash ignores it', () => {
   });
   assert.notEqual(JSON.stringify(other.params), JSON.stringify(withParams.params));
 });
+
+// params is a caller-supplied object, and a free-form object is an opening for README text: before
+// the whitelist, {note: 'a line from the README'} landed in the receipt and the no-text test could
+// not see it, because that test only knows what scan-repo passes.
+test('receipt: params is whitelisted, so a caller cannot smuggle text in', () => {
+  const { report } = make();
+  const receipt = buildReceipt({
+    runId: 'scan_1', now: new Date('2026-10-09T18:22:04.512Z'), repo: { owner: 'o', name: 'r' }, commit: 'a1b2c3d4e5',
+    readme: 'x', report, calls: [], stepsMs: {},
+    params: { sourceBudget: 20, readmeTruncated: true, note: 'a line from the README', nested: { x: 1 } },
+  });
+  assert.deepEqual(receipt.params, { sourceBudget: 20, readmeTruncated: true });
+  assert.ok(!JSON.stringify(receipt).includes('a line from the README'));
+});
 test('usage: totals equal the sum of calls; Haiku cost is an estimate from published prices', () => {
   const { usage } = make();
   const t = usage.totals();
