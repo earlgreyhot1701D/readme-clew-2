@@ -247,6 +247,10 @@ test('importedPackages: an import written inside a template literal is not an im
   assert.deepEqual([...found.keys()], ['real-pkg']);
   const escapes = importedPackages({ 'index.js': "const s = `a \\` import x from 'nope'; \\``;\nimport y from 'yes';\n" });
   assert.deepEqual([...escapes.keys()], ['yes']);
+  // The same mask covers quoted strings, not only templates: "import x from 'p'" inside a plain
+  // string is text, and the real import next to it still counts.
+  const quoted = importedPackages({ 'index.js': "const s = \"import x from 'inside-double'\";\nimport z from 'real-two';\n" });
+  assert.deepEqual([...quoted.keys()], ['real-two']);
 });
 
 test('importedPackages: the word from inside a string is not an import keyword', () => {
