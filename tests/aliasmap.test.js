@@ -2,7 +2,7 @@
 // "./src/*" inside a JSONC string and two "./" segments in a row.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildAliasMap, stripJsonc } from '../lib/aliasmap.js';
+import { buildAliasMap, stripJsonc, bundlerRules, configCandidates } from '../lib/aliasmap.js';
 
 const files = new Set([
   'packages/ui/src/index.ts',
@@ -43,7 +43,24 @@ test('alias map: a workspace package name is local even with subpaths', () => {
   assert.equal(map.resolve('@vueuse/core', 'x.ts'), null);
 });
 
-// Two packages in one repo can define the same prefix differently; the closer tsconfig must win.
+// Bundler-only aliases: vite/webpack resolve.alias is often the only map in the repo. Three shapes
+// were seen in the wild: resolve('src'), a template with import.meta.dirname, and a plain relative.
+test('bundlerRules: the three real config shapes, and which configs are worth reading', () => {
+  const plain = bundlerRules("resolve: { alias: { '@app': path.resolve(__dirname, 'src') } }", 'vite.config.ts');
+  assert.deepEqual(plain.map((r) => [r.prefix, r.target]), [['@app', 'src']]);
+
+  const bare = bundlerRules("resolve: { alias: { '@': resolve('src') } }", 'vue.config.js');
+  assert.deepEqual(bare.map((r) => [r.prefix, r.target]), [['@', 'src']]);
+
+  const template = bundlerRules("resolve: { alias: { '~/': `${path.resolve(import.meta.dirname, 'src')}/` } }", 'vite.config.ts');
+  assert.deepEqual(template.map((r) => [r.prefix, r.target]), [['~/', 'src']]);
+
+  // nearest configs only: root and one package, never a deep unrelated one
+  const files = ['vite.config.ts', 'packages/a/vite.config.ts', 'packages/z/deep/vite.config.ts'];
+  assert.deepEqual(configCandidates(['src/x.ts'], files), ['vite.config.ts']);
+  assert.deepEqual(configCandidates(['packages/a/src/x.ts'], files), ['vite.config.ts', 'packages/a/vite.config.ts']);
+});
+
 test('alias map: the nearest tsconfig wins, not the first one read', () => {
   const tsconfigs = {
     'tsconfig.json': JSON.stringify({ compilerOptions: { paths: { '~/*': ['./shared/*'] } } }),

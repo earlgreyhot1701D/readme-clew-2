@@ -34,6 +34,18 @@ test('coverage: a single-file component is read through its script block, and al
   assert.deepEqual(names(wsRepo), ['lodash']);
 });
 
+// A bundle-only alias is local too. Found live on mydraft-cc/ui: `@app` is defined in vite.config.ts,
+// not in tsconfig, and three findings named @app/* until the map was read.
+test('coverage: a bundler alias makes its specifiers local', () => {
+  const src = { 'src/app.ts': "import a from '@app/core';\nimport b from 'vue';\n", 'src/core.ts': 'export default 1;\n' };
+  const plain = repo(src, ['src/app.ts', 'src/core.ts']);
+  assert.deepEqual(names(plain), ['@app/core', 'vue']);
+
+  const withBundler = { ...plain, bundlerAliases: [{ prefix: '@app', target: 'src', dir: '' }] };
+  const out = verifyCoverage('nothing', withBundler);
+  assert.deepEqual(out.map((m) => m.name), ['vue']);
+});
+
 test('coverage: imports under example/test/docs style folders are ignored, at any depth', () => {
   for (const dir of ['examples', 'example', 'demo', 'demos', 'test', 'tests', '__tests__', 'fixtures', 'docs', 'benchmark', 'benchmarks', 'bench', 'benches', 'packages/a/examples']) {
     assert.deepEqual(names(repo({ [`${dir}/x.js`]: "import a from 'zed';" })), [], dir);
