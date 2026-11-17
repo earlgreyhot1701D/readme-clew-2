@@ -2,6 +2,8 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { summarize, buildInput, parseNotes, promptInput, twoSentences, SYSTEM } from '../lib/summarize.js';
 import { FIXTURES, runFixture } from './helpers.js';
+import { readFileSync } from 'node:fs';
+import { runPipeline } from '../lib/pipeline.js';
 
 const GOOD = { summary: 'Mostly fine.', verified: 'Five checks passed.', unverifiable: 'None.', missing: 'None.', contradicted: 'None.' };
 const reply = (text, extra = {}) => new Response(JSON.stringify({ content: [{ type: 'thinking' }, { type: 'text', text }], usage: { input_tokens: 200, output_tokens: 60 }, ...extra }));
@@ -34,6 +36,23 @@ test('input: names must be a single safe token, so sentence-like names are dropp
   const names = buildInput(r).findings.map((f) => f.name);
   assert.equal(names[0], undefined);
   assert.equal(names[1], 'express');
+});
+
+// The report-level tests above prove quotes and evidence never travel. This one proves it end to end:
+// a marker that exists only in the README the pipeline was handed must not appear in the prompt.
+test('input: text that exists only in the README never reaches the Haiku prompt', () => {
+  const marker = 'ZZ_README_ONLY_MARKER_7f3';
+  const held = JSON.parse(readFileSync(new URL('../fixtures/corpus/repos/hoppscotch-hoppscotch.json', import.meta.url), 'utf8'));
+  const noJev = new Proxy({}, { get: () => ({ choice: 'not_a_claim', confidence: 1 }) });
+  const marked = runPipeline({
+    readme: `${marker}\n\n${held.readme}`,
+    repo: held.repo,
+    snapshot: held.snapshot,
+    jev: { labels: noJev, names: noJev },
+  });
+  const prompt = JSON.stringify(promptInput(marked));
+  assert.ok(marked.findings.length > 0, 'the fixture must produce findings, or the test proves nothing');
+  assert.ok(!prompt.includes(marker), 'README text reached the prompt');
 });
 test('request: pinned Haiku 5.5 id, no sampling params, key in header only, system prompt separate', async () => {
   let seen;
