@@ -61,6 +61,18 @@ test('coverage: a substring-only mention no longer hides a Missing finding (yoct
   assert.deepEqual(missingNames('No test runner is named here.', repo), ['ava']);
 });
 
+// A name that only appears as a path segment in a link is not a mention either. linkbruno.com asked
+// on DEV whether stripping link targets first would catch more of these; the whole-token rule already
+// covers it, and this test keeps it that way.
+test('coverage: a package name inside a URL path is not a mention', () => {
+  const repo = repoWith({}, { 'index.js': "import fp from 'lodash';\n" });
+  assert.deepEqual(missingNames('See https://example.com/lodash for details.', repo), ['lodash']);
+  assert.deepEqual(missingNames('Docs: https://example.com/guide/lodash/fp', repo), ['lodash']);
+  // Controls: a subpath of the package itself is a mention, and so is a plain word.
+  assert.deepEqual(missingNames('We use lodash/fp here.', repo), []);
+  assert.deepEqual(missingNames('We use lodash.', repo), []);
+});
+
 test('dependencies: a name inside another package does not become a code claim', () => {
   const repo = repoWith({ express: '^4' }, { 'index.js': "import x from 'express';\n" });
   const bucket = (name, text) => verifyDependency(name, repo, { text, inFence: false }).bucket;
