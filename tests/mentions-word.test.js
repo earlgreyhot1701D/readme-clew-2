@@ -48,6 +48,18 @@ test('mentionsWord: a name inside a longer word is not a mention, a standalone n
   }
 });
 
+// Property access is not a package mention. Express's README says `res.send(...)` and Koa's says
+// `ctx.request.accepts(...)`; both names are declared dependencies, and counting the method hid the
+// real finding. Found by asking which findings a README-only suppression was hiding.
+test('mentionsWord: a name after a dot is property access, not a mention', () => {
+  assert.equal(mentionsWord("res.send('Hello World')", 'send'), false);
+  assert.equal(mentionsWord('ctx.request.accepts(json)', 'accepts'), false);
+  assert.equal(mentionsWord('obj.lodash', 'lodash'), false);
+  // Controls: a sentence-ending dot after the name still counts, and so does a standalone name.
+  assert.equal(mentionsWord('We use send.', 'send'), true);
+  assert.equal(mentionsWord('Install send globally', 'send'), true);
+});
+
 const repoWith = (deps, sources) => ({ pkg: { name: 'p', dependencies: deps }, workspaces: [], files: ['package.json'], sources });
 const missingNames = (readme, repo) => verifyCoverage(readme, repo).filter((f) => f.bucket === 'missing').map((f) => f.name);
 
