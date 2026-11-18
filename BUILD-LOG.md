@@ -287,3 +287,23 @@ Oct 10, 2026, 10:26 PM PT
 2. Merged PR #5 (`c11d820`, ManSio: guard `withoutRepoParam(null)` in `web/site.js` and `extension/shared/site.js`; per ManSio's PR notes, Node 24.19+ changed `new URLSearchParams(null)` to produce `'null='`).
 3. Merged PR #3 (`788f912`, ManSio: add `.gitattributes` with `* text=auto eol=lf` so Windows checkouts keep LF line endings and byte-comparison tests stay green).
 4. Suite: 480 pass, 0 fail, 0 cancelled.
+
+## Coverage semantics: what counts as shipped (2026-11-17)
+
+1. Read what `Missing` actually reports on 84 public repositories, frozen as 86 snapshots: 838 findings. The split is read from package.json, not judged: 547 name a package with a runtime field, 262 are dev-only, 29 are declared nowhere.
+2. Added `lib/path-kind.js`, one policy for two questions that were drifting apart: which files coverage reads, and which files count as shipped for strict R5. Segments, not substrings, case insensitive, hidden folders, config files, dotfiles, control characters stripped.
+3. Added strict R5 in `lib/r5.js`: a dev-only package imported only from files that do not ship is dropped. Enabled it in the real scan path (`lib/scan-repo.js`), which the flag had not reached before.
+4. Added the local alias rule (a bare specifier that names a directory is not a package) and the cut-README caveat (a README cut at the 50 KB cap keeps its finding and says a mention may be past the cut).
+5. Effect on the frozen corpus: 98 of 838 findings dropped, 11.7%, none carrying a runtime field, and verified, contradicted and unverifiable unchanged.
+6. Wrong turns, recorded: an early 68.3% came from a sample of 3 repositories and is withdrawn; `files`/`exports` from package.json was measured as an alternative and rejected (22 of 86 declare `files`, and it silently drops real `src/` imports); a separate bucket was considered and not taken.
+7. Suite: 544 tests, all offline, from a clean archive. Five review rounds; every fix has a mutant that turns a test red.
+8. Where the numbers come from: items 1, 5 and 6 were measured on 86 frozen snapshots of public repositories kept outside this tree (a working copy under `scratch/`, not committed), and the same applies to the counts in LEDGER. The tree reproduces the behaviour, not the counts: `fixtures/corpus` holds 3 repositories, so a reader who wants the aggregate has to rebuild the corpus. Item 3 is verified in the tree by tests that fail without it.
+9. Red team before the push: 85 attacks on the rule in five classes plus 28 on the path policy, 0 failures after two fixes. A source entry that is not a string crashed the site scanner, and an inherited property counted as a declared devDependency. Both have a test that fails without the fix; the corpus numbers did not move.
+
+## Coverage: specifier aliases and test-runner configs (2026-11-18)
+
+1. Manual audit of 63 findings on a 1165 repository corpus found two defects. The alias map received the package name while the code imports a subpath, so 39 findings were false (0.69%). Test-runner config names were counted as shipped source, so 52 dev-only findings were kept.
+2. `lib/verifiers/dependencies.js`: new `importSites()` returns the specifier as written, and `importedPackages()` is now a thin wrapper over it. `lib/verifiers/coverage.js` asks the alias map for the specifier first, then for the package name.
+3. `lib/path-kind.js`: `TOOLING_FILE` recognises karma, jest, mocha, vitest, ava, wdio, nightwatch and protractor config names, anchored to a JS/TS extension. It is separate from `CONFIG_FILE` because coverage and the env var verifier treat config files differently from the drop rule.
+4. `fixtures/blind/` holds the 63 audited cases with neutral names and a separate label file: 40 policy, 18 observed, 2 known gaps, 3 undecidable. `tests/blind-cases.test.js` checks them; the gaps are frozen at today's verdict so a change cannot pass silently.
+5. Effect on the corpus: Missing 5622 to 5583, dropped 485 to 537 (9.6%), verified, unverifiable and contradicted unchanged, and no dropped finding has a shipped import site.
