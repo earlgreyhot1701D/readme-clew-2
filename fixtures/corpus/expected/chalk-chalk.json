@@ -7,46 +7,12 @@
   "counts": {
     "verified": 1,
     "unverifiable": 2,
-    "missing": 2,
+    "missing": 0,
     "contradicted": 0
   },
   "findings": [
     {
       "id": "f-01",
-      "bucket": "missing",
-      "claimType": "dependency",
-      "line": null,
-      "quote": null,
-      "name": "#ansi-styles",
-      "evidence": {
-        "file": "source/index.js",
-        "detail": "source/index.js imports #ansi-styles (not listed in package.json); the README never mentions it"
-      },
-      "decidedBy": "rule",
-      "confidence": null,
-      "lowConfidence": false,
-      "verifier": "coverage",
-      "link": null
-    },
-    {
-      "id": "f-02",
-      "bucket": "missing",
-      "claimType": "dependency",
-      "line": null,
-      "quote": null,
-      "name": "#supports-color",
-      "evidence": {
-        "file": "source/index.js",
-        "detail": "source/index.js imports #supports-color (not listed in package.json); the README never mentions it"
-      },
-      "decidedBy": "rule",
-      "confidence": null,
-      "lowConfidence": false,
-      "verifier": "coverage",
-      "link": null
-    },
-    {
-      "id": "f-03",
       "bucket": "unverifiable",
       "claimType": "env_var",
       "line": 149,
@@ -63,7 +29,7 @@
       "link": "https://github.com/chalk/chalk/blob/HEAD/readme.md?plain=1#L149"
     },
     {
-      "id": "f-04",
+      "id": "f-02",
       "bucket": "unverifiable",
       "claimType": "env_var",
       "line": 151,
@@ -80,7 +46,7 @@
       "link": "https://github.com/chalk/chalk/blob/HEAD/readme.md?plain=1#L151"
     },
     {
-      "id": "f-05",
+      "id": "f-03",
       "bucket": "verified",
       "claimType": "command",
       "line": 39,
@@ -98,7 +64,7 @@
     }
   ],
   "notes": null,
-  "mood": "worried",
+  "mood": "curious",
   "tilt": false,
   "meta": {
     "jevModel": "jev-1.13.0",

@@ -4,20 +4,10 @@
   "measured": {
     "verified": 1,
     "unverifiable": 2,
-    "missing": 2,
+    "missing": 0,
     "contradicted": 0
   },
   "entries": [
-    {
-      "key": "missing/dependency/#ansi-styles#repo",
-      "verdict": "false",
-      "why": "#ansi-styles is a package subpath import, declared under \"imports\" in package.json (true); the evidence says it is not listed"
-    },
-    {
-      "key": "missing/dependency/#supports-color#repo",
-      "verdict": "false",
-      "why": "#supports-color is a package subpath import, declared under \"imports\" in package.json (true); the evidence says it is not listed"
-    },
     {
       "key": "unverifiable/env_var/FORCE_COLOR#149",
       "verdict": "correct",

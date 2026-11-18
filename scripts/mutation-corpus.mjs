@@ -5,7 +5,7 @@ import { execFileSync } from 'node:child_process';
 const files = {
   fixture: 'fixtures/corpus/repos/chalk-chalk.json',
   coverage: 'lib/verifiers/coverage.js',
-  audit: 'fixtures/corpus/audit/chalk-chalk.json',
+  audit: 'fixtures/corpus/audit/hoppscotch-hoppscotch.json',
 };
 
 function run() {
@@ -28,9 +28,13 @@ const baseline = run();
 console.log(`baseline: exit=${baseline}`);
 
 const cases = [
-  ['data: a subpath import becomes relative', files.fixture, "import ansiStyles from '#ansi-styles';", "import ansiStyles from './vendor/ansi-styles/index.js';"],
+  // chalk no longer reports a subpath import as Missing, so the old mutation (turn "#ansi-styles"
+  // into a relative path) changed nothing. This one does change the report: a package import the
+  // README never names must show up, and the pinned expected report must notice.
+  ['data: a package import the README never names appears', files.fixture, "import ansiStyles from '#ansi-styles';", "import leftPad from 'left-pad';"],
   ['logic: coverage reports nothing at all', files.coverage, 'if (mentionsWord(readme, name)) continue;', 'continue;'],
-  ['audit: a false verdict is flipped to correct', files.audit, '"key": "missing/dependency/#ansi-styles#repo",\n      "verdict": "false",', '"key": "missing/dependency/#ansi-styles#repo",\n      "verdict": "correct",'],
+  // chalk's audit has no false verdict left; flip one on hoppscotch, where the ratchet is also zero.
+  ['audit: a verdict is flipped to false', files.audit, '"key": "missing/dependency/@hoppscotch/ui#repo",\n      "verdict": "no_action",', '"key": "missing/dependency/@hoppscotch/ui#repo",\n      "verdict": "false",'],
 ];
 
 for (const [label, file, from, to] of cases) {

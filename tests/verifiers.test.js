@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { verifyDependency } from '../lib/verifiers/dependencies.js';
+import { verifyDependency, importedPackages } from '../lib/verifiers/dependencies.js';
 import { verifyCommand } from '../lib/verifiers/commands.js';
 import { verifyEnvVar } from '../lib/verifiers/envvars.js';
 import { verifyReference } from '../lib/verifiers/references.js';
@@ -203,4 +203,29 @@ test('dependencies and coverage: with unread workspaces, "not declared" is Unver
   assert.equal(verifyDependency('left-pad', t, ctx).bucket, 'unverifiable');
   const out = verifyCoverage('nothing', { ...t, sources: { 'a.js': "import z from 'zed';\n" } });
   assert.match(out[0].evidence.detail, /not found in the package\.json files read/);
+});
+
+// A subpath import ("#name") is resolved by the package's own "imports" map, not installed from the
+// registry, so it is never a dependency. Found live on chalk/chalk: see fixtures/corpus/.
+test('importedPackages: package subpath imports are not packages, scoped ones still are', () => {
+  const found = importedPackages({
+    'index.js': "import a from '#ansi-styles';\nimport b from '@scope/pkg';\nimport c from './local.js';\n",
+  });
+  assert.deepEqual([...found.keys()], ['@scope/pkg']);
+});
+
+test('importedPackages: an import written inside a comment is not an import', () => {
+  const found = importedPackages({
+    'index.js': "// import a from 'commented-out';\nconst url = 'http://x//y';\n/* import b from 'blocked'; */\nimport c from 'real';\n",
+  });
+  assert.deepEqual([...found.keys()], ['real']);
+});
+
+test('importedPackages: the word from inside a string is not an import keyword', () => {
+  const multi = importedPackages({
+    'index.js': "const pick = (w) => w ? 'to' : 'from';\n\nexport const f = (v) => { if (typeof v === 'x') return 1; };\n",
+  });
+  assert.deepEqual([...multi.keys()], []);
+  const single = importedPackages({ 'index.js': "const pick = (w) => w ? 'to' : 'from'; const y = foo('bar');\n" });
+  assert.deepEqual([...single.keys()], []);
 });
