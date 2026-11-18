@@ -48,6 +48,18 @@ test('mentionsWord: a name inside a longer word is not a mention, a standalone n
   }
 });
 
+// Property access is not a package mention. Express's README says `res.send(...)` and Koa's says
+// `ctx.request.accepts(...)`; both names are declared dependencies, and counting the method hid the
+// real finding. Found by asking which findings a README-only suppression was hiding.
+test('mentionsWord: a name after a dot is property access, not a mention', () => {
+  assert.equal(mentionsWord("res.send('Hello World')", 'send'), false);
+  assert.equal(mentionsWord('ctx.request.accepts(json)', 'accepts'), false);
+  assert.equal(mentionsWord('obj.lodash', 'lodash'), false);
+  // Controls: a sentence-ending dot after the name still counts, and so does a standalone name.
+  assert.equal(mentionsWord('We use send.', 'send'), true);
+  assert.equal(mentionsWord('Install send globally', 'send'), true);
+});
+
 const repoWith = (deps, sources) => ({ pkg: { name: 'p', dependencies: deps }, workspaces: [], files: ['package.json'], sources });
 const missingNames = (readme, repo) => verifyCoverage(readme, repo).filter((f) => f.bucket === 'missing').map((f) => f.name);
 
@@ -59,6 +71,18 @@ test('coverage: a substring-only mention no longer hides a Missing finding (yoct
   // Controls: a standalone mention suppresses it; a README with no mention at all still reports it.
   assert.deepEqual(missingNames('Tests run with `ava`.', repo), []);
   assert.deepEqual(missingNames('No test runner is named here.', repo), ['ava']);
+});
+
+// A name that only appears as a path segment in a link is not a mention either. linkbruno.com asked
+// on DEV whether stripping link targets first would catch more of these; the whole-token rule already
+// covers it, and this test keeps it that way.
+test('coverage: a package name inside a URL path is not a mention', () => {
+  const repo = repoWith({}, { 'index.js': "import fp from 'lodash';\n" });
+  assert.deepEqual(missingNames('See https://example.com/lodash for details.', repo), ['lodash']);
+  assert.deepEqual(missingNames('Docs: https://example.com/guide/lodash/fp', repo), ['lodash']);
+  // Controls: a subpath of the package itself is a mention, and so is a plain word.
+  assert.deepEqual(missingNames('We use lodash/fp here.', repo), []);
+  assert.deepEqual(missingNames('We use lodash.', repo), []);
 });
 
 test('dependencies: a name inside another package does not become a code claim', () => {

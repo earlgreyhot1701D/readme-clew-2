@@ -45,8 +45,27 @@ test('fetches README, commit, package.json, and sources at the pinned commit', a
   assert.ok(fx.urls.filter((u) => u.includes('api.github.com')).length === 4);
   assert.ok(fx.urls.filter((u) => u.includes('raw.githubusercontent.com')).every((u) => u.includes(SHA)));
 });
-test('a private repo is refused as not found (N1)', async () => {
-  const fx = fakeGithub({ files: base, meta: { private: true } });
+
+// zod's README.md is the single line "packages/zod/README.md". Following it once keeps the
+// findings about a document people actually read instead of about the pointer.
+test('a README that is a one-line pointer is followed once, to a path that exists', async () => {
+  const pointer = { 'README.md': 'packages/zod/README.md\n', 'packages/zod/README.md': '# Zod\n\nInstall zod.\n', 'package.json': '{"name":"zod"}' };
+  const fx = fakeGithub({ files: pointer });
+  const r = await fetchRepo({ owner: 'o', name: 'r' }, { fetchImpl: fx });
+  assert.equal(r.readmePath, 'packages/zod/README.md');
+  assert.match(r.readme, /Install zod/);
+
+  const dangling = fakeGithub({ files: { 'README.md': 'docs/missing.md\n', 'package.json': '{"name":"x"}' } });
+  const kept = await fetchRepo({ owner: 'o', name: 'r' }, { fetchImpl: dangling });
+  assert.equal(kept.readmePath, 'README.md');
+  assert.equal(kept.readme, 'docs/missing.md\n');
+
+  const normal = fakeGithub({ files: { 'README.md': '# Hi\n\nA normal README that mentions readme.md somewhere.\n', 'package.json': '{"name":"x"}' } });
+  const plain = await fetchRepo({ owner: 'o', name: 'r' }, { fetchImpl: normal });
+  assert.equal(plain.readmePath, 'README.md');
+  assert.match(plain.readme, /normal README/);
+});
+test('a private repo is refused as not found (N1)', async () => {  const fx = fakeGithub({ files: base, meta: { private: true } });
   await assert.rejects(fetchRepo({ owner: 'o', name: 'r' }, { fetchImpl: fx }), { code: 'not_found' });
 });
 test('404 is not_found; a repo without a README is no_readme', async () => {

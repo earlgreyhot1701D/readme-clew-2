@@ -221,6 +221,38 @@ test('importedPackages: an import written inside a comment is not an import', ()
   assert.deepEqual([...found.keys()], ['real']);
 });
 
+test('importedPackages: a specifier that cannot be an npm name is not a package', () => {
+  const found = importedPackages({
+    'index.js': "import a from '_private';\nimport b from 'pkg.';\nimport c from 'under_score';\nimport d from '123numeric';\nimport e from '.hidden';\n",
+  });
+  assert.deepEqual([...found.keys()], ['under_score', '123numeric']);
+});
+
+// A regex literal that contains a quote must not open a string and swallow the rest of the file.
+test('importedPackages: a regex with a quote does not hide the import after it', () => {
+  const found = importedPackages({ 'index.js': "const q = /'/g;\nimport a from 'after-regex';\n" });
+  assert.deepEqual([...found.keys()], ['after-regex']);
+  const division = importedPackages({ 'index.js': 'const half = total / count;\nimport b from "after-division";\n' });
+  assert.deepEqual([...division.keys()], ['after-division']);
+  const withClass = importedPackages({ 'index.js': "const re = /[\"']/gu;\nimport c from 'after-class';\n" });
+  assert.deepEqual([...withClass.keys()], ['after-class']);
+});
+
+// A generated-test template can contain import statements as text. Found on trpc/trpc, where three
+// of five Missing findings came from a template literal, not from code.
+test('importedPackages: an import written inside a template literal is not an import', () => {
+  const found = importedPackages({
+    'index.js': "const ASSERTIONS = `\nimport a from 'inside-template';\n`;\nimport b from 'real-pkg';\n",
+  });
+  assert.deepEqual([...found.keys()], ['real-pkg']);
+  const escapes = importedPackages({ 'index.js': "const s = `a \\` import x from 'nope'; \\``;\nimport y from 'yes';\n" });
+  assert.deepEqual([...escapes.keys()], ['yes']);
+  // The same mask covers quoted strings, not only templates: "import x from 'p'" inside a plain
+  // string is text, and the real import next to it still counts.
+  const quoted = importedPackages({ 'index.js': "const s = \"import x from 'inside-double'\";\nimport z from 'real-two';\n" });
+  assert.deepEqual([...quoted.keys()], ['real-two']);
+});
+
 test('importedPackages: the word from inside a string is not an import keyword', () => {
   const multi = importedPackages({
     'index.js': "const pick = (w) => w ? 'to' : 'from';\n\nexport const f = (v) => { if (typeof v === 'x') return 1; };\n",
