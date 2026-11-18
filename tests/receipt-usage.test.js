@@ -42,6 +42,42 @@ test('receipt: carries no README text and no quotes', () => {
   for (const line of readme.split('\n').filter((l) => l.length > 8)) assert.ok(!json.includes(line), line);
   for (const f of report.findings) assert.ok(!json.includes(f.quote));
 });
+// Two scans whose findings differ because of what was read must not look identical in the receipt.
+test('receipt: records what shaped the scan, and the hash ignores it', () => {
+  const { report, receipt } = make();
+  const params = {
+    sourceBudget: 20, sourcesRead: 12, tsconfigsRead: 1, bundlerAliases: 0,
+    workspacesRead: 0, workspacesTruncated: false, readmeBytes: 900, readmeTruncated: false,
+  };
+  const withParams = buildReceipt({
+    runId: 'scan_1', now: new Date('2026-10-09T18:22:04.512Z'), repo: { owner: 'o', name: 'r' }, commit: 'a1b2c3d4e5',
+    readme: 'x'.repeat(900), report, calls: [], stepsMs: {}, params,
+  });
+  assert.deepEqual(withParams.params, params);
+  assert.equal(withParams.reportSha256, receipt.reportSha256);
+  // without params the field is absent, so an old receipt stays valid
+  assert.equal('params' in receipt, false);
+  // a different budget is a different receipt, even with the same report
+  const other = buildReceipt({
+    runId: 'scan_1', now: new Date('2026-10-09T18:22:04.512Z'), repo: { owner: 'o', name: 'r' }, commit: 'a1b2c3d4e5',
+    readme: 'x'.repeat(900), report, calls: [], stepsMs: {}, params: { ...params, sourceBudget: 100 },
+  });
+  assert.notEqual(JSON.stringify(other.params), JSON.stringify(withParams.params));
+});
+
+// params is a caller-supplied object, and a free-form object is an opening for README text: before
+// the whitelist, {note: 'a line from the README'} landed in the receipt and the no-text test could
+// not see it, because that test only knows what scan-repo passes.
+test('receipt: params is whitelisted, so a caller cannot smuggle text in', () => {
+  const { report } = make();
+  const receipt = buildReceipt({
+    runId: 'scan_1', now: new Date('2026-10-09T18:22:04.512Z'), repo: { owner: 'o', name: 'r' }, commit: 'a1b2c3d4e5',
+    readme: 'x', report, calls: [], stepsMs: {},
+    params: { sourceBudget: 20, readmeTruncated: true, note: 'a line from the README', nested: { x: 1 } },
+  });
+  assert.deepEqual(receipt.params, { sourceBudget: 20, readmeTruncated: true });
+  assert.ok(!JSON.stringify(receipt).includes('a line from the README'));
+});
 test('usage: totals equal the sum of calls; Haiku cost is an estimate from published prices', () => {
   const { usage } = make();
   const t = usage.totals();
