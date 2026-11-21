@@ -173,7 +173,7 @@ No model writes any part of the receipt. Ways to use the file: attach it to a pu
 
 ## Testing
 
-**528 tests, all offline.** `npm test` runs them with Node's built-in test runner. No network and no keys: Jev's answers come from recorded fixtures, so the suite gives the same result every time.
+**529 tests, all offline.** `npm test` runs them with Node's built-in test runner. No network and no keys: Jev's answers come from recorded fixtures, so the suite gives the same result every time.
 
 The tests that matter most guard the promise that a correct README is never called wrong:
 

@@ -71,6 +71,14 @@ test('commands: an angle placeholder is Unverifiable, a trailing comment is not 
   assert.equal(verifyCommand('npm run build # --workspace packages/ghost', small).bucket, 'verified');
 });
 
+test('commands: a compound shell command is Unverifiable, because only one part would be checked', () => {
+  for (const cmd of ['npm run build && npm run ghost', 'npm run build | tee x', 'npm run build; npm start', 'yarn build || yarn dev']) {
+    assert.equal(verifyCommand(cmd, small).bucket, 'unverifiable', cmd);
+  }
+  // A lone "#" is a comment, so the command before it is still checked.
+  assert.equal(verifyCommand('npm run build #', small).bucket, 'verified');
+});
+
 test('commands: when some workspaces were not read, a missing script is Unverifiable', () => {
   const truncated = { ...small, workspaces: [{ path: 'packages/a', pkg: { scripts: { build: 'x' } } }], workspacesTruncated: true };
   assert.equal(verifyCommand('npm run deploy', truncated).bucket, 'unverifiable');
