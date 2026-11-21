@@ -71,6 +71,14 @@ test('commands: an angle placeholder is Unverifiable, a trailing comment is not 
   assert.equal(verifyCommand('npm run build # --workspace packages/ghost', small).bucket, 'verified');
 });
 
+test('commands: a path built from a variable is Unverifiable, not a missing file', () => {
+  for (const cmd of ['node "$SKILL_DIR/scripts/x.mjs"', 'node $HOME/app.js', 'node ./tools/$X/y.js', 'node %APPDATA%/x.js']) {
+    assert.equal(verifyCommand(cmd, small).bucket, 'unverifiable', cmd);
+  }
+  assert.equal(verifyCommand('node tools/missing.js', small).bucket, 'contradicted');
+  assert.equal(verifyCommand('node src/index.js', small).bucket, 'verified');
+});
+
 test('commands: a compound shell command is Unverifiable, because only one part would be checked', () => {
   for (const cmd of ['npm run build && npm run ghost', 'npm run build | tee x', 'npm run build; npm start', 'yarn build || yarn dev']) {
     assert.equal(verifyCommand(cmd, small).bucket, 'unverifiable', cmd);
