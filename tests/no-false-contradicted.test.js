@@ -72,7 +72,11 @@ test('commands: an angle placeholder is Unverifiable, a trailing comment is not 
 });
 
 test('commands: node_modules is installed, not committed, so a path there is Unverifiable', () => {
-  assert.equal(verifyCommand('node node_modules/x/scripts/init.js', small).bucket, 'unverifiable');
+  for (const cmd of ['node node_modules/x/scripts/init.js', 'node ./node_modules/x/init.js',
+    'node /abs/node_modules/x/init.js', 'node packages/a/node_modules/x/y.js',
+    'node node_modules\\x\\y.js', 'node ../node_modules/x.js', 'node node_modules']) {
+    assert.equal(verifyCommand(cmd, small).bucket, 'unverifiable', cmd);
+  }
   assert.equal(verifyCommand('node tools/missing.js', small).bucket, 'contradicted');
 });
 
