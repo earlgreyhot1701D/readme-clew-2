@@ -134,14 +134,24 @@ test('a token that is rejected even without it is not retried in a loop', async 
     { name: 'GithubError', code: 'forbidden', status: 401 });
   assert.equal(seen.length, 2); // the first request, then one retry without the token
 });
-test('source picking: shipped code comes first, so a 20-file budget is not spent on tooling', () => {
+test('pickSources: the budget is 60, the first 20 stay the same, and a duplicate is not read twice', () => {
+  const paths = Array.from({ length: 100 }, (_, i) => `src/f${String(i).padStart(3, '0')}.js`);
+  const picked = pickSources(paths);
+  assert.equal(picked.length, MAX_SOURCES);
+  assert.equal(picked.length, 60);
+  assert.deepEqual(picked.slice(0, 20), paths.slice(0, 20));
+  assert.deepEqual(pickSources(paths.slice(0, 7)), paths.slice(0, 7));
+  assert.equal(pickSources([...paths.slice(0, 30), ...paths.slice(0, 30)]).length, 30);
+});
+
+test('source picking: shipped code comes first, so the budget is not spent on tooling', () => {
   const paths = [
     ...[0, 1, 2].map((i) => `benchmarks/b${i}.js`),
     ...[0, 1, 2].map((i) => `docs/d${i}.js`),
     'scripts/publish.js',
     'vite.config.ts',
     'bin/cli.js',
-    ...Array.from({ length: 30 }, (_, i) => `lib/deep/f${i}.js`),
+    ...Array.from({ length: 90 }, (_, i) => `lib/deep/f${String(i).padStart(3, '0')}.js`),
     'index.js',
   ];
   const picked = pickSources(paths);
@@ -153,20 +163,20 @@ test('source picking: shipped code comes first, so a 20-file budget is not spent
 });
 
 test('source picking: a large SFC tree gets no reserved slots (measured: the quota lost runtime findings)', () => {
-  const js = Array.from({ length: 30 }, (_, i) => `src/f${i}.js`);
+  const js = Array.from({ length: 90 }, (_, i) => `src/f${String(i).padStart(2, '0')}.js`);
   const vue = Array.from({ length: 25 }, (_, i) => `packages/app/src/c${i}.vue`);
   const picked = pickSources([...js, ...vue]);
   assert.equal(picked.length, MAX_SOURCES);
-  // components are ranked like any other file: 30 src/ files fill the budget first
+  // components are ranked like any other file: the 90 src/ files fill the budget first
   assert.equal(picked.filter((p) => p.endsWith('.vue')).length, 0);
   const mixed = pickSources([...js.slice(0, 5), ...vue]);
-  assert.equal(mixed.length, MAX_SOURCES);
+  assert.equal(mixed.length, 30, 'a tree smaller than the budget is returned whole');
   assert.ok(mixed.some((p) => p.endsWith('.vue')), 'components still take part when there is room');
 });
 
-test('source picking: at most 20, skips tests, build output, and typings, shallow first', () => {
+test('source picking: at most MAX_SOURCES, skips tests, build output, and typings, shallow first', () => {
   const paths = ['src/a.js', 'src/a.test.js', 'node_modules/x/i.js', 'dist/o.js', 'types/t.d.ts', 'index.ts', 'tests/x.js', 'README.md',
-    ...Array.from({ length: 30 }, (_, i) => `lib/deep/f${i}.js`)];
+    ...Array.from({ length: 90 }, (_, i) => `lib/deep/f${String(i).padStart(2, '0')}.js`)];
   const picked = pickSources(paths);
   assert.equal(picked.length, MAX_SOURCES);
   assert.deepEqual(picked.slice(0, 2), ['index.ts', 'src/a.js']);
