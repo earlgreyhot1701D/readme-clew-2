@@ -71,6 +71,17 @@ test('commands: an angle placeholder is Unverifiable, a trailing comment is not 
   assert.equal(verifyCommand('npm run build # --workspace packages/ghost', small).bucket, 'verified');
 });
 
+test('commands: node_modules is installed, not committed, so a path there is Unverifiable', () => {
+  assert.equal(verifyCommand('node node_modules/x/scripts/init.js', small).bucket, 'unverifiable');
+  assert.equal(verifyCommand('node tools/missing.js', small).bucket, 'contradicted');
+});
+
+test('commands: a // comment after a command is not a file', () => {
+  assert.equal(verifyCommand('node -v // will show v10.22.1', small).bucket, 'unverifiable');
+  assert.equal(verifyCommand('node tools/run.js // start here', small).bucket, 'contradicted');
+  assert.equal(verifyCommand('node src/index.js // start here', small).bucket, 'verified');
+});
+
 test('commands: a path built from a variable is Unverifiable, not a missing file', () => {
   for (const cmd of ['node "$SKILL_DIR/scripts/x.mjs"', 'node $HOME/app.js', 'node ./tools/$X/y.js', 'node %APPDATA%/x.js']) {
     assert.equal(verifyCommand(cmd, small).bucket, 'unverifiable', cmd);
