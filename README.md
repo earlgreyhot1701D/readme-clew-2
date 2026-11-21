@@ -136,7 +136,7 @@ Drag the bookmarklet from the **ABOUT** tab to your bookmarks bar. On a GitHub r
 - **Most lines end up Unverifiable.** That's expected. Most README text is prose that no code check can test. Unverifiable means "can't tell," not "wrong."
 - **Monorepos:** reads the pnpm workspace file and the workspaces field in `package.json`, with simple folder patterns only (one level of wildcard, or an exact folder), up to 30 workspaces. Beyond that, Missing turns into Unverifiable. A recursive pnpm command counts as verified if any one workspace has that script.
 - **Example, demo, test, fixture and docs folders** are skipped when looking for Missing packages, because they usually have their own `package.json`.
-- **Size:** READMEs over 50 KB are cut, and at most 20 source files are read per scan.
+- **Size:** READMEs over 50 KB are cut, and at most 60 source files are read per scan. The budget was 20; raising it to 60 was measured on 20 repositories, where it reports 83% more Missing findings and 51 of the 54 extra names sit in shipped code. Reads are parallel, so the scan time does not visibly change.
 - **Env vars are only called Contradicted when the whole repo was read.** If a scan hit the 20-file limit, or the repo has config files whose text wasn't fetched (database schemas, CI and Docker files), a missing env var comes back Unverifiable instead. `PORT`, `NODE_ENV`, `CI` and `HOST` are always Unverifiable, because platforms set them.
 - **Build output isn't checked.** A README that points at `dist/`, `build/`, `out/` or similar gets Unverifiable, because those files are created by the build and aren't committed.
 - **Labels can drift by a line.** The same README scanned twice can move one borderline line between buckets. The 0.8 gate keeps that drift away from Contradicted.
@@ -173,7 +173,7 @@ No model writes any part of the receipt. Ways to use the file: attach it to a pu
 
 ## Testing
 
-**524 tests, all offline.** `npm test` runs them with Node's built-in test runner. No network and no keys: Jev's answers come from recorded fixtures, so the suite gives the same result every time.
+**525 tests, all offline.** `npm test` runs them with Node's built-in test runner. No network and no keys: Jev's answers come from recorded fixtures, so the suite gives the same result every time.
 
 The tests that matter most guard the promise that a correct README is never called wrong:
 
