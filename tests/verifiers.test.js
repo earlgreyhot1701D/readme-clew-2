@@ -214,6 +214,14 @@ test('importedPackages: package subpath imports are not packages, scoped ones st
   assert.deepEqual([...found.keys()], ['@scope/pkg']);
 });
 
+test('importedPackages: a quoted </script> does not end the component script', () => {
+  const found = importedPackages({ 'App.svelte': '<script>\nconst s = "</script>";\nimport real from "real";\n</script>\n' });
+  assert.ok(found.has('real'), JSON.stringify([...found.keys()]));
+  // Control: two blocks are still both read.
+  const two = importedPackages({ 'App.vue': '<script>import a from "a";</script><script setup>import b from "b";</script>' });
+  assert.deepEqual([...two.keys()].sort(), ['a', 'b']);
+});
+
 test('importedPackages: an import written inside a comment is not an import', () => {
   const found = importedPackages({
     'index.js': "// import a from 'commented-out';\nconst url = 'http://x//y';\n/* import b from 'blocked'; */\nimport c from 'real';\n",
