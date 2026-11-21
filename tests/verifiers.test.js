@@ -80,9 +80,12 @@ test('commands: built-in package manager commands are Verified', () => {
   assert.equal(verifyCommand('npm install', repo).bucket, 'verified');
   assert.equal(verifyCommand('pnpm add left-pad', repo).bucket, 'verified');
 });
-test('commands: yarn and pnpm shortcuts run scripts', () => {
+test('commands: yarn and pnpm shortcuts run a script when it exists, and are Unverifiable when it does not', () => {
   assert.equal(verifyCommand('yarn dev', repo).bucket, 'verified');
-  assert.equal(verifyCommand('pnpm deploy', repo).bucket, 'contradicted');
+  // Measured on 1032 repositories: 43 findings of this shape were a binary from node_modules
+  // (lerna, tauri, ava, ganache-cli), so a bare missing word is not a contradiction.
+  assert.equal(verifyCommand('pnpm deploy', repo).bucket, 'unverifiable');
+  assert.equal(verifyCommand('pnpm run deploy', repo).bucket, 'contradicted');
 });
 test('commands: node checks the file exists', () => {
   assert.equal(verifyCommand('node tools/run.js', repo).bucket, 'verified');
