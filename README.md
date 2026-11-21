@@ -136,7 +136,7 @@ Drag the bookmarklet from the **ABOUT** tab to your bookmarks bar. On a GitHub r
 - **Most lines end up Unverifiable.** That's expected. Most README text is prose that no code check can test. Unverifiable means "can't tell," not "wrong."
 - **Monorepos:** reads the pnpm workspace file and the workspaces field in `package.json`, with simple folder patterns only (one level of wildcard, or an exact folder), up to 30 workspaces. Beyond that, Missing turns into Unverifiable. A recursive pnpm command counts as verified if any one workspace has that script.
 - **Example, demo, test, fixture and docs folders** are skipped when looking for Missing packages, because they usually have their own `package.json`.
-- **Missing no longer reports build tools used only in setup files, tests or tooling folders.** A package counts only when the code imports it from source that ships. A build tool imported only by a config file, a test, a script or a hidden tooling folder is not reported. Measured on 1032 public repositories: 537 findings dropped (9.6%), none of them a package with a runtime field.
+- **Missing no longer reports build tools used only in setup files, tests or tooling folders.** A package counts only when the code imports it from source that ships. A build tool imported only by a config file, a test, a script or a hidden tooling folder is not reported. Measured on 1032 public repositories: 536 findings dropped (9.6%), none of them a package with a runtime field.
 - **Size:** READMEs over 50 KB are cut, and at most 20 source files are read per scan.
 - **Env vars are only called Contradicted when the whole repo was read.** If a scan hit the 20-file limit, or the repo has config files whose text wasn't fetched (database schemas, CI and Docker files), a missing env var comes back Unverifiable instead. `PORT`, `NODE_ENV`, `CI` and `HOST` are always Unverifiable, because platforms set them.
 - **Build output isn't checked.** A README that points at `dist/`, `build/`, `out/` or similar gets Unverifiable, because those files are created by the build and aren't committed.
@@ -174,7 +174,7 @@ No model writes any part of the receipt. Ways to use the file: attach it to a pu
 
 ## Testing
 
-**554 tests, all offline.** `npm test` runs them with Node's built-in test runner. No network and no keys: Jev's answers come from recorded fixtures, so the suite gives the same result every time.
+**555 tests, all offline.** `npm test` runs them with Node's built-in test runner. No network and no keys: Jev's answers come from recorded fixtures, so the suite gives the same result every time.
 
 The tests that matter most guard the promise that a correct README is never called wrong:
 
@@ -275,7 +275,7 @@ To the AdaL team, who answered fast every time: they fixed the Glasser connector
 
 ### Contributors
 
-[ManSio](https://github.com/ManSio) ([@mansio on DEV](https://dev.to/mansio)) found that package names were matched as pieces of words (so the name "ava" matched inside the word "javascript") and fixed both checks to match whole names, with 3 new tests ([#2](https://github.com/earlgreyhot1701D/readme-clew-2/pull/2)). He has since kept text files consistent across Windows and Mac ([#3](https://github.com/earlgreyhot1701D/readme-clew-2/pull/3)), made scans keep working when the GitHub token expires ([#4](https://github.com/earlgreyhot1701D/readme-clew-2/pull/4)), handled a change in how newer Node versions read web addresses ([#5](https://github.com/earlgreyhot1701D/readme-clew-2/pull/5)), and taught the app to tell a short GitHub slow-down from a real block ([#7](https://github.com/earlgreyhot1701D/readme-clew-2/pull/7)).
+[ManSio](https://github.com/ManSio) ([@mansio on DEV](https://dev.to/mansio)) found that package names were matched as pieces of words (so the name "ava" matched inside the word "javascript") and fixed both checks to match whole names, with 3 new tests ([#2](https://github.com/earlgreyhot1701D/readme-clew-2/pull/2)). He has since kept text files consistent across Windows and Mac ([#3](https://github.com/earlgreyhot1701D/readme-clew-2/pull/3)), made scans keep working when the GitHub token expires ([#4](https://github.com/earlgreyhot1701D/readme-clew-2/pull/4)), handled a change in how newer Node versions read web addresses ([#5](https://github.com/earlgreyhot1701D/readme-clew-2/pull/5)), and taught the app to tell a short GitHub slow-down from a real block ([#7](https://github.com/earlgreyhot1701D/readme-clew-2/pull/7)). He also built a frozen test set of real repos and fixed more false Missing findings and link checks (#8 to #14).
 
 ### Built with
 
