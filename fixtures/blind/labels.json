@@ -1,0 +1,447 @@
+[
+ {
+  "id": "case-001",
+  "name": "@formkit/auto-animate",
+  "truth": "V1",
+  "expect": "reported",
+  "tag": "policy"
+ },
+ {
+  "id": "case-002",
+  "name": "geist",
+  "truth": "V1",
+  "expect": "reported",
+  "tag": "policy"
+ },
+ {
+  "id": "case-003",
+  "name": "express-openid-connect",
+  "truth": "V1",
+  "expect": "reported",
+  "tag": "policy"
+ },
+ {
+  "id": "case-004",
+  "name": "@element-plus/icons-vue",
+  "truth": "V1",
+  "expect": "reported",
+  "tag": "policy"
+ },
+ {
+  "id": "case-005",
+  "name": "@ffmpeg-installer/ffmpeg",
+  "truth": "V1",
+  "expect": "reported",
+  "tag": "policy"
+ },
+ {
+  "id": "case-006",
+  "name": "js-cookie",
+  "truth": "V1",
+  "expect": "reported",
+  "tag": "policy"
+ },
+ {
+  "id": "case-007",
+  "name": "cross-fetch",
+  "truth": "V2",
+  "expect": "reported",
+  "tag": "observed"
+ },
+ {
+  "id": "case-008",
+  "name": "cn",
+  "truth": "V1",
+  "expect": "reported",
+  "tag": "policy"
+ },
+ {
+  "id": "case-009",
+  "name": "es-toolkit",
+  "truth": "V1",
+  "expect": "reported",
+  "tag": "policy"
+ },
+ {
+  "id": "case-010",
+  "name": "clsx",
+  "truth": "V1",
+  "expect": "reported",
+  "tag": "policy"
+ },
+ {
+  "id": "case-011",
+  "name": "karma-coverage",
+  "truth": "V2",
+  "expect": "reported",
+  "tag": "observed"
+ },
+ {
+  "id": "case-012",
+  "name": "@nx/jest",
+  "truth": "V2",
+  "expect": "reported",
+  "tag": "observed"
+ },
+ {
+  "id": "case-013",
+  "name": "webpack",
+  "truth": "V2",
+  "expect": "reported",
+  "tag": "observed"
+ },
+ {
+  "id": "case-014",
+  "name": "serwist",
+  "truth": "V1",
+  "expect": "reported",
+  "tag": "policy"
+ },
+ {
+  "id": "case-015",
+  "name": "markdown-it-container",
+  "truth": "V2",
+  "expect": "reported",
+  "tag": "observed"
+ },
+ {
+  "id": "case-016",
+  "name": "@shared/ipc",
+  "truth": "F",
+  "expect": "not_reported",
+  "tag": "policy"
+ },
+ {
+  "id": "case-017",
+  "name": "framer-motion",
+  "truth": "V1",
+  "expect": "reported",
+  "tag": "policy"
+ },
+ {
+  "id": "case-018",
+  "name": "@ember/routing",
+  "truth": "V2",
+  "expect": "reported",
+  "tag": "observed"
+ },
+ {
+  "id": "case-019",
+  "name": "indicative",
+  "truth": "V2",
+  "expect": "reported",
+  "tag": "observed"
+ },
+ {
+  "id": "case-020",
+  "name": "typanion",
+  "truth": "V2",
+  "expect": "reported",
+  "tag": "observed"
+ },
+ {
+  "id": "case-021",
+  "name": "@tarojs/binding-linux-x64-musl",
+  "truth": "V2",
+  "expect": "reported",
+  "tag": "observed"
+ },
+ {
+  "id": "case-022",
+  "name": "@a2a-js/sdk",
+  "truth": "V1",
+  "expect": "reported",
+  "tag": "policy"
+ },
+ {
+  "id": "case-023",
+  "name": "query-string",
+  "truth": "V1",
+  "expect": "reported",
+  "tag": "policy"
+ },
+ {
+  "id": "case-024",
+  "name": "axios",
+  "truth": "V1",
+  "expect": "reported",
+  "tag": "policy"
+ },
+ {
+  "id": "case-025",
+  "name": "react-dom",
+  "truth": "V1",
+  "expect": "reported",
+  "tag": "policy"
+ },
+ {
+  "id": "case-026",
+  "name": "@nestjs/platform-fastify",
+  "truth": "V1",
+  "expect": "reported",
+  "tag": "policy"
+ },
+ {
+  "id": "case-027",
+  "name": "@r3-dev/brand",
+  "truth": "V1",
+  "expect": "reported",
+  "tag": "policy"
+ },
+ {
+  "id": "case-028",
+  "name": "@tryghost/logging",
+  "truth": "V1",
+  "expect": "reported",
+  "tag": "policy"
+ },
+ {
+  "id": "case-029",
+  "name": "gts",
+  "truth": "V1",
+  "expect": "reported",
+  "tag": "policy"
+ },
+ {
+  "id": "case-030",
+  "name": "webpack",
+  "truth": "V1",
+  "expect": "reported",
+  "tag": "policy"
+ },
+ {
+  "id": "case-031",
+  "name": "@branchlint/default-config",
+  "truth": "V2",
+  "expect": "reported",
+  "tag": "observed"
+ },
+ {
+  "id": "case-032",
+  "name": "memfs",
+  "truth": "V1",
+  "expect": "reported",
+  "tag": "policy"
+ },
+ {
+  "id": "case-033",
+  "name": "@babel/preset-env",
+  "truth": "V2",
+  "expect": "reported",
+  "tag": "observed"
+ },
+ {
+  "id": "case-034",
+  "name": "@codexteam/icons",
+  "truth": "V1",
+  "expect": "reported",
+  "tag": "policy"
+ },
+ {
+  "id": "case-035",
+  "name": "@nx/jest",
+  "truth": "V2",
+  "expect": "reported",
+  "tag": "observed"
+ },
+ {
+  "id": "case-036",
+  "name": "vitest",
+  "truth": "V2",
+  "expect": "reported",
+  "tag": "observed"
+ },
+ {
+  "id": "case-037",
+  "name": "@core/geoip",
+  "truth": "F",
+  "expect": "not_reported",
+  "tag": "policy"
+ },
+ {
+  "id": "case-038",
+  "name": "@core/task",
+  "truth": "F",
+  "expect": "not_reported",
+  "tag": "policy"
+ },
+ {
+  "id": "case-039",
+  "name": "path-to-regexp",
+  "truth": "V1",
+  "expect": "reported",
+  "tag": "policy"
+ },
+ {
+  "id": "case-040",
+  "name": "@sapper/app",
+  "truth": "V1",
+  "expect": "reported",
+  "tag": "policy"
+ },
+ {
+  "id": "case-041",
+  "name": "styled-system",
+  "truth": "V1",
+  "expect": "reported",
+  "tag": "policy"
+ },
+ {
+  "id": "case-042",
+  "name": "react",
+  "truth": "V2",
+  "expect": "reported",
+  "tag": "observed"
+ },
+ {
+  "id": "case-043",
+  "name": "@angular/common",
+  "truth": "V1",
+  "expect": "reported",
+  "tag": "policy"
+ },
+ {
+  "id": "case-044",
+  "name": "update-electron-app",
+  "truth": "V1",
+  "expect": "reported",
+  "tag": "policy"
+ },
+ {
+  "id": "case-045",
+  "name": "commander",
+  "truth": "V1",
+  "expect": "reported",
+  "tag": "policy"
+ },
+ {
+  "id": "case-046",
+  "name": "type-fest",
+  "truth": "V1",
+  "expect": "reported",
+  "tag": "policy"
+ },
+ {
+  "id": "case-047",
+  "name": "react-icons",
+  "truth": "V1",
+  "expect": "reported",
+  "tag": "policy"
+ },
+ {
+  "id": "case-048",
+  "name": "hexo-fs",
+  "truth": "V1",
+  "expect": "reported",
+  "tag": "policy"
+ },
+ {
+  "id": "case-049",
+  "name": "undici",
+  "truth": "V1",
+  "expect": "reported",
+  "tag": "policy"
+ },
+ {
+  "id": "case-050",
+  "name": "@parcel/watcher",
+  "truth": "V1",
+  "expect": "reported",
+  "tag": "policy"
+ },
+ {
+  "id": "case-051",
+  "name": "rollup-pluginutils",
+  "truth": "V1",
+  "expect": "reported",
+  "tag": "policy"
+ },
+ {
+  "id": "case-052",
+  "name": "eslint-plugin-react-hooks",
+  "truth": "V2",
+  "expect": "reported",
+  "tag": "observed"
+ },
+ {
+  "id": "case-053",
+  "name": "@testing-library/react",
+  "truth": "U",
+  "expect": "unknown",
+  "tag": "undecidable"
+ },
+ {
+  "id": "case-054",
+  "name": "html-minifier",
+  "truth": "V2",
+  "expect": "reported",
+  "tag": "observed"
+ },
+ {
+  "id": "case-055",
+  "name": "@storybook/react-vite",
+  "truth": "V2",
+  "expect": "reported",
+  "tag": "observed"
+ },
+ {
+  "id": "case-056",
+  "name": "markdown-it-sup",
+  "truth": "V1",
+  "expect": "reported",
+  "tag": "policy"
+ },
+ {
+  "id": "case-057",
+  "name": "mdx",
+  "truth": "V1",
+  "expect": "reported",
+  "tag": "policy"
+ },
+ {
+  "id": "case-058",
+  "name": "babel-runtime",
+  "truth": "V1",
+  "expect": "reported",
+  "tag": "policy"
+ },
+ {
+  "id": "case-059",
+  "name": "karma-jasmine",
+  "truth": "V2",
+  "expect": "reported",
+  "tag": "observed"
+ },
+ {
+  "id": "case-060",
+  "name": "@storybook/html",
+  "truth": "U",
+  "expect": "unknown",
+  "tag": "undecidable"
+ },
+ {
+  "id": "case-061",
+  "name": "@genshin-optimizer/pando",
+  "truth": "F",
+  "expect": "not_reported",
+  "tag": "gap",
+  "frozen": "reported",
+  "reason": "the package belongs to a workspace whose package.json the fetch layer did not read (a nested <root>/<a>/<b>/package.json, or libraries/<x>), so the alias map and the declared set both miss it; measured: 93 of 1032 repositories carry such manifests"
+ },
+ {
+  "id": "case-062",
+  "name": "@gitroom/nestjs-libraries",
+  "truth": "F",
+  "expect": "not_reported",
+  "tag": "gap",
+  "frozen": "reported",
+  "reason": "the package belongs to a workspace whose package.json the fetch layer did not read (a nested <root>/<a>/<b>/package.json, or libraries/<x>), so the alias map and the declared set both miss it; measured: 93 of 1032 repositories carry such manifests"
+ },
+ {
+  "id": "case-063",
+  "name": "builtInLanguages",
+  "truth": "U",
+  "expect": "unknown",
+  "tag": "undecidable"
+ }
+]
