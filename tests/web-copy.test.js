@@ -67,7 +67,7 @@ test('ABOUT: three steps, the limits, and the address', () => {
   assert.match(about, /1\. RULES/);
   assert.match(about, /2\. JEV LABELS/);
   assert.match(about, /3\. HAIKU EXPLAINS/);
-  assert.match(about, /JS\/TS ONLY .*package\.json holds both the packages and the commands.*Other languages are planned, not built\./);
+  assert.match(about, /JS\/TS ONLY .*package\.json holds both the packages and the commands.*Python isn't supported yet\. We measured it on real Python repos, and the checks found too little to be worth shipping\./);
   assert.match(about, /MONOREPOS .*pnpm-workspace\.yaml.*workspaces.*dir\/\*.*exact dirs.*up to 30 workspaces/);
   assert.match(about, /SCANS NEVER STORED Public repos only\./);
   assert.match(about, /ANALYTICS Anonymous page-view counts through Vercel Analytics\. No cookies\. Scans are never stored\./);

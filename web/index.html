@@ -109,7 +109,7 @@
       <section class="strip">
         <h2 class="strip-title">LIMITS</h2>
         <ul class="limits">
-          <li><span class="label">JS/TS ONLY</span><span>package.json holds both the packages and the commands, so it gives the checks something solid to test against. Other languages are planned, not built.</span></li>
+          <li><span class="label">JS/TS ONLY</span><span>package.json holds both the packages and the commands, so it gives the checks something solid to test against. Python isn't supported yet. We measured it on real Python repos, and the checks found too little to be worth shipping.</span></li>
           <li><span class="label">MONOREPOS</span><span>Reads pnpm-workspace.yaml and the workspaces field in package.json. Supports dir/* and exact dirs, up to 30 workspaces.</span></li>
           <li><span class="label">SIZE</span><span>READMEs over 50 KB are cut, and only the first 20 source files are read.</span></li>
           <li><span class="label">SCANS NEVER STORED</span><span>Public repos only. Nothing about a scan is kept after it finishes.</span></li>
